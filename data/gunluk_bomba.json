@@ -1,0 +1,161 @@
+{
+  "tarih": "2026-03-30 18:33",
+  "rejim": {
+    "rejim": "bear",
+    "guven": 70.6,
+    "adx": 35.3,
+    "volatilite": 25.9,
+    "vol_vs_median": 1.47,
+    "sma20_uzaklik": -2.88
+  },
+  "sentiment": 0.1,
+  "bombalar": [
+    {
+      "ticker": "TSKB",
+      "bomba_skor": 58,
+      "sebepler": [
+        "🧠 ML:70% GÜÇLÜ",
+        "⬇️ RSI7:0 AŞIRI SATIM",
+        "🔥 SIKIŞMA",
+        "💎 VOL SIKIŞMA"
+      ],
+      "ml": 0.705,
+      "fiyat": 11.079999923706055,
+      "stop": 6.0
+    },
+    {
+      "ticker": "TKFEN",
+      "bomba_skor": 53,
+      "sebepler": [
+        "🧠 ML:70%",
+        "📊 Hacim x1.8",
+        "🏦 KURUMSAL ALIM",
+        "🚀 İVME DÖNÜŞÜ",
+        "✨ TAM TREND"
+      ],
+      "ml": 0.698,
+      "fiyat": 96.30000305175781,
+      "stop": 8.0
+    },
+    {
+      "ticker": "ISCTR",
+      "bomba_skor": 51,
+      "sebepler": [
+        "🧠 ML:63%",
+        "⬇️ RSI7:9 AŞIRI SATIM",
+        "📉 Boll ALT BAND",
+        "💎 VOL SIKIŞMA"
+      ],
+      "ml": 0.627,
+      "fiyat": 12.9399995803833,
+      "stop": 6.0
+    },
+    {
+      "ticker": "AKSEN",
+      "bomba_skor": 50,
+      "sebepler": [
+        "🧠 ML:77% GÜÇLÜ",
+        "📊 Hacim x1.8",
+        "🚀 İVME DÖNÜŞÜ",
+        "✨ TAM TREND"
+      ],
+      "ml": 0.774,
+      "fiyat": 78.75,
+      "stop": 8.0
+    },
+    {
+      "ticker": "ENJSA",
+      "bomba_skor": 50,
+      "sebepler": [
+        "🧠 ML:71% GÜÇLÜ",
+        "🚀 İVME DÖNÜŞÜ",
+        "✨ TAM TREND"
+      ],
+      "ml": 0.714,
+      "fiyat": 116.19999694824219,
+      "stop": 6.0
+    }
+  ],
+  "tum_skor": [
+    {
+      "ticker": "TSKB",
+      "skor": 58
+    },
+    {
+      "ticker": "TKFEN",
+      "skor": 53
+    },
+    {
+      "ticker": "ISCTR",
+      "skor": 51
+    },
+    {
+      "ticker": "AKSEN",
+      "skor": 50
+    },
+    {
+      "ticker": "ENJSA",
+      "skor": 50
+    },
+    {
+      "ticker": "AYEN",
+      "skor": 50
+    },
+    {
+      "ticker": "GESAN",
+      "skor": 50
+    },
+    {
+      "ticker": "BRISA",
+      "skor": 48
+    },
+    {
+      "ticker": "GARAN",
+      "skor": 46
+    },
+    {
+      "ticker": "SASA",
+      "skor": 46
+    },
+    {
+      "ticker": "HALKB",
+      "skor": 45
+    },
+    {
+      "ticker": "ISGYO",
+      "skor": 41
+    },
+    {
+      "ticker": "KONTR",
+      "skor": 41
+    },
+    {
+      "ticker": "AKBNK",
+      "skor": 38
+    },
+    {
+      "ticker": "NETAS",
+      "skor": 38
+    },
+    {
+      "ticker": "SOKM",
+      "skor": 38
+    },
+    {
+      "ticker": "EKGYO",
+      "skor": 37
+    },
+    {
+      "ticker": "ALBRK",
+      "skor": 36
+    },
+    {
+      "ticker": "OTKAR",
+      "skor": 33
+    },
+    {
+      "ticker": "TTRAK",
+      "skor": 30
+    }
+  ]
+}

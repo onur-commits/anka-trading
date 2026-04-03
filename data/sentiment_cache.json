@@ -1,0 +1,109 @@
+{
+  "genel_sentiment": 0.125,
+  "genel_sinyal": "POZITIF",
+  "hisse_sentiments": {},
+  "son_haberler": [
+    {
+      "baslik": "Elektrik ve doğalgaza zam yapıldı",
+      "aciklama": "Elektrik ve doğalgaz fiyatlarına 4 Nisan 2026 itibarıyla zam geldi.",
+      "tarih": "Fri, 03 Apr 2026 17:33:29 +0000",
+      "kaynak": "www.bloomberght.com",
+      "link": "https://www.bloomberght.com/elektrik-ve-dogalgaza-zam-yapildi-3773760",
+      "sentiment": 0.0,
+      "ilgili_hisseler": [],
+      "sinyal": "⚪"
+    },
+    {
+      "baslik": "Trump'tan savunma için 1,5 trilyon dolarlık bütçe talebi",
+      "aciklama": "Trump yönetimi, 2027 mali yılı bütçe teklifini Kongre'ye sundu. Bütçede savunma harcamaları geçen yıla kıyasla yüzde 42 artırılarak 1,5 trilyon dolara çıkarılırken, savunma dışı harcamalarda 73 milyar dolarlık kesintiye gidildi.",
+      "tarih": "Fri, 03 Apr 2026 16:35:49 +0000",
+      "kaynak": "www.bloomberght.com",
+      "link": "https://www.bloomberght.com/trump-tan-savunma-icin-1-5-trilyon-dolarlik-butce-talebi-3773759",
+      "sentiment": 0.0,
+      "ilgili_hisseler": [],
+      "sinyal": "⚪"
+    },
+    {
+      "baslik": "ABD'de petrol sondaj kulesi sayısı arttı",
+      "aciklama": "ABD'de petrol sondaj kulesi sayısı haftalık bazda artış gösterirken, yıllık bazda düşüşünü sürdürdü. Petrol fiyatları ise yüksek seviyelerini korudu.",
+      "tarih": "Fri, 03 Apr 2026 16:16:50 +0000",
+      "kaynak": "www.bloomberght.com",
+      "link": "https://www.bloomberght.com/abd-de-petrol-sondaj-kulesi-sayisi-artti-3773758",
+      "sentiment": 1.0,
+      "ilgili_hisseler": [],
+      "sinyal": "🟢"
+    },
+    {
+      "baslik": "Erdoğan ile Putin telefon görüşmesi gerçekleştirdi",
+      "aciklama": "Cumhurbaşkanı Erdoğan, Putin ile görüşmesinde İran'a yönelik saldırıları ve karşılıkları tasvip etmediklerini belirterek, tüm taraflara gerilimi tırmandıracak adımlardan kaçınma çağrısı yaptı.",
+      "tarih": "Fri, 03 Apr 2026 16:08:46 +0000",
+      "kaynak": "www.bloomberght.com",
+      "link": "https://www.bloomberght.com/erdogan-ile-putin-telefon-gorusmesi-gerceklestirdi-3773757",
+      "sentiment": 0.0,
+      "ilgili_hisseler": [],
+      "sinyal": "⚪"
+    },
+    {
+      "baslik": "Saldırı sonrası alüminyum devinde toparlanma bir yıl sürecek",
+      "aciklama": "Orta Doğu'nun alüminyum üreticisi Emirates Global Aluminium, İran'ın tesislerine yaptığı saldırının ardından üretimin normale dönmesinin 12 ay sürebileceğini açıkladı.\n\n",
+      "tarih": "Fri, 03 Apr 2026 15:51:28 +0000",
+      "kaynak": "www.bloomberght.com",
+      "link": "https://www.bloomberght.com/saldiri-sonrasi-aluminyum-devinde-toparlanma-bir-yil-surecek-3773754",
+      "sentiment": 1.0,
+      "ilgili_hisseler": [],
+      "sinyal": "🟢"
+    },
+    {
+      "baslik": "OpenAI, teknoloji talk show'u TBPN'yi satın aldı",
+      "aciklama": "OpenAI, popüler teknoloji sektörü talk show'u Technology Business Programming Network'ü satın aldı.",
+      "tarih": "Fri, 03 Apr 2026 15:10:02 +0000",
+      "kaynak": "www.bloomberght.com",
+      "link": "https://www.bloomberght.com/openai-teknoloji-talk-show-u-tbpn-yi-satin-aldi-3773749",
+      "sentiment": 0.0,
+      "ilgili_hisseler": [],
+      "sinyal": "⚪"
+    },
+    {
+      "baslik": "Rekabet Kurulu'ndan Google'a soruşturma",
+      "aciklama": "Rekabet Kurulu, Alphabet Inc, Google Ireland Limited, Google LLC, Google International LLC ve Google Reklamcılık ve Pazarlama Ltd. Şti'den oluşan ekonomik bütünlük hakkında reklam faturalandırma süreçlerine ilişkin soruşturma açılmasına karar verdi.",
+      "tarih": "Fri, 03 Apr 2026 14:31:09 +0000",
+      "kaynak": "www.bloomberght.com",
+      "link": "https://www.bloomberght.com/rekabet-kurulu-ndan-google-a-sorusturma-3773748",
+      "sentiment": 0.0,
+      "ilgili_hisseler": [],
+      "sinyal": "⚪"
+    },
+    {
+      "baslik": "ABD'de hizmet aktivitesi 2023'ten beri ilk kez daraldı",
+      "aciklama": "ABD'de hizmet sektöründeki faaliyetler, İran savaşı sonrasında yeni iş hacminin düşmesiyle Mart ayında üç yıl sonra ilk kez daraldı.",
+      "tarih": "Fri, 03 Apr 2026 14:18:11 +0000",
+      "kaynak": "www.bloomberght.com",
+      "link": "https://www.bloomberght.com/abd-de-hizmet-aktivitesi-2023-ten-beri-ilk-kez-daraldi-3773745",
+      "sentiment": 0.0,
+      "ilgili_hisseler": [],
+      "sinyal": "⚪"
+    },
+    {
+      "baslik": "Dünya Kupası’na yoğun ilgi: Yüzde 90'ı doldu",
+      "aciklama": "2026 FIFA Dünya Kupası’nın turizm sektörü üzerindeki etkilerini Bloomberg HT’ye değerlendiren Pronto Tour Yönetim Kurulu Başkanı Ali Onaran, A milli futbol takımızın kupaya adını yazdırmasının ardından ilk iki günde turların yüzde 90'ının dolduğuna işaret etti. \n\n",
+      "tarih": "Fri, 03 Apr 2026 13:18:52 +0000",
+      "kaynak": "www.bloomberght.com",
+      "link": "https://www.bloomberght.com/dunya-kupasina-yogun-ilgi-yuzde-90-i-doldu-3773741",
+      "sentiment": 0.0,
+      "ilgili_hisseler": [],
+      "sinyal": "⚪"
+    },
+    {
+      "baslik": "ABD'de tarım dışı istihdam Mart'ta beklentileri aştı",
+      "aciklama": "ABD'de İran savaşının gölgesinde tarım dışı istihdam verilerinden güçlü sinyal geldi. ",
+      "tarih": "Fri, 03 Apr 2026 12:37:38 +0000",
+      "kaynak": "www.bloomberght.com",
+      "link": "https://www.bloomberght.com/abd-de-tarim-disi-istihdam-mart-ta-beklentileri-asti-3773739",
+      "sentiment": 1.0,
+      "ilgili_hisseler": [],
+      "sinyal": "🟢"
+    }
+  ],
+  "analiz_zamani": "2026-04-03 21:00",
+  "haber_sayisi": 40
+}

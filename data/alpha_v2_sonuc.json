@@ -1,0 +1,364 @@
+{
+  "zaman": "2026-03-30 11:24",
+  "rejim": {
+    "rejim": "bear",
+    "guven": 70.6,
+    "adx": 35.3,
+    "volatilite": 25.9,
+    "vol_vs_median": 1.47,
+    "sma20_uzaklik": -2.66
+  },
+  "sentiment_genel": -0.08,
+  "islem_sinyalleri": [
+    {
+      "ticker": "TKFEN.IS",
+      "birlesik_skor": 49.0,
+      "ml_olasilik": 0.3937,
+      "teknik_skor": 58.7,
+      "sentiment": 0,
+      "fiyat": 100.30000305175781,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "⬆️ Aşırı Alım",
+        "✨ Tam Trend",
+        "🏦 Kurumsal Alım",
+        "🚀 İvme Artışı"
+      ]
+    },
+    {
+      "ticker": "HALKB.IS",
+      "birlesik_skor": 46.6,
+      "ml_olasilik": 0.6454,
+      "teknik_skor": 28.6,
+      "sentiment": 0,
+      "fiyat": 36.439998626708984,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "⬇️ Aşırı Satım"
+      ]
+    },
+    {
+      "ticker": "ODAS.IS",
+      "birlesik_skor": 44.4,
+      "ml_olasilik": 0.7218,
+      "teknik_skor": 16.7,
+      "sentiment": 0,
+      "fiyat": 5.690000057220459,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "🔨 Hammer"
+      ]
+    },
+    {
+      "ticker": "SASA.IS",
+      "birlesik_skor": 43.9,
+      "ml_olasilik": 0.6672,
+      "teknik_skor": 21.0,
+      "sentiment": 0,
+      "fiyat": 2.3399999141693115,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "🔥 Sıkışma",
+        "🔨 Hammer"
+      ]
+    },
+    {
+      "ticker": "GESAN.IS",
+      "birlesik_skor": 42.6,
+      "ml_olasilik": 0.6009,
+      "teknik_skor": 25.2,
+      "sentiment": 0,
+      "fiyat": 44.540000915527344,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "🔥 Sıkışma"
+      ]
+    },
+    {
+      "ticker": "KONTR.IS",
+      "birlesik_skor": 42.5,
+      "ml_olasilik": 0.6694,
+      "teknik_skor": 18.0,
+      "sentiment": 0,
+      "fiyat": 8.600000381469727,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "🔥 Sıkışma"
+      ]
+    },
+    {
+      "ticker": "KORDS.IS",
+      "birlesik_skor": 41.9,
+      "ml_olasilik": 0.5351,
+      "teknik_skor": 30.3,
+      "sentiment": 0,
+      "fiyat": 56.099998474121094,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "✨ Tam Trend",
+        "🏦 Kurumsal Alım"
+      ]
+    },
+    {
+      "ticker": "SOKM.IS",
+      "birlesik_skor": 40.95,
+      "ml_olasilik": 0.593,
+      "teknik_skor": 31.7,
+      "sentiment": -1.0,
+      "fiyat": 48.31999969482422,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "⬇️ Aşırı Satım"
+      ]
+    },
+    {
+      "ticker": "ENJSA.IS",
+      "birlesik_skor": 35.7,
+      "ml_olasilik": 0.4347,
+      "teknik_skor": 27.9,
+      "sentiment": 0,
+      "fiyat": 118.0999984741211,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "✨ Tam Trend",
+        "🚀 İvme Artışı"
+      ]
+    },
+    {
+      "ticker": "PETKM.IS",
+      "birlesik_skor": 35.2,
+      "ml_olasilik": 0.3224,
+      "teknik_skor": 38.1,
+      "sentiment": 0,
+      "fiyat": 19.90999984741211,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "✨ Tam Trend",
+        "🚀 İvme Artışı"
+      ]
+    },
+    {
+      "ticker": "ULKER.IS",
+      "birlesik_skor": 32.3,
+      "ml_olasilik": 0.2725,
+      "teknik_skor": 37.3,
+      "sentiment": 0,
+      "fiyat": 110.9000015258789,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "🔥 Sıkışma"
+      ]
+    },
+    {
+      "ticker": "OTKAR.IS",
+      "birlesik_skor": 31.8,
+      "ml_olasilik": 0.4555,
+      "teknik_skor": 18.0,
+      "sentiment": 0,
+      "fiyat": 365.75,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "🔥 Sıkışma"
+      ]
+    },
+    {
+      "ticker": "LOGO.IS",
+      "birlesik_skor": 30.1,
+      "ml_olasilik": 0.2704,
+      "teknik_skor": 33.2,
+      "sentiment": 0,
+      "fiyat": 135.0,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "🔥 Sıkışma",
+        "🚀 İvme Artışı"
+      ]
+    },
+    {
+      "ticker": "TCELL.IS",
+      "birlesik_skor": 28.8,
+      "ml_olasilik": 0.1592,
+      "teknik_skor": 41.6,
+      "sentiment": 0,
+      "fiyat": 105.4000015258789,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "🔥 Sıkışma",
+        "🏦 Kurumsal Alım"
+      ]
+    },
+    {
+      "ticker": "YKBNK.IS",
+      "birlesik_skor": 28.5,
+      "ml_olasilik": 0.3273,
+      "teknik_skor": 24.3,
+      "sentiment": 0,
+      "fiyat": 33.08000183105469,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "➖ Bekle"
+      ]
+    },
+    {
+      "ticker": "EGEEN.IS",
+      "birlesik_skor": 28.2,
+      "ml_olasilik": 0.3118,
+      "teknik_skor": 25.3,
+      "sentiment": 0,
+      "fiyat": 5552.5,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "🔥 Sıkışma"
+      ]
+    },
+    {
+      "ticker": "TUPRS.IS",
+      "birlesik_skor": 27.7,
+      "ml_olasilik": 0.2703,
+      "teknik_skor": 28.3,
+      "sentiment": 0,
+      "fiyat": 247.39999389648438,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "✨ Tam Trend"
+      ]
+    },
+    {
+      "ticker": "AKSEN.IS",
+      "birlesik_skor": 27.4,
+      "ml_olasilik": 0.3379,
+      "teknik_skor": 21.0,
+      "sentiment": 0,
+      "fiyat": 71.55000305175781,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "✨ Tam Trend"
+      ]
+    },
+    {
+      "ticker": "ASELS.IS",
+      "birlesik_skor": 27.2,
+      "ml_olasilik": 0.264,
+      "teknik_skor": 28.0,
+      "sentiment": 0,
+      "fiyat": 324.0,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "🔥 Sıkışma",
+        "✨ Tam Trend"
+      ]
+    },
+    {
+      "ticker": "GARAN.IS",
+      "birlesik_skor": 26.8,
+      "ml_olasilik": 0.3718,
+      "teknik_skor": 16.5,
+      "sentiment": 0,
+      "fiyat": 126.0,
+      "risk": {
+        "islem": false,
+        "lot": 0,
+        "stop_loss": 0,
+        "take_profit": 0
+      },
+      "sinyal_ozet": [
+        "➖ Bekle"
+      ]
+    }
+  ]
+}

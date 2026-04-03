@@ -1,0 +1,10 @@
+{
+    "multiplier": 1.0,
+    "regime": "BEAR",
+    "xu100_change": -0.88,
+    "vix": 20.0,
+    "usd_change": 0.0,
+    "dry_run": true,
+    "pos_value": 16000,
+    "last_update": "22:11:39"
+}

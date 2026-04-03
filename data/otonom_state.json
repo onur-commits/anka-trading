@@ -1,0 +1,56 @@
+{
+  "tarih": "2026-04-02",
+  "rejim": {
+    "rejim": "bear",
+    "guven": 63.6,
+    "adx": 31.8,
+    "volatilite": 23.0,
+    "vol_vs_median": 1.31,
+    "sma20_uzaklik": -0.3
+  },
+  "bombalar": [
+    {
+      "ticker": "AYEN",
+      "skor": 60,
+      "ml": 0.786,
+      "fiyat": 36.0,
+      "atr_pct": 5.84
+    },
+    {
+      "ticker": "DOHOL",
+      "skor": 58,
+      "ml": 0.678,
+      "fiyat": 20.799999237060547,
+      "atr_pct": 3.8
+    },
+    {
+      "ticker": "KONTR",
+      "skor": 53,
+      "ml": 0.779,
+      "fiyat": 8.199999809265137,
+      "atr_pct": 4.47
+    },
+    {
+      "ticker": "TUPRS",
+      "skor": 50,
+      "ml": 0.526,
+      "fiyat": 256.5,
+      "atr_pct": 4.32
+    },
+    {
+      "ticker": "KORDS",
+      "skor": 45,
+      "ml": 0.381,
+      "fiyat": 55.900001525878906,
+      "atr_pct": 3.72
+    }
+  ],
+  "aktif_stratejiler": [
+    "AYEN",
+    "DOHOL",
+    "KONTR",
+    "TUPRS",
+    "KORDS"
+  ],
+  "son_guncelleme": "11:01"
+}

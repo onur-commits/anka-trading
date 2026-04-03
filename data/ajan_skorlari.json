@@ -1,0 +1,26 @@
+{
+  "TECHNO": {
+    "dogru": 484,
+    "yanlis": 953,
+    "toplam": 1437,
+    "guven": 33.7
+  },
+  "VOLUME": {
+    "dogru": 506.5,
+    "yanlis": 384.5,
+    "toplam": 1437,
+    "guven": 56.8
+  },
+  "MACRO": {
+    "dogru": 0,
+    "yanlis": 0,
+    "toplam": 0,
+    "guven": 50
+  },
+  "FUNDA": {
+    "dogru": 0,
+    "yanlis": 0,
+    "toplam": 0,
+    "guven": 50
+  }
+}

@@ -1,0 +1,1302 @@
+[
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "🤖 BIST ALPHA V2 — OTONOM TRADER"
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "📅 PROGRAM:"
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "  05:30 → ML model eğitimi"
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "  08:30 → Bomba tarama + IQ kod üretimi"
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "  08:50 → IQ bildirim (kodlar hazır)"
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "  09:35 → Açılış gap kontrolü"
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "  10:00 → İlk yarım saat raporu"
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "  12:00 → Öğlen hacim kontrolü"
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "  12:15 → Strateji güncelleme"
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "  15:00 → İkindi risk kontrolü"
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": "  17:35 → Gün sonu rapor"
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-03-30 18:54:23",
+  "seviye": "BILDIRIM",
+  "mesaj": "Otonom Trader başladı!"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "🤖 BIST ALPHA V2 — OTONOM TRADER"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "📅 PROGRAM:"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "  05:30 → ML model eğitimi"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "  08:30 → Bomba tarama + IQ kod üretimi"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "  08:50 → IQ bildirim (kodlar hazır)"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "  09:35 → Açılış gap kontrolü"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "  10:00 → İlk yarım saat raporu"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "  12:00 → Öğlen hacim kontrolü"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "  12:15 → Strateji güncelleme"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "  15:00 → İkindi risk kontrolü"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": "  17:35 → Gün sonu rapor"
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-03-30 18:58:45",
+  "seviye": "BILDIRIM",
+  "mesaj": "Otonom Trader başladı!"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "🤖 BIST ALPHA V2 — OTONOM TRADER"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "📅 PROGRAM:"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "  05:30 → ML model eğitimi"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "  08:30 → Bomba tarama + IQ kod üretimi"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "  08:50 → IQ bildirim (kodlar hazır)"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "  09:35 → Açılış gap kontrolü"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "  10:00 → İlk yarım saat raporu"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "  12:00 → Öğlen hacim kontrolü"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "  12:15 → Strateji güncelleme"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "  15:00 → İkindi risk kontrolü"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": "  17:35 → Gün sonu rapor"
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-03-30 23:28:10",
+  "seviye": "BILDIRIM",
+  "mesaj": "Otonom Trader başladı!"
+ },
+ {
+  "zaman": "2026-03-31 05:30:13",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-03-31 05:30:13",
+  "seviye": "INFO",
+  "mesaj": "🧠 [05:30] ML MODEL EĞİTİMİ"
+ },
+ {
+  "zaman": "2026-03-31 05:30:35",
+  "seviye": "INFO",
+  "mesaj": "  52 hisse (2 yıl)"
+ },
+ {
+  "zaman": "2026-03-31 05:30:42",
+  "seviye": "INFO",
+  "mesaj": "  ✅ AUC:0.5805 F1:0.6631"
+ },
+ {
+  "zaman": "2026-03-31 05:30:42",
+  "seviye": "BILDIRIM",
+  "mesaj": "ML güncellendi — AUC:0.5805"
+ },
+ {
+  "zaman": "2026-03-31 08:30:15",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-03-31 08:30:15",
+  "seviye": "INFO",
+  "mesaj": "🔥 [08:30] SABAH BOMBA TARAMASI"
+ },
+ {
+  "zaman": "2026-03-31 08:30:32",
+  "seviye": "INFO",
+  "mesaj": "  53 hisse"
+ },
+ {
+  "zaman": "2026-03-31 08:30:32",
+  "seviye": "INFO",
+  "mesaj": "  Piyasa: BEAR ADX:35.3"
+ },
+ {
+  "zaman": "2026-03-31 08:30:34",
+  "seviye": "INFO",
+  "mesaj": "  💣 TKFEN Skor:60 ML:72% Fiyat:96.30"
+ },
+ {
+  "zaman": "2026-03-31 08:30:34",
+  "seviye": "INFO",
+  "mesaj": "  💣 SASA Skor:46 ML:67% Fiyat:2.33"
+ },
+ {
+  "zaman": "2026-03-31 08:30:34",
+  "seviye": "INFO",
+  "mesaj": "  💣 ISCTR Skor:43 ML:53% Fiyat:12.94"
+ },
+ {
+  "zaman": "2026-03-31 08:30:34",
+  "seviye": "INFO",
+  "mesaj": "  💣 AKSEN Skor:43 ML:64% Fiyat:78.75"
+ },
+ {
+  "zaman": "2026-03-31 08:30:34",
+  "seviye": "INFO",
+  "mesaj": "  💣 AYEN Skor:43 ML:62% Fiyat:30.54"
+ },
+ {
+  "zaman": "2026-03-31 08:30:34",
+  "seviye": "INFO",
+  "mesaj": "  📝 aktif_bombalar.txt → TKFEN,SASA,ISCTR,AKSEN,AYEN"
+ },
+ {
+  "zaman": "2026-03-31 08:30:34",
+  "seviye": "BILDIRIM",
+  "mesaj": "Bombalar: TKFEN, SASA, ISCTR, AKSEN, AYEN"
+ },
+ {
+  "zaman": "2026-03-31 08:50:05",
+  "seviye": "INFO",
+  "mesaj": "🤖 [08:50] IQ KONTROL"
+ },
+ {
+  "zaman": "2026-03-31 08:50:06",
+  "seviye": "INFO",
+  "mesaj": "  ✅ IQ çalışıyor, 4/10 strateji log'u var"
+ },
+ {
+  "zaman": "2026-03-31 09:35:06",
+  "seviye": "INFO",
+  "mesaj": "📊 [09:35] AÇILIŞ KONTROLÜ"
+ },
+ {
+  "zaman": "2026-03-31 09:35:07",
+  "seviye": "INFO",
+  "mesaj": "  ⚪ TKFEN: Gap -0.2% | Hareket -2.0% | Son:96.30"
+ },
+ {
+  "zaman": "2026-03-31 09:35:07",
+  "seviye": "INFO",
+  "mesaj": "  🟢 SASA: Gap +0.9% | Hareket -0.9% | Son:2.33"
+ },
+ {
+  "zaman": "2026-03-31 09:35:07",
+  "seviye": "INFO",
+  "mesaj": "  ⚪ ISCTR: Gap -0.2% | Hareket -1.4% | Son:12.96"
+ },
+ {
+  "zaman": "2026-03-31 09:35:07",
+  "seviye": "INFO",
+  "mesaj": "  ⚪ AKSEN: Gap +0.2% | Hareket +9.8% | Son:78.75"
+ },
+ {
+  "zaman": "2026-03-31 09:35:08",
+  "seviye": "INFO",
+  "mesaj": "  ⚪ AYEN: Gap -0.2% | Hareket +8.6% | Son:30.54"
+ },
+ {
+  "zaman": "2026-03-31 09:35:08",
+  "seviye": "INFO",
+  "mesaj": "  XU100: 12643 (-0.4%)"
+ },
+ {
+  "zaman": "2026-03-31 10:00:08",
+  "seviye": "INFO",
+  "mesaj": "📈 [10:00] İLK YARIM SAAT"
+ },
+ {
+  "zaman": "2026-03-31 12:00:11",
+  "seviye": "INFO",
+  "mesaj": "📊 [12:00] ÖĞLEN KONTROLÜ"
+ },
+ {
+  "zaman": "2026-03-31 12:00:11",
+  "seviye": "INFO",
+  "mesaj": "  TKFEN: 99.80 (+3.6%) Hacim:x0.4"
+ },
+ {
+  "zaman": "2026-03-31 12:00:11",
+  "seviye": "INFO",
+  "mesaj": "  SASA: 2.34 (+0.4%) Hacim:x1.3"
+ },
+ {
+  "zaman": "2026-03-31 12:00:12",
+  "seviye": "INFO",
+  "mesaj": "  ISCTR: 13.17 (+1.8%) Hacim:x0.4"
+ },
+ {
+  "zaman": "2026-03-31 12:00:12",
+  "seviye": "INFO",
+  "mesaj": "  AKSEN: 77.65 (-1.4%) Hacim:x0.5"
+ },
+ {
+  "zaman": "2026-03-31 12:00:12",
+  "seviye": "INFO",
+  "mesaj": "  AYEN: 32.58 (+6.7%) Hacim:x2.7"
+ },
+ {
+  "zaman": "2026-03-31 12:15:12",
+  "seviye": "INFO",
+  "mesaj": "🔄 [12:15] STRATEJİ GÜNCELLEME"
+ },
+ {
+  "zaman": "2026-03-31 12:15:32",
+  "seviye": "INFO",
+  "mesaj": "  ✅ Değişiklik yok"
+ },
+ {
+  "zaman": "2026-03-31 15:00:04",
+  "seviye": "INFO",
+  "mesaj": "⚖️ [15:00] İKİNDİ RİSK"
+ },
+ {
+  "zaman": "2026-03-31 15:00:04",
+  "seviye": "INFO",
+  "mesaj": "  XU100: 12724 (+0.8%)"
+ },
+ {
+  "zaman": "2026-03-31 15:00:04",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_TKFEN: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-03-31 15:00:04",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_SASA: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-03-31 15:00:05",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_ISCTR: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-03-31 15:00:05",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_AKSEN: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-03-31 15:00:05",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_AYEN: ✅ Aktif"
+ },
+ {
+  "zaman": "2026-03-31 17:35:06",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-03-31 17:35:06",
+  "seviye": "INFO",
+  "mesaj": "📝 [17:35] GÜN SONU RAPORU"
+ },
+ {
+  "zaman": "2026-03-31 17:35:07",
+  "seviye": "INFO",
+  "mesaj": "📊 31.03.2026 Raporu\nPiyasa: BEAR\n  TKFEN: 98.35 (+2.1%) Skor:60\n  SASA: 2.33 (+0.0%) Skor:46\n  ISCTR: 13.16 (+1.7%) Skor:43\n  AKSEN: 77.20 (-2.0%) Skor:43\n  AYEN: 32.66 (+6.9%) Skor:43"
+ },
+ {
+  "zaman": "2026-03-31 17:35:07",
+  "seviye": "BILDIRIM",
+  "mesaj": "Gün sonu rapor hazır"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "🤖 BIST ALPHA V2 — OTONOM TRADER"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "📅 PROGRAM:"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "  05:30 → ML model eğitimi"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "  08:30 → Bomba tarama + IQ kod üretimi"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "  08:50 → IQ bildirim (kodlar hazır)"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "  09:35 → Açılış gap kontrolü"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "  10:00 → İlk yarım saat raporu"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "  12:00 → Öğlen hacim kontrolü"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "  12:15 → Strateji güncelleme"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "  15:00 → İkindi risk kontrolü"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": "  17:35 → Gün sonu rapor"
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-04-01 10:45:27",
+  "seviye": "BILDIRIM",
+  "mesaj": "Otonom Trader başladı!"
+ },
+ {
+  "zaman": "2026-04-01 10:45:34",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-01 10:45:34",
+  "seviye": "INFO",
+  "mesaj": "🔥 [08:30] SABAH BOMBA TARAMASI"
+ },
+ {
+  "zaman": "2026-04-01 10:46:21",
+  "seviye": "INFO",
+  "mesaj": "  52 hisse"
+ },
+ {
+  "zaman": "2026-04-01 10:46:21",
+  "seviye": "INFO",
+  "mesaj": "  Piyasa: BEAR ADX:33.3"
+ },
+ {
+  "zaman": "2026-04-01 10:46:24",
+  "seviye": "INFO",
+  "mesaj": "  💣 AYEN Skor:55 ML:78% Fiyat:32.70"
+ },
+ {
+  "zaman": "2026-04-01 10:46:24",
+  "seviye": "INFO",
+  "mesaj": "  💣 KONTR Skor:53 ML:75% Fiyat:8.78"
+ },
+ {
+  "zaman": "2026-04-01 10:46:24",
+  "seviye": "INFO",
+  "mesaj": "  💣 EREGL Skor:48 ML:63% Fiyat:28.90"
+ },
+ {
+  "zaman": "2026-04-01 10:46:24",
+  "seviye": "INFO",
+  "mesaj": "  💣 SASA Skor:46 ML:51% Fiyat:2.37"
+ },
+ {
+  "zaman": "2026-04-01 10:46:24",
+  "seviye": "INFO",
+  "mesaj": "  💣 GESAN Skor:41 ML:61% Fiyat:46.26"
+ },
+ {
+  "zaman": "2026-04-01 10:46:24",
+  "seviye": "INFO",
+  "mesaj": "  📝 aktif_bombalar.txt → AYEN,KONTR,EREGL,SASA,GESAN"
+ },
+ {
+  "zaman": "2026-04-01 10:46:24",
+  "seviye": "BILDIRIM",
+  "mesaj": "Bombalar: AYEN, KONTR, EREGL, SASA, GESAN"
+ },
+ {
+  "zaman": "2026-04-01 12:00:28",
+  "seviye": "INFO",
+  "mesaj": "📊 [12:00] ÖĞLEN KONTROLÜ"
+ },
+ {
+  "zaman": "2026-04-01 12:00:29",
+  "seviye": "INFO",
+  "mesaj": "  AYEN: 32.44 (-3.4%) Hacim:x0.9"
+ },
+ {
+  "zaman": "2026-04-01 12:00:30",
+  "seviye": "INFO",
+  "mesaj": "  KONTR: 8.78 (+1.9%) Hacim:x0.3"
+ },
+ {
+  "zaman": "2026-04-01 12:00:30",
+  "seviye": "INFO",
+  "mesaj": "  EREGL: 29.00 (+2.8%) Hacim:x0.4"
+ },
+ {
+  "zaman": "2026-04-01 12:00:31",
+  "seviye": "INFO",
+  "mesaj": "  SASA: 2.37 (+1.3%) Hacim:x1.3"
+ },
+ {
+  "zaman": "2026-04-01 12:00:31",
+  "seviye": "INFO",
+  "mesaj": "  GESAN: 45.82 (-0.2%) Hacim:x0.3"
+ },
+ {
+  "zaman": "2026-04-01 12:15:01",
+  "seviye": "INFO",
+  "mesaj": "🔄 [12:15] STRATEJİ GÜNCELLEME"
+ },
+ {
+  "zaman": "2026-04-01 12:15:41",
+  "seviye": "INFO",
+  "mesaj": "  ✅ Değişiklik yok"
+ },
+ {
+  "zaman": "2026-04-01 15:00:13",
+  "seviye": "INFO",
+  "mesaj": "⚖️ [15:00] İKİNDİ RİSK"
+ },
+ {
+  "zaman": "2026-04-01 15:00:13",
+  "seviye": "INFO",
+  "mesaj": "  XU100: 12928 (+1.1%)"
+ },
+ {
+  "zaman": "2026-04-01 15:00:13",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_AYEN: ✅ Aktif"
+ },
+ {
+  "zaman": "2026-04-01 15:00:14",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_KONTR: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-01 15:00:14",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_EREGL: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-01 15:00:14",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_SASA: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-01 15:00:14",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_GESAN: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-01 16:35:50",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-01 16:35:50",
+  "seviye": "INFO",
+  "mesaj": "🔥 [08:30] SABAH BOMBA TARAMASI"
+ },
+ {
+  "zaman": "2026-04-01 16:36:30",
+  "seviye": "INFO",
+  "mesaj": "  53 hisse"
+ },
+ {
+  "zaman": "2026-04-01 16:36:30",
+  "seviye": "INFO",
+  "mesaj": "  Piyasa: BEAR ADX:33.3"
+ },
+ {
+  "zaman": "2026-04-01 16:36:33",
+  "seviye": "INFO",
+  "mesaj": "  💣 AYEN Skor:60 ML:70% Fiyat:32.96"
+ },
+ {
+  "zaman": "2026-04-01 16:36:33",
+  "seviye": "INFO",
+  "mesaj": "  💣 SASA Skor:56 ML:61% Fiyat:2.36"
+ },
+ {
+  "zaman": "2026-04-01 16:36:33",
+  "seviye": "INFO",
+  "mesaj": "  💣 AKSEN Skor:55 ML:73% Fiyat:78.80"
+ },
+ {
+  "zaman": "2026-04-01 16:36:33",
+  "seviye": "INFO",
+  "mesaj": "  💣 OTKAR Skor:53 ML:72% Fiyat:369.50"
+ },
+ {
+  "zaman": "2026-04-01 16:36:33",
+  "seviye": "INFO",
+  "mesaj": "  💣 KONTR Skor:53 ML:72% Fiyat:8.78"
+ },
+ {
+  "zaman": "2026-04-01 16:36:33",
+  "seviye": "INFO",
+  "mesaj": "  📝 aktif_bombalar.txt → AYEN,SASA,AKSEN,OTKAR,KONTR"
+ },
+ {
+  "zaman": "2026-04-01 16:36:33",
+  "seviye": "BILDIRIM",
+  "mesaj": "Bombalar: AYEN, SASA, AKSEN, OTKAR, KONTR"
+ },
+ {
+  "zaman": "2026-04-01 17:35:15",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-01 17:35:15",
+  "seviye": "INFO",
+  "mesaj": "📝 [17:35] GÜN SONU RAPORU"
+ },
+ {
+  "zaman": "2026-04-01 17:35:18",
+  "seviye": "INFO",
+  "mesaj": "📊 01.04.2026 Raporu\nPiyasa: BEAR\n  AYEN: 32.88 (-2.1%) Skor:60\n  SASA: 2.37 (+1.3%) Skor:56\n  AKSEN: 78.80 (+2.2%) Skor:55\n  OTKAR: 369.00 (+1.4%) Skor:53\n  KONTR: 8.84 (+2.6%) Skor:53"
+ },
+ {
+  "zaman": "2026-04-01 17:35:18",
+  "seviye": "BILDIRIM",
+  "mesaj": "Gün sonu rapor hazır"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "🤖 BIST ALPHA V2 — OTONOM TRADER"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "📅 PROGRAM:"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "  05:30 → ML model eğitimi"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "  08:30 → Bomba tarama + IQ kod üretimi"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "  08:50 → IQ bildirim (kodlar hazır)"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "  09:35 → Açılış gap kontrolü"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "  10:00 → İlk yarım saat raporu"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "  12:00 → Öğlen hacim kontrolü"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "  12:15 → Strateji güncelleme"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "  15:00 → İkindi risk kontrolü"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": "  17:35 → Gün sonu rapor"
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-04-02 03:06:09",
+  "seviye": "BILDIRIM",
+  "mesaj": "Otonom Trader başladı!"
+ },
+ {
+  "zaman": "2026-04-02 05:30:11",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-02 05:30:11",
+  "seviye": "INFO",
+  "mesaj": "🧠 [05:30] ML MODEL EĞİTİMİ"
+ },
+ {
+  "zaman": "2026-04-02 05:30:46",
+  "seviye": "INFO",
+  "mesaj": "  52 hisse (2 yıl)"
+ },
+ {
+  "zaman": "2026-04-02 05:30:54",
+  "seviye": "INFO",
+  "mesaj": "  ✅ AUC:0.5892 F1:0.6844"
+ },
+ {
+  "zaman": "2026-04-02 05:30:54",
+  "seviye": "BILDIRIM",
+  "mesaj": "ML güncellendi — AUC:0.5892"
+ },
+ {
+  "zaman": "2026-04-02 08:30:26",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-02 08:30:26",
+  "seviye": "INFO",
+  "mesaj": "🔥 [08:30] SABAH BOMBA TARAMASI"
+ },
+ {
+  "zaman": "2026-04-02 08:31:10",
+  "seviye": "INFO",
+  "mesaj": "  53 hisse"
+ },
+ {
+  "zaman": "2026-04-02 08:31:10",
+  "seviye": "INFO",
+  "mesaj": "  Piyasa: BEAR ADX:33.3"
+ },
+ {
+  "zaman": "2026-04-02 08:31:13",
+  "seviye": "INFO",
+  "mesaj": "  💣 AYEN Skor:53 ML:62% Fiyat:33.08"
+ },
+ {
+  "zaman": "2026-04-02 08:31:13",
+  "seviye": "INFO",
+  "mesaj": "  💣 TUPRS Skor:51 ML:61% Fiyat:253.75"
+ },
+ {
+  "zaman": "2026-04-02 08:31:13",
+  "seviye": "INFO",
+  "mesaj": "  💣 AKSEN Skor:48 ML:68% Fiyat:78.50"
+ },
+ {
+  "zaman": "2026-04-02 08:31:13",
+  "seviye": "INFO",
+  "mesaj": "  💣 PETKM Skor:43 ML:62% Fiyat:20.34"
+ },
+ {
+  "zaman": "2026-04-02 08:31:13",
+  "seviye": "INFO",
+  "mesaj": "  💣 BRISA Skor:41 ML:61% Fiyat:83.55"
+ },
+ {
+  "zaman": "2026-04-02 08:31:13",
+  "seviye": "INFO",
+  "mesaj": "  📝 aktif_bombalar.txt → AYEN,TUPRS,AKSEN,PETKM,BRISA"
+ },
+ {
+  "zaman": "2026-04-02 08:31:13",
+  "seviye": "BILDIRIM",
+  "mesaj": "Bombalar: AYEN, TUPRS, AKSEN, PETKM, BRISA"
+ },
+ {
+  "zaman": "2026-04-02 08:50:14",
+  "seviye": "INFO",
+  "mesaj": "🤖 [08:50] IQ KONTROL"
+ },
+ {
+  "zaman": "2026-04-02 08:50:15",
+  "seviye": "INFO",
+  "mesaj": "  ✅ IQ çalışıyor, 6/10 strateji log'u var"
+ },
+ {
+  "zaman": "2026-04-02 09:35:15",
+  "seviye": "INFO",
+  "mesaj": "📊 [09:35] AÇILIŞ KONTROLÜ"
+ },
+ {
+  "zaman": "2026-04-02 09:35:16",
+  "seviye": "INFO",
+  "mesaj": "  🟢 AYEN: Gap +2.6% | Hareket -3.9% | Son:33.10"
+ },
+ {
+  "zaman": "2026-04-02 09:35:17",
+  "seviye": "INFO",
+  "mesaj": "  🔴 TUPRS: Gap -2.1% | Hareket -0.1% | Son:253.00"
+ },
+ {
+  "zaman": "2026-04-02 09:35:17",
+  "seviye": "INFO",
+  "mesaj": "  🟢 AKSEN: Gap +1.0% | Hareket +0.7% | Son:78.55"
+ },
+ {
+  "zaman": "2026-04-02 09:35:18",
+  "seviye": "INFO",
+  "mesaj": "  🔴 PETKM: Gap -2.3% | Hareket -1.6% | Son:20.26"
+ },
+ {
+  "zaman": "2026-04-02 09:35:18",
+  "seviye": "INFO",
+  "mesaj": "  🟢 BRISA: Gap +1.5% | Hareket -0.3% | Son:83.55"
+ },
+ {
+  "zaman": "2026-04-02 09:35:19",
+  "seviye": "INFO",
+  "mesaj": "  XU100: 12954 (+1.3%)"
+ },
+ {
+  "zaman": "2026-04-02 10:00:19",
+  "seviye": "INFO",
+  "mesaj": "📈 [10:00] İLK YARIM SAAT"
+ },
+ {
+  "zaman": "2026-04-02 11:01:08",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-02 11:01:08",
+  "seviye": "INFO",
+  "mesaj": "🔥 [08:30] SABAH BOMBA TARAMASI"
+ },
+ {
+  "zaman": "2026-04-02 11:01:43",
+  "seviye": "INFO",
+  "mesaj": "  53 hisse"
+ },
+ {
+  "zaman": "2026-04-02 11:01:43",
+  "seviye": "INFO",
+  "mesaj": "  Piyasa: BEAR ADX:31.8"
+ },
+ {
+  "zaman": "2026-04-02 11:01:46",
+  "seviye": "INFO",
+  "mesaj": "  💣 AYEN Skor:60 ML:79% Fiyat:36.00"
+ },
+ {
+  "zaman": "2026-04-02 11:01:46",
+  "seviye": "INFO",
+  "mesaj": "  💣 DOHOL Skor:58 ML:68% Fiyat:20.80"
+ },
+ {
+  "zaman": "2026-04-02 11:01:46",
+  "seviye": "INFO",
+  "mesaj": "  💣 KONTR Skor:53 ML:78% Fiyat:8.20"
+ },
+ {
+  "zaman": "2026-04-02 11:01:46",
+  "seviye": "INFO",
+  "mesaj": "  💣 TUPRS Skor:50 ML:53% Fiyat:256.50"
+ },
+ {
+  "zaman": "2026-04-02 11:01:46",
+  "seviye": "INFO",
+  "mesaj": "  💣 KORDS Skor:45 ML:38% Fiyat:55.90"
+ },
+ {
+  "zaman": "2026-04-02 11:01:46",
+  "seviye": "INFO",
+  "mesaj": "  📝 aktif_bombalar.txt → AYEN,DOHOL,KONTR,TUPRS,KORDS"
+ },
+ {
+  "zaman": "2026-04-02 11:01:46",
+  "seviye": "BILDIRIM",
+  "mesaj": "Bombalar: AYEN, DOHOL, KONTR, TUPRS, KORDS"
+ },
+ {
+  "zaman": "2026-04-02 12:00:23",
+  "seviye": "INFO",
+  "mesaj": "📊 [12:00] ÖĞLEN KONTROLÜ"
+ },
+ {
+  "zaman": "2026-04-02 12:00:23",
+  "seviye": "INFO",
+  "mesaj": "  AYEN: 36.38 (+10.0%) Hacim:x1.4"
+ },
+ {
+  "zaman": "2026-04-02 12:00:24",
+  "seviye": "INFO",
+  "mesaj": "  DOHOL: 20.48 (-0.6%) Hacim:x3.4"
+ },
+ {
+  "zaman": "2026-04-02 12:00:24",
+  "seviye": "BILDIRIM",
+  "mesaj": "📊 DOHOL hacim patlaması x3.4!"
+ },
+ {
+  "zaman": "2026-04-02 12:00:24",
+  "seviye": "INFO",
+  "mesaj": "  KONTR: 8.15 (-5.7%) Hacim:x1.1"
+ },
+ {
+  "zaman": "2026-04-02 12:00:24",
+  "seviye": "BILDIRIM",
+  "mesaj": "⚠️ KONTR -%5.7 düşüş!"
+ },
+ {
+  "zaman": "2026-04-02 12:00:25",
+  "seviye": "INFO",
+  "mesaj": "  TUPRS: 257.75 (+1.6%) Hacim:x0.3"
+ },
+ {
+  "zaman": "2026-04-02 12:00:26",
+  "seviye": "INFO",
+  "mesaj": "  KORDS: 55.60 (-0.7%) Hacim:x0.1"
+ },
+ {
+  "zaman": "2026-04-02 12:15:26",
+  "seviye": "INFO",
+  "mesaj": "🔄 [12:15] STRATEJİ GÜNCELLEME"
+ },
+ {
+  "zaman": "2026-04-02 12:15:57",
+  "seviye": "INFO",
+  "mesaj": "  ✅ Değişiklik yok"
+ },
+ {
+  "zaman": "2026-04-02 15:00:28",
+  "seviye": "INFO",
+  "mesaj": "⚖️ [15:00] İKİNDİ RİSK"
+ },
+ {
+  "zaman": "2026-04-02 15:00:28",
+  "seviye": "INFO",
+  "mesaj": "  XU100: 12943 (+0.0%)"
+ },
+ {
+  "zaman": "2026-04-02 15:00:28",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_AYEN: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-02 15:00:28",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_DOHOL: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-02 15:00:29",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_KONTR: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-02 15:00:29",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_TUPRS: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-02 15:00:29",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_KORDS: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-02 17:35:00",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-02 17:35:00",
+  "seviye": "INFO",
+  "mesaj": "📝 [17:35] GÜN SONU RAPORU"
+ },
+ {
+  "zaman": "2026-04-02 17:35:03",
+  "seviye": "INFO",
+  "mesaj": "📊 02.04.2026 Raporu\nPiyasa: BEAR\n  AYEN: 36.38 (+10.0%) Skor:60\n  DOHOL: 19.96 (-3.1%) Skor:58\n  KONTR: 8.09 (-6.4%) Skor:53\n  TUPRS: 257.00 (+1.3%) Skor:50\n  KORDS: 56.85 (+1.5%) Skor:45"
+ },
+ {
+  "zaman": "2026-04-02 17:35:03",
+  "seviye": "BILDIRIM",
+  "mesaj": "Gün sonu rapor hazır"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "🤖 BIST ALPHA V2 — OTONOM TRADER"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "📅 PROGRAM:"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "  05:30 → ML model eğitimi"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "  08:30 → Bomba tarama + IQ kod üretimi"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "  08:50 → IQ bildirim (kodlar hazır)"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "  09:35 → Açılış gap kontrolü"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "  10:00 → İlk yarım saat raporu"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "  12:00 → Öğlen hacim kontrolü"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "  12:15 → Strateji güncelleme"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "  15:00 → İkindi risk kontrolü"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": "  17:35 → Gün sonu rapor"
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-04-03 09:41:59",
+  "seviye": "BILDIRIM",
+  "mesaj": "Otonom Trader başladı!"
+ },
+ {
+  "zaman": "2026-04-03 10:00:00",
+  "seviye": "INFO",
+  "mesaj": "📈 [10:00] İLK YARIM SAAT"
+ },
+ {
+  "zaman": "2026-04-03 12:00:03",
+  "seviye": "INFO",
+  "mesaj": "📊 [12:00] ÖĞLEN KONTROLÜ"
+ },
+ {
+  "zaman": "2026-04-03 12:00:03",
+  "seviye": "INFO",
+  "mesaj": "  AYEN: 38.00 (+4.5%) Hacim:x1.1"
+ },
+ {
+  "zaman": "2026-04-03 12:00:04",
+  "seviye": "INFO",
+  "mesaj": "  DOHOL: 19.83 (+0.2%) Hacim:x0.1"
+ },
+ {
+  "zaman": "2026-04-03 12:00:04",
+  "seviye": "INFO",
+  "mesaj": "  KONTR: 8.04 (-0.6%) Hacim:x0.3"
+ },
+ {
+  "zaman": "2026-04-03 12:00:04",
+  "seviye": "INFO",
+  "mesaj": "  TUPRS: 258.00 (+0.8%) Hacim:x0.2"
+ },
+ {
+  "zaman": "2026-04-03 12:00:05",
+  "seviye": "INFO",
+  "mesaj": "  KORDS: 58.65 (-1.2%) Hacim:x0.5"
+ },
+ {
+  "zaman": "2026-04-03 12:15:05",
+  "seviye": "INFO",
+  "mesaj": "🔄 [12:15] STRATEJİ GÜNCELLEME"
+ },
+ {
+  "zaman": "2026-04-03 12:15:28",
+  "seviye": "INFO",
+  "mesaj": "  ✅ Değişiklik yok"
+ },
+ {
+  "zaman": "2026-04-03 15:00:00",
+  "seviye": "INFO",
+  "mesaj": "⚖️ [15:00] İKİNDİ RİSK"
+ },
+ {
+  "zaman": "2026-04-03 15:00:00",
+  "seviye": "INFO",
+  "mesaj": "  XU100: 12994 (-0.4%)"
+ },
+ {
+  "zaman": "2026-04-03 15:00:00",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_AYEN: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-03 15:00:00",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_DOHOL: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-03 15:00:00",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_KONTR: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-03 15:00:01",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_TUPRS: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-03 15:00:01",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_KORDS: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-03 17:35:02",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-03 17:35:02",
+  "seviye": "INFO",
+  "mesaj": "📝 [17:35] GÜN SONU RAPORU"
+ },
+ {
+  "zaman": "2026-04-03 17:35:03",
+  "seviye": "INFO",
+  "mesaj": "📊 03.04.2026 Raporu\nPiyasa: BEAR\n  AYEN: 37.18 (+2.2%) Skor:60\n  DOHOL: 19.65 (-0.8%) Skor:58\n  KONTR: 7.81 (-3.5%) Skor:53\n  TUPRS: 256.25 (+0.1%) Skor:50\n  KORDS: 58.65 (-1.2%) Skor:45"
+ },
+ {
+  "zaman": "2026-04-03 17:35:03",
+  "seviye": "BILDIRIM",
+  "mesaj": "Gün sonu rapor hazır"
+ }
+]

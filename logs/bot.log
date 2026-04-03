@@ -1,0 +1,182 @@
+2026-04-01 17:17:57,748 [INFO] 🤖 BIST Sürpriz Bot başlatıldı!
+2026-04-01 17:17:57,748 [INFO]    Tarama aralığı: 15 dk
+2026-04-01 17:17:57,748 [INFO]    Min sürpriz skor: 65.0
+2026-04-01 17:17:57,748 [INFO]    Hisse sayısı: 50
+2026-04-01 17:18:09,711 [INFO] ==================================================
+2026-04-01 17:18:09,736 [INFO] TAM TARAMA BAŞLADI - 2026-04-01 17:18:09
+2026-04-01 17:18:09,737 [INFO] ==================================================
+2026-04-01 17:18:09,737 [INFO] Veri çekiliyor... (50 hisse)
+2026-04-01 17:18:46,341 [INFO] 50 hisse verisi alındı
+2026-04-01 17:18:46,342 [INFO] ML modeli eğitiliyor...
+2026-04-01 17:18:47,245 [INFO] Hisseler taranıyor...
+2026-04-01 17:18:47,522 [INFO] 🎯 29 sinyal tespit edildi!
+2026-04-01 17:18:59,906 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '🚨 BIST SÜRPRIZ\n\n==============================\n💎 SOKM - Şok Marketler\n📊 Sürpriz Skoru: 82/100\n📈 Fiya']' timed out after 10 seconds
+2026-04-01 17:18:59,990 [INFO] SİNYAL: SOKM skor=82
+2026-04-01 17:19:12,345 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '🚨 BIST SÜRPRIZ\n\n==============================\n💎 ULKER - Ülker\n📊 Sürpriz Skoru: 81/100\n📈 Fiyat: 116.']' timed out after 10 seconds
+2026-04-01 17:19:12,427 [INFO] SİNYAL: ULKER skor=81
+2026-04-01 17:19:24,783 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 AKSEN - Aksa Enerji\n📊 Sürpriz Skoru: 79/100\n📈 Fiyat: 78']' timed out after 10 seconds
+2026-04-01 17:19:24,865 [INFO] SİNYAL: AKSEN skor=79
+2026-04-01 17:19:37,229 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 TCELL - Turkcell\n📊 Sürpriz Skoru: 79/100\n📈 Fiyat: 107.1']' timed out after 10 seconds
+2026-04-01 17:19:37,366 [INFO] SİNYAL: TCELL skor=79
+2026-04-01 17:19:49,724 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 PGSUS - Pegasus\n📊 Sürpriz Skoru: 77/100\n📈 Fiyat: 179.50']' timed out after 10 seconds
+2026-04-01 17:19:49,807 [INFO] SİNYAL: PGSUS skor=77
+2026-04-01 17:20:02,177 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 TUPRS - Tüpraş\n📊 Sürpriz Skoru: 76/100\n📈 Fiyat: 253.00 ']' timed out after 10 seconds
+2026-04-01 17:20:02,257 [INFO] SİNYAL: TUPRS skor=76
+2026-04-01 17:20:14,609 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 VAKBN - Vakıfbank\n📊 Sürpriz Skoru: 76/100\n📈 Fiyat: 31.1']' timed out after 10 seconds
+2026-04-01 17:20:14,690 [INFO] SİNYAL: VAKBN skor=76
+2026-04-01 17:20:27,048 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 ALARK - Alarko Holding\n📊 Sürpriz Skoru: 76/100\n📈 Fiyat:']' timed out after 10 seconds
+2026-04-01 17:20:27,135 [INFO] SİNYAL: ALARK skor=76
+2026-04-01 17:20:39,497 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 TAVHL - TAV Havalimanları\n📊 Sürpriz Skoru: 75/100\n📈 Fiy']' timed out after 10 seconds
+2026-04-01 17:20:39,581 [INFO] SİNYAL: TAVHL skor=75
+2026-04-01 17:20:51,435 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 YKBNK - Yapı Kredi\n📊 Sürpriz Skoru: 75/100\n📈 Fiyat: 34.']' timed out after 10 seconds
+2026-04-01 17:20:51,515 [INFO] SİNYAL: YKBNK skor=75
+2026-04-01 17:21:03,877 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 AGHOL - Anadolu Grubu\n📊 Sürpriz Skoru: 75/100\n📈 Fiyat: ']' timed out after 10 seconds
+2026-04-01 17:21:03,960 [INFO] SİNYAL: AGHOL skor=75
+2026-04-01 17:21:16,321 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 EKGYO - Emlak Konut GYO\n📊 Sürpriz Skoru: 75/100\n📈 Fiyat']' timed out after 10 seconds
+2026-04-01 17:21:16,406 [INFO] SİNYAL: EKGYO skor=75
+2026-04-01 17:21:28,771 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 KORDS - Kordsa\n📊 Sürpriz Skoru: 74/100\n📈 Fiyat: 56.00 T']' timed out after 10 seconds
+2026-04-01 17:21:28,855 [INFO] SİNYAL: KORDS skor=74
+2026-04-01 17:21:41,212 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 ISCTR - İş Bankası C\n📊 Sürpriz Skoru: 74/100\n📈 Fiyat: 1']' timed out after 10 seconds
+2026-04-01 17:21:41,346 [INFO] SİNYAL: ISCTR skor=74
+2026-04-01 17:21:53,709 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 AKBNK - Akbank\n📊 Sürpriz Skoru: 74/100\n📈 Fiyat: 68.35 T']' timed out after 10 seconds
+2026-04-01 17:21:53,793 [INFO] SİNYAL: AKBNK skor=74
+2026-04-01 17:22:06,152 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 MGROS - Migros\n📊 Sürpriz Skoru: 71/100\n📈 Fiyat: 615.00 ']' timed out after 10 seconds
+2026-04-01 17:22:06,234 [INFO] SİNYAL: MGROS skor=71
+2026-04-01 17:22:18,587 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 KCHOL - Koç Holding\n📊 Sürpriz Skoru: 70/100\n📈 Fiyat: 19']' timed out after 10 seconds
+2026-04-01 17:22:18,667 [INFO] SİNYAL: KCHOL skor=70
+2026-04-01 17:22:30,531 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 AEFES - Anadolu Efes\n📊 Sürpriz Skoru: 69/100\n📈 Fiyat: 1']' timed out after 10 seconds
+2026-04-01 17:22:30,612 [INFO] SİNYAL: AEFES skor=69
+2026-04-01 17:22:42,970 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 ISMEN - İş Yatırım\n📊 Sürpriz Skoru: 68/100\n📈 Fiyat: 40.']' timed out after 10 seconds
+2026-04-01 17:22:43,103 [INFO] SİNYAL: ISMEN skor=68
+2026-04-01 17:22:55,470 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 TTKOM - Türk Telekom\n📊 Sürpriz Skoru: 68/100\n📈 Fiyat: 5']' timed out after 10 seconds
+2026-04-01 17:22:55,604 [INFO] SİNYAL: TTKOM skor=68
+2026-04-01 17:23:07,964 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 HALKB - Halkbank\n📊 Sürpriz Skoru: 68/100\n📈 Fiyat: 36.14']' timed out after 10 seconds
+2026-04-01 17:23:08,048 [INFO] SİNYAL: HALKB skor=68
+2026-04-01 17:23:20,405 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 EREGL - Ereğli Demir Çelik\n📊 Sürpriz Skoru: 67/100\n📈 Fi']' timed out after 10 seconds
+2026-04-01 17:23:20,488 [INFO] SİNYAL: EREGL skor=67
+2026-04-01 17:23:32,842 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 DOAS - Doğuş Otomotiv\n📊 Sürpriz Skoru: 66/100\n📈 Fiyat: ']' timed out after 10 seconds
+2026-04-01 17:23:32,927 [INFO] SİNYAL: DOAS skor=66
+2026-04-01 17:23:45,288 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 DOHOL - Doğan Holding\n📊 Sürpriz Skoru: 66/100\n📈 Fiyat: ']' timed out after 10 seconds
+2026-04-01 17:23:45,373 [INFO] SİNYAL: DOHOL skor=66
+2026-04-01 17:23:57,728 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 CIMSA - Çimsa\n📊 Sürpriz Skoru: 66/100\n📈 Fiyat: 49.84 TL']' timed out after 10 seconds
+2026-04-01 17:23:57,812 [INFO] SİNYAL: CIMSA skor=66
+2026-04-01 17:24:10,170 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 OTKAR - Otokar\n📊 Sürpriz Skoru: 65/100\n📈 Fiyat: 369.00 ']' timed out after 10 seconds
+2026-04-01 17:24:10,249 [INFO] SİNYAL: OTKAR skor=65
+2026-04-01 17:24:22,604 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 AKSA - Aksa Akrilik\n📊 Sürpriz Skoru: 65/100\n📈 Fiyat: 11']' timed out after 10 seconds
+2026-04-01 17:24:22,688 [INFO] SİNYAL: AKSA skor=65
+2026-04-01 17:24:35,052 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 SASA - Sasa Polyester\n📊 Sürpriz Skoru: 65/100\n📈 Fiyat: ']' timed out after 10 seconds
+2026-04-01 17:24:35,136 [INFO] SİNYAL: SASA skor=65
+2026-04-01 17:24:47,497 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 KONTR - Kontrolmatik\n📊 Sürpriz Skoru: 65/100\n📈 Fiyat: 8']' timed out after 10 seconds
+2026-04-01 17:24:47,576 [INFO] SİNYAL: KONTR skor=65
+2026-04-01 17:24:59,926 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n📊 Tarama Özeti\nTaranan: 50 hisse\nSinyal: 29 hisse\nEn yüksek: SOKM (82)\nSaat: 17:24']' timed out after 10 seconds
+2026-04-01 17:25:00,011 [INFO] Sonraki tarama: 15 dk sonra
+2026-04-01 17:40:00,036 [INFO] ==================================================
+2026-04-01 17:40:00,038 [INFO] TAM TARAMA BAŞLADI - 2026-04-01 17:40:00
+2026-04-01 17:40:00,038 [INFO] ==================================================
+2026-04-01 17:40:00,038 [INFO] Veri çekiliyor... (50 hisse)
+2026-04-01 17:40:30,876 [INFO] 50 hisse verisi alındı
+2026-04-01 17:40:30,876 [INFO] Hisseler taranıyor...
+2026-04-01 17:40:31,178 [INFO] 🎯 30 sinyal tespit edildi!
+2026-04-01 17:40:43,562 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 SAHOL - Sabancı Holding\n📊 Sürpriz Skoru: 74/100\n📈 Fiyat']' timed out after 10 seconds
+2026-04-01 17:40:43,646 [INFO] SİNYAL: SAHOL skor=74
+2026-04-01 17:40:56,011 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n📊 Tarama Özeti\nTaranan: 50 hisse\nSinyal: 30 hisse\nEn yüksek: SOKM (82)\nSaat: 17:40']' timed out after 10 seconds
+2026-04-01 17:40:56,141 [INFO] Sonraki tarama: 15 dk sonra
+2026-04-01 17:55:56,120 [INFO] ==================================================
+2026-04-01 17:55:56,121 [INFO] TAM TARAMA BAŞLADI - 2026-04-01 17:55:56
+2026-04-01 17:55:56,121 [INFO] ==================================================
+2026-04-01 17:55:56,121 [INFO] Veri çekiliyor... (50 hisse)
+2026-04-01 17:56:24,181 [INFO] 50 hisse verisi alındı
+2026-04-01 17:56:24,182 [INFO] Hisseler taranıyor...
+2026-04-01 17:56:24,480 [INFO] 🎯 29 sinyal tespit edildi!
+2026-04-01 17:56:36,864 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n📊 Tarama Özeti\nTaranan: 50 hisse\nSinyal: 29 hisse\nEn yüksek: SOKM (82)\nSaat: 17:56']' timed out after 10 seconds
+2026-04-01 17:56:36,947 [INFO] Sonraki tarama: 15 dk sonra
+2026-04-01 18:11:36,939 [INFO] ==================================================
+2026-04-01 18:11:36,941 [INFO] TAM TARAMA BAŞLADI - 2026-04-01 18:11:36
+2026-04-01 18:11:36,941 [INFO] ==================================================
+2026-04-01 18:11:36,941 [INFO] Veri çekiliyor... (50 hisse)
+2026-04-01 18:12:03,693 [INFO] 50 hisse verisi alındı
+2026-04-01 18:12:03,694 [INFO] Hisseler taranıyor...
+2026-04-01 18:12:04,000 [INFO] 🎯 28 sinyal tespit edildi!
+2026-04-01 18:12:16,380 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n📊 Tarama Özeti\nTaranan: 50 hisse\nSinyal: 28 hisse\nEn yüksek: SOKM (82)\nSaat: 18:12']' timed out after 10 seconds
+2026-04-01 18:12:16,465 [INFO] Sonraki tarama: 15 dk sonra
+2026-04-01 18:27:16,463 [INFO] ==================================================
+2026-04-01 18:27:16,465 [INFO] TAM TARAMA BAŞLADI - 2026-04-01 18:27:16
+2026-04-01 18:27:16,465 [INFO] ==================================================
+2026-04-01 18:27:16,465 [INFO] Veri çekiliyor... (50 hisse)
+2026-04-01 18:27:42,950 [INFO] 50 hisse verisi alındı
+2026-04-01 18:27:42,951 [INFO] Hisseler taranıyor...
+2026-04-01 18:27:43,255 [INFO] 🎯 27 sinyal tespit edildi!
+2026-04-01 18:27:55,642 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '🚨 BIST SÜRPRIZ\n\n==============================\n💎 SOKM - Şok Marketler\n📊 Sürpriz Skoru: 82/100\n📈 Fiya']' timed out after 10 seconds
+2026-04-01 18:27:55,723 [INFO] SİNYAL: SOKM skor=82
+2026-04-01 18:28:08,073 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '🚨 BIST SÜRPRIZ\n\n==============================\n💎 ULKER - Ülker\n📊 Sürpriz Skoru: 81/100\n📈 Fiyat: 116.']' timed out after 10 seconds
+2026-04-01 18:28:08,209 [INFO] SİNYAL: ULKER skor=81
+2026-04-01 18:28:20,572 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 AKSEN - Aksa Enerji\n📊 Sürpriz Skoru: 80/100\n📈 Fiyat: 78']' timed out after 10 seconds
+2026-04-01 18:28:20,708 [INFO] SİNYAL: AKSEN skor=80
+2026-04-01 18:28:33,060 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 SASA - Sasa Polyester\n📊 Sürpriz Skoru: 80/100\n📈 Fiyat: ']' timed out after 10 seconds
+2026-04-01 18:28:33,139 [INFO] SİNYAL: SASA skor=80
+2026-04-01 18:28:45,499 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 TCELL - Turkcell\n📊 Sürpriz Skoru: 79/100\n📈 Fiyat: 107.2']' timed out after 10 seconds
+2026-04-01 18:28:45,579 [INFO] SİNYAL: TCELL skor=79
+2026-04-01 18:28:57,933 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 YKBNK - Yapı Kredi\n📊 Sürpriz Skoru: 78/100\n📈 Fiyat: 34.']' timed out after 10 seconds
+2026-04-01 18:28:58,061 [INFO] SİNYAL: YKBNK skor=78
+2026-04-01 18:29:10,415 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 PGSUS - Pegasus\n📊 Sürpriz Skoru: 77/100\n📈 Fiyat: 179.40']' timed out after 10 seconds
+2026-04-01 18:29:10,498 [INFO] SİNYAL: PGSUS skor=77
+2026-04-01 18:29:22,853 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 DOHOL - Doğan Holding\n📊 Sürpriz Skoru: 77/100\n📈 Fiyat: ']' timed out after 10 seconds
+2026-04-01 18:29:22,934 [INFO] SİNYAL: DOHOL skor=77
+2026-04-01 18:29:35,289 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 TUPRS - Tüpraş\n📊 Sürpriz Skoru: 76/100\n📈 Fiyat: 253.75 ']' timed out after 10 seconds
+2026-04-01 18:29:35,368 [INFO] SİNYAL: TUPRS skor=76
+2026-04-01 18:29:47,723 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 VAKBN - Vakıfbank\n📊 Sürpriz Skoru: 76/100\n📈 Fiyat: 31.0']' timed out after 10 seconds
+2026-04-01 18:29:47,858 [INFO] SİNYAL: VAKBN skor=76
+2026-04-01 18:30:00,211 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 TAVHL - TAV Havalimanları\n📊 Sürpriz Skoru: 76/100\n📈 Fiy']' timed out after 10 seconds
+2026-04-01 18:30:00,289 [INFO] SİNYAL: TAVHL skor=76
+2026-04-01 18:30:12,642 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 ALARK - Alarko Holding\n📊 Sürpriz Skoru: 76/100\n📈 Fiyat:']' timed out after 10 seconds
+2026-04-01 18:30:12,720 [INFO] SİNYAL: ALARK skor=76
+2026-04-01 18:30:25,073 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 AGHOL - Anadolu Grubu\n📊 Sürpriz Skoru: 76/100\n📈 Fiyat: ']' timed out after 10 seconds
+2026-04-01 18:30:25,156 [INFO] SİNYAL: AGHOL skor=76
+2026-04-01 18:30:37,506 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 EKGYO - Emlak Konut GYO\n📊 Sürpriz Skoru: 75/100\n📈 Fiyat']' timed out after 10 seconds
+2026-04-01 18:30:37,638 [INFO] SİNYAL: EKGYO skor=75
+2026-04-01 18:30:49,991 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 KORDS - Kordsa\n📊 Sürpriz Skoru: 74/100\n📈 Fiyat: 56.00 T']' timed out after 10 seconds
+2026-04-01 18:30:50,124 [INFO] SİNYAL: KORDS skor=74
+2026-04-01 18:31:02,483 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 ISCTR - İş Bankası C\n📊 Sürpriz Skoru: 74/100\n📈 Fiyat: 1']' timed out after 10 seconds
+2026-04-01 18:31:02,564 [INFO] SİNYAL: ISCTR skor=74
+2026-04-01 18:31:14,922 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 AKBNK - Akbank\n📊 Sürpriz Skoru: 74/100\n📈 Fiyat: 68.25 T']' timed out after 10 seconds
+2026-04-01 18:31:15,005 [INFO] SİNYAL: AKBNK skor=74
+2026-04-01 18:31:27,363 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 MGROS - Migros\n📊 Sürpriz Skoru: 72/100\n📈 Fiyat: 617.00 ']' timed out after 10 seconds
+2026-04-01 18:31:27,498 [INFO] SİNYAL: MGROS skor=72
+2026-04-01 18:31:39,851 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 AKSA - Aksa Akrilik\n📊 Sürpriz Skoru: 70/100\n📈 Fiyat: 11']' timed out after 10 seconds
+2026-04-01 18:31:39,933 [INFO] SİNYAL: AKSA skor=70
+2026-04-01 18:31:52,286 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 ISMEN - İş Yatırım\n📊 Sürpriz Skoru: 69/100\n📈 Fiyat: 40.']' timed out after 10 seconds
+2026-04-01 18:31:52,369 [INFO] SİNYAL: ISMEN skor=69
+2026-04-01 18:32:04,724 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 AEFES - Anadolu Efes\n📊 Sürpriz Skoru: 69/100\n📈 Fiyat: 1']' timed out after 10 seconds
+2026-04-01 18:32:04,807 [INFO] SİNYAL: AEFES skor=69
+2026-04-01 18:32:17,161 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 TTKOM - Türk Telekom\n📊 Sürpriz Skoru: 68/100\n📈 Fiyat: 5']' timed out after 10 seconds
+2026-04-01 18:32:17,242 [INFO] SİNYAL: TTKOM skor=68
+2026-04-01 18:32:29,593 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 EREGL - Ereğli Demir Çelik\n📊 Sürpriz Skoru: 67/100\n📈 Fi']' timed out after 10 seconds
+2026-04-01 18:32:29,673 [INFO] SİNYAL: EREGL skor=67
+2026-04-01 18:32:42,030 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 HALKB - Halkbank\n📊 Sürpriz Skoru: 67/100\n📈 Fiyat: 36.26']' timed out after 10 seconds
+2026-04-01 18:32:42,113 [INFO] SİNYAL: HALKB skor=67
+2026-04-01 18:32:54,465 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 DOAS - Doğuş Otomotiv\n📊 Sürpriz Skoru: 66/100\n📈 Fiyat: ']' timed out after 10 seconds
+2026-04-01 18:32:54,547 [INFO] SİNYAL: DOAS skor=66
+2026-04-01 18:33:06,902 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 CIMSA - Çimsa\n📊 Sürpriz Skoru: 66/100\n📈 Fiyat: 49.76 TL']' timed out after 10 seconds
+2026-04-01 18:33:06,983 [INFO] SİNYAL: CIMSA skor=66
+2026-04-01 18:33:19,340 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n==============================\n💎 OTKAR - Otokar\n📊 Sürpriz Skoru: 65/100\n📈 Fiyat: 368.50 ']' timed out after 10 seconds
+2026-04-01 18:33:19,420 [INFO] SİNYAL: OTKAR skor=65
+2026-04-01 18:33:31,778 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n📊 Tarama Özeti\nTaranan: 50 hisse\nSinyal: 27 hisse\nEn yüksek: SOKM (82)\nSaat: 18:33']' timed out after 10 seconds
+2026-04-01 18:33:31,859 [INFO] Sonraki tarama: 15 dk sonra
+2026-04-01 18:48:31,861 [INFO] ==================================================
+2026-04-01 18:48:31,862 [INFO] TAM TARAMA BAŞLADI - 2026-04-01 18:48:31
+2026-04-01 18:48:31,862 [INFO] ==================================================
+2026-04-01 18:48:31,862 [INFO] Veri çekiliyor... (50 hisse)
+2026-04-01 18:48:58,429 [INFO] 50 hisse verisi alındı
+2026-04-01 18:48:58,430 [INFO] Hisseler taranıyor...
+2026-04-01 18:48:58,730 [INFO] 🎯 27 sinyal tespit edildi!
+2026-04-01 18:49:11,112 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n📊 Tarama Özeti\nTaranan: 50 hisse\nSinyal: 27 hisse\nEn yüksek: SOKM (82)\nSaat: 18:48']' timed out after 10 seconds
+2026-04-01 18:49:11,246 [INFO] Sonraki tarama: 15 dk sonra
+2026-04-01 19:04:11,273 [INFO] ==================================================
+2026-04-01 19:04:11,274 [INFO] TAM TARAMA BAŞLADI - 2026-04-01 19:04:11
+2026-04-01 19:04:11,274 [INFO] ==================================================
+2026-04-01 19:04:11,275 [INFO] Veri çekiliyor... (50 hisse)
+2026-04-01 19:04:38,922 [INFO] 50 hisse verisi alındı
+2026-04-01 19:04:38,922 [INFO] Hisseler taranıyor...
+2026-04-01 19:04:39,229 [INFO] 🎯 27 sinyal tespit edildi!
+2026-04-01 19:04:51,613 [WARNING] Ses hatası: Command '['say', '-v', 'Yelda', '📊 BIST Bot\n\n📊 Tarama Özeti\nTaranan: 50 hisse\nSinyal: 27 hisse\nEn yüksek: SOKM (82)\nSaat: 19:04']' timed out after 10 seconds
+2026-04-01 19:04:51,752 [INFO] Sonraki tarama: 15 dk sonra
