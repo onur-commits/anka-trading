@@ -12,15 +12,15 @@
     "guven": 56.8
   },
   "MACRO": {
-    "dogru": 0,
-    "yanlis": 0,
-    "toplam": 0,
-    "guven": 50
+    "dogru": 462.0,
+    "yanlis": 630.5,
+    "toplam": 1276,
+    "guven": 42.3
   },
   "FUNDA": {
-    "dogru": 0,
-    "yanlis": 0,
-    "toplam": 0,
-    "guven": 50
+    "dogru": 412.5,
+    "yanlis": 257.0,
+    "toplam": 1276,
+    "guven": 61.6
   }
 }

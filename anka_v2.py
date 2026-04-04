@@ -431,10 +431,12 @@ class AnkaBrain:
     Minimum oy kontrolü yapar. Veto hakkı uygular.
     """
 
+    # ÖĞRENİLMİŞ AĞIRLIKLAR (1,276 işlem simülasyonundan)
+    # Güven: FUNDA %61.6 > VOLUME %56.8 > MACRO %42.3 > TECHNO %33.7
     AGIRLIKLAR = {
-        "BULL":     {"TECHNO": 0.35, "VOLUME": 0.25, "MACRO": 0.10, "FUNDA": 0.15, "MOMENTUM": 0.15},
-        "SIDEWAYS": {"TECHNO": 0.25, "VOLUME": 0.20, "MACRO": 0.25, "FUNDA": 0.15, "MOMENTUM": 0.15},
-        "BEAR":     {"TECHNO": 0.15, "VOLUME": 0.10, "MACRO": 0.35, "FUNDA": 0.25, "MOMENTUM": 0.15},
+        "BULL":     {"TECHNO": 0.15, "VOLUME": 0.25, "MACRO": 0.10, "FUNDA": 0.35, "MOMENTUM": 0.15},
+        "SIDEWAYS": {"TECHNO": 0.15, "VOLUME": 0.25, "MACRO": 0.20, "FUNDA": 0.30, "MOMENTUM": 0.10},
+        "BEAR":     {"TECHNO": 0.10, "VOLUME": 0.15, "MACRO": 0.25, "FUNDA": 0.40, "MOMENTUM": 0.10},
     }
 
     MIN_ONAY = {"BULL": 2, "SIDEWAYS": 2, "BEAR": 3}

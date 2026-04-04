@@ -1298,5 +1298,30 @@
   "zaman": "2026-04-03 17:35:03",
   "seviye": "BILDIRIM",
   "mesaj": "Gün sonu rapor hazır"
+ },
+ {
+  "zaman": "2026-04-04 05:30:13",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-04 05:30:13",
+  "seviye": "INFO",
+  "mesaj": "🧠 [05:30] ML MODEL EĞİTİMİ"
+ },
+ {
+  "zaman": "2026-04-04 05:30:31",
+  "seviye": "INFO",
+  "mesaj": "  52 hisse (2 yıl)"
+ },
+ {
+  "zaman": "2026-04-04 05:30:38",
+  "seviye": "INFO",
+  "mesaj": "  ✅ AUC:0.5893 F1:0.6857"
+ },
+ {
+  "zaman": "2026-04-04 05:30:38",
+  "seviye": "BILDIRIM",
+  "mesaj": "ML güncellendi — AUC:0.5893"
  }
 ]

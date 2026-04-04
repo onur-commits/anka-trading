@@ -21,12 +21,14 @@ ISLEM_LOG = DATA_DIR / "islem_gecmisi.json"
 AJAN_SKOR = DATA_DIR / "ajan_skorlari.json"
 
 # Başlangıç ağırlıkları
+# ÖĞRENİLMİŞ AĞIRLIKLAR (1,276 işlem, 49 hisse, 5 yıl simülasyon)
+# FUNDA %61.6 > VOLUME %56.8 > MACRO %42.3 > TECHNO %33.7
 VARSAYILAN_AGIRLIKLAR = {
-    "TEKNİK": 0.25,
-    "MAKRO": 0.25,
-    "HABER": 0.15,
-    "KURUMSAL": 0.15,
-    "MOMENTUM": 0.20,
+    "TECHNO": 0.15,
+    "VOLUME": 0.25,
+    "MACRO": 0.20,
+    "FUNDA": 0.30,
+    "MOMENTUM": 0.10,
 }
 
 
