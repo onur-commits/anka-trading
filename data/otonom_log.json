@@ -1323,5 +1323,85 @@
   "zaman": "2026-04-04 05:30:38",
   "seviye": "BILDIRIM",
   "mesaj": "ML güncellendi — AUC:0.5893"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "🤖 BIST ALPHA V2 — OTONOM TRADER"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "📅 PROGRAM:"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "  05:30 → ML model eğitimi"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "  08:30 → Bomba tarama + IQ kod üretimi"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "  08:50 → IQ bildirim (kodlar hazır)"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "  09:35 → Açılış gap kontrolü"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "  10:00 → İlk yarım saat raporu"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "  12:00 → Öğlen hacim kontrolü"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "  12:15 → Strateji güncelleme"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "  15:00 → İkindi risk kontrolü"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": "  17:35 → Gün sonu rapor"
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-04-05 01:35:36",
+  "seviye": "BILDIRIM",
+  "mesaj": "Otonom Trader başladı!"
  }
 ]

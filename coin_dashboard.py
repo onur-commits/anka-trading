@@ -138,7 +138,7 @@ with tab1:
     st.subheader("📊 Kripto Piyasası")
 
     # Filtre
-    filtre = st.radio("Göster:", ["🔥 Top 20 USDT", "🇹🇷 TL Pairleri", "📈 En çok yükselen", "📉 En çok düşen"], horizontal=True)
+    filtre = st.radio("Göster:", ["🔥 Top 20 USDT", "📈 En çok yükselen", "📉 En çok düşen", "🇹🇷 TL Pairleri"], horizontal=True)
 
     if fiyatlar:
         rows = []
@@ -275,8 +275,8 @@ with tab3:
 with tab4:
     st.subheader("🔔 Alarmlar & Kişisel Notlar")
 
-    ALARM_DOSYA = DATA_DIR / "coin_alarmlar.json"
-    NOT_DOSYA = DATA_DIR / "coin_notlar.json"
+    ALARM_DOSYA = BASE_DIR / "data" / "coin_alarmlar.json"
+    NOT_DOSYA = BASE_DIR / "data" / "coin_notlar.json"
 
     def alarmlar_oku():
         if ALARM_DOSYA.exists():
@@ -285,7 +285,7 @@ with tab4:
         return []
 
     def alarmlar_yaz(data):
-        DATA_DIR.mkdir(exist_ok=True)
+        ALARM_DOSYA.parent.mkdir(exist_ok=True)
         with open(ALARM_DOSYA, "w") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 
@@ -296,7 +296,7 @@ with tab4:
         return []
 
     def notlar_yaz(data):
-        DATA_DIR.mkdir(exist_ok=True)
+        NOT_DOSYA.parent.mkdir(exist_ok=True)
         with open(NOT_DOSYA, "w") as f:
             json.dump(data, f, indent=2, ensure_ascii=False)
 

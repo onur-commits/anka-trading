@@ -474,7 +474,7 @@ def hedef_olustur(df, gun=5, kar_esik=2.0, zarar_limiti=-1.5):
     return sonuc.fillna(0).astype(int)
 
 
-def purged_walk_forward(X, y, n_splits=5, purge_days=5):
+def purged_walk_forward(X, y, n_splits=50, purge_days=10):
     """
     Purged Walk-Forward CV — veri sızıntısı önleme.
     Train ve test arasında 'purge_days' boşluk bırakır.
