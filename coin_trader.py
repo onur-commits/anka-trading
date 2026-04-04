@@ -313,13 +313,28 @@ class CoinBrain:
                 puan_txt = " ".join(f"{k[:3]}:{v}" for k, v in puanlar.items())
                 print(f"  {emoji} {symbol:12} ${fiyat:>10,.2f} | {puan_txt} | Toplam:{toplam:.0f}")
 
-                if karar == "AL":
-                    bombalar.append({"symbol": symbol, "fiyat": fiyat, "skor": toplam})
+                bombalar.append({
+                    "symbol": symbol, "fiyat": fiyat, "skor": toplam,
+                    "karar": karar, "puanlar": puanlar,
+                    "techno_d": techno_d, "volume_d": volume_d,
+                })
 
             except Exception as e:
                 continue
 
-        print(f"\n🎯 COIN BOMBALAR: {', '.join(b['symbol'] for b in bombalar) if bombalar else 'YOK'}")
+        # SKORA GÖRE SIRALA
+        bombalar.sort(key=lambda x: x["skor"], reverse=True)
+
+        print(f"\n{'='*60}")
+        print(f"📊 SKOR SIRALAMASINA GÖRE TÜM COİNLER:")
+        print(f"{'='*60}")
+        for i, b in enumerate(bombalar):
+            emoji = "🥇" if i == 0 else "🥈" if i == 1 else "🥉" if i == 2 else "🪙" if b["karar"] == "AL" else "⚪"
+            birim = "₺" if "TRY" in b["symbol"] else "$"
+            print(f"  {i+1:2}. {emoji} {b['symbol']:12} {birim}{b['fiyat']:>10,.2f} | Skor:{b['skor']:5.1f} | {b['karar']}")
+
+        al_listesi = [b for b in bombalar if b["karar"] == "AL"]
+        print(f"\n🎯 BOMBA ({len(al_listesi)}/{len(bombalar)}): {', '.join(b['symbol'] for b in al_listesi) if al_listesi else 'YOK'}")
         return bombalar
 
 
