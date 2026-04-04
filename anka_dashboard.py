@@ -535,6 +535,25 @@ with tab4:
             except Exception as e:
                 st.error(str(e))
 
+    # Roket Tarayıcı
+    if st.button("🚀 ROKET TARA (Hacim Patlaması)", use_container_width=True):
+        with st.spinner("46 coin taranıyor..."):
+            try:
+                sys.path.insert(0, str(BASE_DIR))
+                from coin_trader import RoketTarayici
+                tarayici = RoketTarayici()
+                roketler = tarayici.hacim_patlama_tara(esik=2.0)
+                if roketler:
+                    df_roket = pd.DataFrame(roketler)
+                    st.dataframe(df_roket[["symbol","fiyat","hacim_x","degisim_24s","degisim_1s","skor","sebep"]],
+                                use_container_width=True, hide_index=True)
+                else:
+                    st.info("Şu an roket yok — piyasa sakin")
+            except Exception as e:
+                st.error(str(e))
+
+    st.divider()
+
     # Hızlı fiyat tablosu
     st.markdown("**Anlık Fiyatlar:**")
     try:
@@ -633,3 +652,7 @@ st.sidebar.markdown(f"💰 {bridge.get('pos_value', '?')} TL × {bridge.get('mul
 
 if st.sidebar.button("🔄 Yenile"):
     st.rerun()
+
+st.sidebar.markdown("---")
+st.sidebar.markdown("[🦅 ANKA Borsa](http://localhost:8501)")
+st.sidebar.markdown("[🪙 COIN Kripto](http://localhost:8502)")

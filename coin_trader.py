@@ -326,10 +326,155 @@ class CoinBrain:
 # ================================================================
 # ANA
 # ================================================================
+# ================================================================
+# ROKET TARAYICI — Anormal Hacim + Parabolik Yükseliş Yakalayıcı
+# ================================================================
+class RoketTarayici:
+    """
+    SIREN gibi roketi yakalar:
+    - Hacim x5+ patlama
+    - Fiyat %10+ yükseliş (24s)
+    - Tüm SMA'ların üstünde
+    - 5 dakikada bir tarar
+    """
+
+    # Binance'deki tüm popüler TL ve USDT pairleri
+    USDT_COINS = [
+        "BTCUSDT","ETHUSDT","BNBUSDT","SOLUSDT","XRPUSDT","ADAUSDT",
+        "AVAXUSDT","DOTUSDT","MATICUSDT","LINKUSDT","ATOMUSDT","NEARUSDT",
+        "FTMUSDT","ARBUSDT","OPUSDT","APTUSDT","SUIUSDT","SEIUSDT",
+        "TIAUSDT","JUPUSDT","WUSDT","ENAUSDT","STRKUSDT","ZETAUSDT",
+        "DYDXUSDT","INJUSDT","PENDLEUSDT","RENDERUSDT","FETUSDT",
+        "ONDOUSDT","ARUSDT","WLDUSDT","PYTHUSDT","RUNEUSDT","EIGENUSDT",
+    ]
+
+    TL_COINS = [
+        "BTCTRY","ETHTRY","BNBTRY","SOLTRY","XRPTRY","ADATRY",
+        "AVAXTRY","DOTTRY","LINKTRY","USDTTRY","SIRENTRY",
+    ]
+
+    def __init__(self):
+        self.client = BinanceClient()
+
+    def hacim_patlama_tara(self, coins=None, esik=5.0):
+        """Hacim ortalamanın N katı olan coinleri bul."""
+        if coins is None:
+            coins = self.USDT_COINS + self.TL_COINS
+
+        print(f"\n🚀 ROKET TARAYICI — {len(coins)} coin")
+        print(f"   Hacim eşiği: x{esik}+")
+        print("=" * 60)
+
+        roketler = []
+
+        for symbol in coins:
+            try:
+                # 1 saatlik veri çek
+                df = self.client.kline(symbol, "1h", 100)
+                if len(df) < 24:
+                    continue
+
+                c = df['Close']
+                v = df['Volume']
+
+                son_fiyat = float(c.iloc[-1])
+                son_hacim = float(v.iloc[-1])
+                ort_hacim = float(v.iloc[-25:-1].mean())  # Son 24 saatlik ortalama
+
+                if ort_hacim <= 0:
+                    continue
+
+                hacim_oran = son_hacim / ort_hacim
+
+                # 24 saatlik değişim
+                fiyat_24s = float(c.iloc[-24]) if len(c) >= 24 else float(c.iloc[0])
+                degisim_24s = (son_fiyat / fiyat_24s - 1) * 100
+
+                # 1 saatlik değişim
+                degisim_1s = (float(c.iloc[-1]) / float(c.iloc[-2]) - 1) * 100
+
+                # SMA kontrol
+                sma20 = float(c.rolling(20).mean().iloc[-1])
+                sma50 = float(c.rolling(min(50, len(c))).mean().iloc[-1])
+                sma_ustunde = son_fiyat > sma20 > sma50
+
+                # ROKET KRİTERLERİ
+                is_roket = False
+                sebep = []
+
+                if hacim_oran >= esik:
+                    sebep.append(f"HACİM x{hacim_oran:.1f}🔥")
+                    is_roket = True
+
+                if degisim_24s >= 10:
+                    sebep.append(f"24s +%{degisim_24s:.1f}🚀")
+                    is_roket = True
+
+                if degisim_1s >= 5:
+                    sebep.append(f"1s +%{degisim_1s:.1f}⚡")
+                    is_roket = True
+
+                if sma_ustunde and degisim_24s > 5:
+                    sebep.append("SMA✅")
+
+                # Skor hesapla
+                skor = (hacim_oran * 10) + (degisim_24s * 2) + (degisim_1s * 5)
+                if sma_ustunde:
+                    skor *= 1.2
+
+                if is_roket:
+                    roketler.append({
+                        "symbol": symbol,
+                        "fiyat": son_fiyat,
+                        "hacim_x": round(hacim_oran, 1),
+                        "degisim_24s": round(degisim_24s, 1),
+                        "degisim_1s": round(degisim_1s, 1),
+                        "sma_ok": sma_ustunde,
+                        "skor": round(skor, 0),
+                        "sebep": " | ".join(sebep),
+                    })
+
+                    fiyat_str = f"₺{son_fiyat:,.2f}" if "TRY" in symbol else f"${son_fiyat:,.4f}" if son_fiyat < 1 else f"${son_fiyat:,.2f}"
+                    print(f"  🚀 {symbol:15} {fiyat_str:>12} | {' | '.join(sebep)} | Skor:{skor:.0f}")
+
+            except:
+                continue
+
+        roketler.sort(key=lambda x: x["skor"], reverse=True)
+
+        if not roketler:
+            print("  Şu an roket yok — piyasa sakin")
+
+        print(f"\n🎯 {len(roketler)} ROKET bulundu")
+        return roketler
+
+    def surekli_tara(self, aralik_dk=5):
+        """Her N dakikada roket tara — 7/24."""
+        print(f"🚀 ROKET TARAYICI 7/24 — Her {aralik_dk} dakika")
+        while True:
+            roketler = self.hacim_patlama_tara()
+            if roketler:
+                # Bridge'e yaz
+                with open(PROJECT_DIR / "data" / "roket_sinyaller.json", "w") as f:
+                    json.dump({
+                        "zaman": datetime.now().isoformat(),
+                        "roketler": roketler
+                    }, f, indent=2)
+            time.sleep(aralik_dk * 60)
+
+
 if __name__ == "__main__":
     if "--tara" in sys.argv or len(sys.argv) == 1:
         brain = CoinBrain()
         bombalar = brain.tara()
+
+    elif "--roket" in sys.argv:
+        tarayici = RoketTarayici()
+        tarayici.hacim_patlama_tara()
+
+    elif "--roket-loop" in sys.argv:
+        tarayici = RoketTarayici()
+        tarayici.surekli_tara(aralik_dk=5)
 
     elif "--durum" in sys.argv:
         print("🪙 COIN TRADER durumu")
