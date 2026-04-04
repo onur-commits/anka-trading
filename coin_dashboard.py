@@ -70,6 +70,46 @@ st.caption(f"Anlık veriler — Binance | {datetime.now().strftime('%H:%M:%S')}"
 # ── ÜST BANT ───────────────────────────────────────────────
 fiyatlar = tum_fiyatlar()
 
+# ── FEAR & GREED (HER ZAMAN GÖRÜNÜR) ────────────────────
+fng_val = 50
+fng_class = "Neutral"
+try:
+    fng_r = requests.get("https://api.alternative.me/fng/?limit=1", timeout=5)
+    fng_data = fng_r.json()["data"][0]
+    fng_val = int(fng_data["value"])
+    fng_class = fng_data["value_classification"]
+except:
+    pass
+
+if fng_val <= 20:
+    fng_renk = "🔴"
+    fng_bg = "#ff000033"
+    fng_mesaj = "EXTREME FEAR — Tarihsel alım bölgesi!"
+elif fng_val <= 35:
+    fng_renk = "🟠"
+    fng_bg = "#ff660033"
+    fng_mesaj = "Fear — Dikkatli ol"
+elif fng_val >= 75:
+    fng_renk = "🟢"
+    fng_bg = "#00ff0033"
+    fng_mesaj = "EXTREME GREED — Satış düşün!"
+elif fng_val >= 55:
+    fng_renk = "🟡"
+    fng_bg = "#ffff0033"
+    fng_mesaj = "Greed — Temkinli ol"
+else:
+    fng_renk = "⚪"
+    fng_bg = "#ffffff11"
+    fng_mesaj = "Neutral"
+
+st.markdown(f"""
+<div style="background:{fng_bg};padding:10px 20px;border-radius:10px;text-align:center;margin-bottom:10px">
+    <span style="font-size:40px">{fng_renk}</span>
+    <span style="font-size:30px;font-weight:bold"> Fear & Greed: {fng_val}</span>
+    <span style="font-size:16px;color:#aaa"> — {fng_mesaj}</span>
+</div>
+""", unsafe_allow_html=True)
+
 if fiyatlar:
     btc = fiyatlar.get("BTCUSDT", {})
     eth = fiyatlar.get("ETHUSDT", {})
@@ -89,7 +129,7 @@ if fiyatlar:
 st.divider()
 
 # ── TABLAR ──────────────────────────────────────────────────
-tab1, tab2, tab3, tab4 = st.tabs(["📊 Piyasa", "🚀 Roket Tarayıcı", "🪙 Bomba Tarayıcı", "⚙️ Ayarlar"])
+tab1, tab2, tab3, tab4, tab5 = st.tabs(["📊 Piyasa", "🚀 Full Scan (533)", "🪙 Bomba Tarayıcı", "🔔 Alarmlar & Notlar", "⚙️ Ayarlar"])
 
 # ══════════════════════════════════════════════════════════
 # TAB 1: PİYASA
@@ -147,49 +187,53 @@ with tab1:
         )
 
 # ══════════════════════════════════════════════════════════
-# TAB 2: ROKET TARAYICI
+# TAB 2: FULL SCAN (533 coin paralel)
 # ══════════════════════════════════════════════════════════
 with tab2:
-    st.subheader("🚀 Roket Tarayıcı — Hacim Patlaması Yakalayıcı")
+    st.subheader("🚀 Full Scan — 533 Coin Paralel Tarama")
+    st.caption("Sıkışma + Birikim = Patlama ÖNCESİ yakalama")
 
-    col1, col2 = st.columns([3, 1])
-    with col1:
-        esik = st.slider("Hacim eşiği (x)", 1.5, 10.0, 2.0, 0.5)
-    with col2:
-        if st.button("🚀 TARA", use_container_width=True, type="primary"):
-            st.session_state["roket_tara"] = True
-
-    if st.session_state.get("roket_tara"):
-        with st.spinner("46 coin taranıyor..."):
+    if st.button("🚀 533 COİN TARA", use_container_width=True, type="primary"):
+        with st.spinner("533 coin paralel taranıyor (~25sn)..."):
             try:
-                from coin_trader import RoketTarayici
-                tarayici = RoketTarayici()
-                roketler = tarayici.hacim_patlama_tara(esik=esik)
+                from coin_fullscan import tum_coinleri_cek, paralel_tara
+                coins = tum_coinleri_cek()
+                sonuclar = paralel_tara(coins, max_workers=8)
 
-                if roketler:
-                    for r in roketler:
-                        col1, col2, col3 = st.columns([2, 2, 3])
-                        with col1:
-                            st.markdown(f"### 🚀 {r['symbol']}")
-                            birim = "₺" if "TRY" in r['symbol'] else "$"
-                            st.markdown(f"**{birim}{r['fiyat']:,.4f}**" if r['fiyat'] < 1 else f"**{birim}{r['fiyat']:,.2f}**")
-                        with col2:
-                            st.metric("24s", f"{r['degisim_24s']:+.1f}%")
-                            st.metric("1s", f"{r['degisim_1s']:+.1f}%")
-                        with col3:
-                            st.markdown(f"**Hacim:** x{r['hacim_x']}")
-                            st.markdown(f"**Skor:** {r['skor']}")
-                            st.markdown(f"**Sebep:** {r['sebep']}")
+                if sonuclar:
+                    # Tablo
+                    rows = []
+                    for i, s in enumerate(sonuclar[:30]):
+                        if i == 0: emoji = "🥇"
+                        elif i == 1: emoji = "🥈"
+                        elif i == 2: emoji = "🥉"
+                        elif s.get("roket"): emoji = "🚀"
+                        elif s["skor"] >= 70: emoji = "🔥"
+                        else: emoji = "⚪"
 
-                        # Mini grafik
-                        grafik = mini_grafik(r['symbol'])
-                        if grafik:
-                            st.line_chart(pd.DataFrame({"fiyat": grafik}), height=80)
-                        st.divider()
-                else:
-                    st.info("🌊 Piyasa sakin — şu an roket yok")
+                        birim = "₺" if "TRY" in s["symbol"] else "$"
+                        rows.append({
+                            "#": f"{emoji} {i+1}",
+                            "Coin": s["symbol"],
+                            "Fiyat": f"{birim}{s['fiyat']}",
+                            "Skor": s["skor"],
+                            "Evre": s.get("evre", "?"),
+                            "24s %": f"{s['degisim_24s']:+.1f}",
+                            "Hacim": f"x{s['hacim_x']}",
+                            "RSI": s["rsi"],
+                        })
 
-                st.session_state["roket_tara"] = False
+                    st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True, height=700)
+
+                    # İstatistik
+                    col1, col2, col3, col4 = st.columns(4)
+                    roketler = [s for s in sonuclar if s.get("roket")]
+                    sikismalar = [s for s in sonuclar if s.get("evre") == "SIKISMA"]
+                    birikimler = [s for s in sonuclar if s.get("evre") == "BIRIKIM"]
+                    with col1: st.metric("Toplam", len(sonuclar))
+                    with col2: st.metric("🔥 Sıkışma", len(sikismalar))
+                    with col3: st.metric("📦 Birikim", len(birikimler))
+                    with col4: st.metric("🚀 Roket", len(roketler))
             except Exception as e:
                 st.error(str(e))
 
@@ -226,9 +270,148 @@ with tab3:
                 st.error(str(e))
 
 # ══════════════════════════════════════════════════════════
-# TAB 4: AYARLAR
+# TAB 4: ALARMLAR & NOTLAR
 # ══════════════════════════════════════════════════════════
 with tab4:
+    st.subheader("🔔 Alarmlar & Kişisel Notlar")
+
+    ALARM_DOSYA = DATA_DIR / "coin_alarmlar.json"
+    NOT_DOSYA = DATA_DIR / "coin_notlar.json"
+
+    def alarmlar_oku():
+        if ALARM_DOSYA.exists():
+            try: return json.load(open(ALARM_DOSYA))
+            except: pass
+        return []
+
+    def alarmlar_yaz(data):
+        DATA_DIR.mkdir(exist_ok=True)
+        with open(ALARM_DOSYA, "w") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+
+    def notlar_oku():
+        if NOT_DOSYA.exists():
+            try: return json.load(open(NOT_DOSYA))
+            except: pass
+        return []
+
+    def notlar_yaz(data):
+        DATA_DIR.mkdir(exist_ok=True)
+        with open(NOT_DOSYA, "w") as f:
+            json.dump(data, f, indent=2, ensure_ascii=False)
+
+    # ── ALARM OLUŞTUR ──
+    st.markdown("### 🔔 Alarm Kur")
+
+    col1, col2, col3 = st.columns(3)
+    with col1:
+        alarm_tip = st.selectbox("Alarm tipi", [
+            "Fear & Greed değişimi",
+            "Coin fiyat hedefi",
+            "Hacim patlaması",
+            "Skor eşiği",
+        ])
+    with col2:
+        if alarm_tip == "Fear & Greed değişimi":
+            alarm_deger = st.number_input("F&G değeri", 0, 100, 25, help="Bu değere gelince alarm")
+            alarm_yon = st.selectbox("Yön", ["Altına düşünce", "Üstüne çıkınca"])
+        elif alarm_tip == "Coin fiyat hedefi":
+            alarm_coin = st.text_input("Coin (örn: BTCUSDT)", "BTCUSDT")
+            alarm_deger = st.number_input("Hedef fiyat ($)", 0.0, 1000000.0, 70000.0)
+            alarm_yon = st.selectbox("Yön", ["Üstüne çıkınca", "Altına düşünce"])
+        elif alarm_tip == "Hacim patlaması":
+            alarm_deger = st.number_input("Hacim oranı (x)", 2.0, 50.0, 5.0)
+            alarm_yon = "Üstüne çıkınca"
+        else:
+            alarm_deger = st.number_input("Skor eşiği", 50, 100, 80)
+            alarm_yon = "Üstüne çıkınca"
+    with col3:
+        alarm_ses = st.toggle("🔊 Sesli alarm", True)
+        if st.button("➕ Alarm Ekle", use_container_width=True):
+            alarmlar = alarmlar_oku()
+            alarmlar.append({
+                "tip": alarm_tip,
+                "deger": alarm_deger,
+                "yon": alarm_yon if 'alarm_yon' in dir() else "Üstüne çıkınca",
+                "coin": alarm_coin if 'alarm_coin' in dir() else "",
+                "ses": alarm_ses,
+                "aktif": True,
+                "olusturma": datetime.now().isoformat(),
+            })
+            alarmlar_yaz(alarmlar)
+            st.success("✅ Alarm eklendi!")
+            st.rerun()
+
+    # Mevcut alarmlar
+    alarmlar = alarmlar_oku()
+    if alarmlar:
+        st.markdown("**Aktif Alarmlar:**")
+        for i, a in enumerate(alarmlar):
+            col1, col2 = st.columns([4, 1])
+            with col1:
+                st.markdown(f"🔔 **{a['tip']}** — {a.get('coin','')} {a['deger']} ({a.get('yon','')})")
+            with col2:
+                if st.button("🗑️", key=f"del_alarm_{i}"):
+                    alarmlar.pop(i)
+                    alarmlar_yaz(alarmlar)
+                    st.rerun()
+
+    # Alarm kontrolü (Fear & Greed)
+    for a in alarmlar:
+        if a["tip"] == "Fear & Greed değişimi" and a["aktif"]:
+            if a.get("yon") == "Altına düşünce" and fng_val <= a["deger"]:
+                st.warning(f"🚨 ALARM: Fear & Greed {fng_val} ≤ {a['deger']}!")
+                if a["ses"]:
+                    try:
+                        import subprocess
+                        subprocess.run(["osascript", "-e", f'display notification "Fear & Greed {fng_val}!" with title "COIN ALARM" sound name "Glass"'], timeout=3, capture_output=True)
+                    except: pass
+            elif a.get("yon") == "Üstüne çıkınca" and fng_val >= a["deger"]:
+                st.warning(f"🚨 ALARM: Fear & Greed {fng_val} ≥ {a['deger']}!")
+
+    st.divider()
+
+    # ── KİŞİSEL NOT GİRİŞİ ──
+    st.markdown("### 📝 Kişisel Notlar & Önseziler")
+    st.caption("Hissettiğin bir şeyi yaz — AI sonra öğrenir")
+
+    not_metin = st.text_area("Not / Önsezi / Gözlem",
+                             placeholder="Örn: AVAX'ta balina hareketi gördüm, yakında patlayabilir...",
+                             height=80)
+
+    col1, col2 = st.columns(2)
+    with col1:
+        not_oncelik = st.selectbox("Öncelik", ["🔴 Acil", "🟡 Önemli", "🟢 Normal", "📌 Hatırlatma"])
+    with col2:
+        not_coin = st.text_input("İlgili coin (opsiyonel)", placeholder="AVAXUSDT")
+
+    if st.button("💾 Notu Kaydet", use_container_width=True):
+        if not_metin:
+            notlar = notlar_oku()
+            notlar.append({
+                "metin": not_metin,
+                "oncelik": not_oncelik,
+                "coin": not_coin,
+                "zaman": datetime.now().isoformat(),
+            })
+            notlar_yaz(notlar)
+            st.success("✅ Not kaydedildi!")
+            st.rerun()
+
+    # Mevcut notlar
+    notlar = notlar_oku()
+    if notlar:
+        st.markdown("**Son Notlar:**")
+        for n in reversed(notlar[-10:]):
+            zaman = n["zaman"][:16].replace("T", " ")
+            coin_txt = f" [{n['coin']}]" if n.get("coin") else ""
+            st.markdown(f"{n['oncelik']} **{zaman}**{coin_txt}: {n['metin']}")
+
+
+# ══════════════════════════════════════════════════════════
+# TAB 5: AYARLAR
+# ══════════════════════════════════════════════════════════
+with tab5:
     st.subheader("⚙️ Coin Ayarları")
 
     st.markdown("**Binance API (emir göndermek için)**")
