@@ -414,12 +414,64 @@ def sektor_momentum_hesapla(tum_veri):
 # V2 ENSEMBLE MODEL — XGBoost + LightGBM + Neural Net
 # ============================================================
 
-def hedef_olustur(df, gun=5, esik=3.0):
-    """5 günde %3+ yukarı hareket."""
-    gelecek_max = df["High"].squeeze().rolling(gun).max().shift(-gun)
+def hedef_olustur(df, gun=5, kar_esik=2.0, zarar_limiti=-1.5):
+    """
+    Triple Barrier Method (Lopez de Prado, Advances in Financial ML).
+
+    Uc bariyer:
+      1. Ust bariyer: Take-profit (kar_esik, ornek +%2)
+      2. Alt bariyer: Stop-loss (zarar_limiti, ornek -%1.5)
+      3. Zaman bariyeri: Maksimum tutma suresi (gun, ornek 5 gun)
+
+    Etiket = hangi bariyer ONCE vurulursa o:
+      - Ust bariyer once vurulursa -> 1 (basarili islem)
+      - Alt bariyer once vurulursa -> 0 (basarisiz islem)
+      - Zaman bariyeri dolursa -> kapanistaki getiriye gore (>0 ise 1, degilse 0)
+
+    Bu yontem rolling-max yaklasimindaki lookahead bias ve
+    asimetrik etiket sorunlarini cozer.
+    """
     close = df["Close"].squeeze()
-    yukari = (gelecek_max - close) / close * 100
-    return (yukari >= esik).astype(int)
+    high = df["High"].squeeze()
+    low = df["Low"].squeeze()
+
+    n = len(close)
+    sonuc = pd.Series(np.nan, index=close.index)
+
+    for i in range(n - 1):
+        giris = close.iloc[i]
+        if giris == 0 or np.isnan(giris):
+            continue
+
+        bariyer_vuruldu = False
+        pencere_sonu = min(i + gun, n - 1)
+
+        for j in range(i + 1, pencere_sonu + 1):
+            # Gun ici en yuksek ve en dusuk fiyatlari kontrol et
+            gun_yuksek = high.iloc[j]
+            gun_dusuk = low.iloc[j]
+
+            yukari_pct = (gun_yuksek - giris) / giris * 100
+            asagi_pct = (gun_dusuk - giris) / giris * 100
+
+            # Ust bariyer vuruldu mu? (take profit)
+            if yukari_pct >= kar_esik:
+                sonuc.iloc[i] = 1
+                bariyer_vuruldu = True
+                break
+
+            # Alt bariyer vuruldu mu? (stop loss)
+            if asagi_pct <= zarar_limiti:
+                sonuc.iloc[i] = 0
+                bariyer_vuruldu = True
+                break
+
+        # Zaman bariyeri: hicbir bariyer vurulmadiysa, son gunun kapanisina bak
+        if not bariyer_vuruldu and pencere_sonu > i:
+            son_getiri = (close.iloc[pencere_sonu] - giris) / giris * 100
+            sonuc.iloc[i] = 1 if son_getiri > 0 else 0
+
+    return sonuc.fillna(0).astype(int)
 
 
 def purged_walk_forward(X, y, n_splits=5, purge_days=5):
@@ -482,6 +534,56 @@ def purged_walk_forward(X, y, n_splits=5, purge_days=5):
     return sonuclar
 
 
+def _feature_sec_v2(X, y, max_feature=25, korelasyon_esik=0.90):
+    """
+    Doktora Raporu Y-07: 73+ feature -> 20-25 secim.
+    1. Korelasyon filtresi (>0.90 koreleli olanlari ele)
+    2. XGBoost importance ile en iyi N feature sec
+    Returns: (X_secilmis, secilen_feature_isimleri_listesi)
+    """
+    from xgboost import XGBClassifier
+    from sklearn.model_selection import train_test_split
+
+    print(f"  🔍 Feature secimi: {X.shape[1]} feature -> max {max_feature}")
+
+    # Adim 1: Korelasyon filtresi
+    corr_matrix = X.corr().abs()
+    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+    cikarilacak = set()
+    for col in upper.columns:
+        yuksek_korele = upper.index[upper[col] > korelasyon_esik].tolist()
+        if yuksek_korele:
+            cikarilacak.add(col)
+
+    X_filtreli = X.drop(columns=list(cikarilacak), errors='ignore')
+    print(f"     Korelasyon: {X.shape[1]} -> {X_filtreli.shape[1]} ({len(cikarilacak)} cikarildi)")
+
+    if X_filtreli.shape[1] <= max_feature:
+        return X_filtreli, X_filtreli.columns.tolist()
+
+    # Adim 2: Importance secimi
+    X_tr, X_val, y_tr, y_val = train_test_split(X_filtreli, y, test_size=0.2, shuffle=False)
+    selector = XGBClassifier(
+        n_estimators=100, max_depth=4, learning_rate=0.05,
+        subsample=0.8, colsample_bytree=0.8,
+        eval_metric='logloss', verbosity=0, random_state=42
+    )
+    selector.fit(X_tr, y_tr)
+
+    importance = pd.Series(
+        selector.feature_importances_, index=X_filtreli.columns
+    ).sort_values(ascending=False)
+
+    secilen = importance.head(max_feature).index.tolist()
+    print(f"     Importance: en iyi {max_feature} feature secildi")
+    for i, (feat, score) in enumerate(importance.head(10).items()):
+        print(f"       {i+1}. {feat}: {score:.4f}")
+    if max_feature > 10:
+        print(f"       ... ve {max_feature - 10} feature daha")
+
+    return X_filtreli[secilen], secilen
+
+
 class EnsembleModelV2:
     """
     3 model ensemble:
@@ -541,9 +643,14 @@ class EnsembleModelV2:
 
         X = pd.concat(X_list, ignore_index=True)
         y = pd.concat(y_list, ignore_index=True)
-        self.feature_cols = X.columns.tolist()
 
-        print(f"  📊 Toplam: {len(X):,} satır | Pozitif: %{y.mean()*100:.1f} | Feature: {len(self.feature_cols)}")
+        print(f"  📊 Ham: {len(X):,} satır | Pozitif: %{y.mean()*100:.1f} | Feature: {X.shape[1]}")
+
+        # ── Feature Secimi (Y-07: 73+ -> 20-25) ─────────────
+        X, secilen = _feature_sec_v2(X, y, max_feature=25, korelasyon_esik=0.90)
+        self.feature_cols = secilen
+
+        print(f"  📊 Secim sonrasi: {len(X):,} satır | Feature: {len(self.feature_cols)}")
 
         # ── Purged Walk-Forward Validation ────────────────────
         print("  🔄 Purged Walk-Forward Validation...")
@@ -920,3 +1027,270 @@ def _sinyal_ozet(f):
     if f.get("mom_accel", 0) > 2:
         sinyaller.append("🚀 İvme Artışı")
     return sinyaller if sinyaller else ["➖ Bekle"]
+
+
+# ============================================================
+# KOMISYON DAHIL BACKTEST (Doktora Raporu Y-09)
+# ============================================================
+
+def komisyonlu_backtest(
+    tum_veri,
+    xu100_df=None,
+    komisyon_tek_yon=0.0015,   # %0.15 tek yon
+    slippage=0.001,            # %0.10
+    baslangic_sermaye=100000,
+    yil=3,
+    kar_esik=2.0,
+    zarar_limiti=-1.5,
+    tutma_gun=5,
+):
+    """
+    Doktora Raporu Y-09: Komisyon dahil 3 yillik backtest.
+
+    - Komisyon: komisyon_tek_yon * 2 (gidis-donus)
+    - Slippage: her islemde ek maliyet
+    - Buy-and-hold XU100 karsilastirmasi
+    - Sharpe ratio, max drawdown hesaplanir
+    - Sonuclar JSON olarak kaydedilir
+
+    Triple Barrier Method ile sinyal uretir ve her sinyalde islem acar.
+    """
+    toplam_maliyet_oran = (komisyon_tek_yon * 2) + (slippage * 2)  # gidis-donus
+
+    print("=" * 60)
+    print("KOMISYON DAHIL BACKTEST")
+    print(f"Komisyon: %{komisyon_tek_yon*100:.2f} tek yon (%{komisyon_tek_yon*200:.2f} gidis-donus)")
+    print(f"Slippage: %{slippage*100:.2f} tek yon")
+    print(f"Toplam maliyet/islem: %{toplam_maliyet_oran*100:.2f}")
+    print(f"Sermaye: {baslangic_sermaye:,.0f} TL")
+    print(f"Triple Barrier: +%{kar_esik} / -%{abs(zarar_limiti)} / {tutma_gun} gun")
+    print("=" * 60)
+
+    # Tum hisse islemlerini simule et
+    islemler = []
+    for ticker, df in tum_veri.items():
+        if len(df) < 252 * yil:
+            continue
+
+        close = df["Close"].squeeze()
+        high = df["High"].squeeze()
+        low = df["Low"].squeeze()
+
+        # Son N yillik veriyi al
+        baslangic_idx = max(0, len(close) - 252 * yil)
+        close = close.iloc[baslangic_idx:]
+        high = high.iloc[baslangic_idx:]
+        low = low.iloc[baslangic_idx:]
+
+        # EMA + Hacim filtresi — her gün değil, sadece sinyal olunca işlem aç
+        ema10 = close.ewm(span=10).mean()
+        ema20 = close.ewm(span=20).mean()
+        vol_avg = df["Volume"].squeeze().iloc[baslangic_idx:].rolling(10).mean()
+        vol_cur = df["Volume"].squeeze().iloc[baslangic_idx:]
+
+        n = len(close)
+        i = 50  # EMA hesaplanabilmesi için 50. günden başla
+        while i < n - tutma_gun - 1:
+            giris_fiyat = close.iloc[i]
+            if giris_fiyat == 0 or np.isnan(giris_fiyat):
+                i += 1
+                continue
+
+            # SİNYAL FİLTRESİ: EMA cross + hacim normalin üstü
+            ema_ok = float(ema10.iloc[i]) > float(ema20.iloc[i])
+            hacim_ok = float(vol_cur.iloc[i]) > float(vol_avg.iloc[i]) * 1.2 if not np.isnan(vol_avg.iloc[i]) else False
+
+            if not (ema_ok and hacim_ok):
+                i += 1
+                continue  # Sinyal yoksa atla
+
+            # Triple barrier kontrol
+            bariyer_vuruldu = False
+            pencere_sonu = min(i + tutma_gun, n - 1)
+            cikis_gun = pencere_sonu
+            brut_getiri_pct = 0
+
+            for j in range(i + 1, pencere_sonu + 1):
+                yukari_pct = (high.iloc[j] - giris_fiyat) / giris_fiyat * 100
+                asagi_pct = (low.iloc[j] - giris_fiyat) / giris_fiyat * 100
+
+                if yukari_pct >= kar_esik:
+                    brut_getiri_pct = kar_esik
+                    cikis_gun = j
+                    bariyer_vuruldu = True
+                    break
+                if asagi_pct <= zarar_limiti:
+                    brut_getiri_pct = zarar_limiti
+                    cikis_gun = j
+                    bariyer_vuruldu = True
+                    break
+
+            if not bariyer_vuruldu:
+                brut_getiri_pct = (close.iloc[pencere_sonu] - giris_fiyat) / giris_fiyat * 100
+
+            # Net getiri = brut - komisyon - slippage
+            net_getiri_pct = brut_getiri_pct - (toplam_maliyet_oran * 100)
+
+            islemler.append({
+                "ticker": ticker,
+                "giris_tarih": str(close.index[i].date()) if hasattr(close.index[i], 'date') else str(close.index[i]),
+                "cikis_tarih": str(close.index[cikis_gun].date()) if hasattr(close.index[cikis_gun], 'date') else str(close.index[cikis_gun]),
+                "giris_fiyat": float(giris_fiyat),
+                "brut_getiri_pct": round(brut_getiri_pct, 4),
+                "net_getiri_pct": round(net_getiri_pct, 4),
+                "tutma_gun": cikis_gun - i,
+                "bariyer": "TP" if brut_getiri_pct >= kar_esik else ("SL" if brut_getiri_pct <= zarar_limiti else "TIME"),
+            })
+
+            # Cooldown: En az 3 gün bekle (overtrading önleme)
+            i = cikis_gun + 3
+
+    if not islemler:
+        print("HATA: Hicbir islem uretilmedi!")
+        return None
+
+    islem_df = pd.DataFrame(islemler)
+
+    # ── Portfoy Equity Curve ────────────────────────────────
+    sermaye = baslangic_sermaye
+    equity_curve = [sermaye]
+    gunluk_getiriler = []
+
+    for _, islem in islem_df.iterrows():
+        getiri = islem["net_getiri_pct"] / 100
+        sermaye *= (1 + getiri)
+        equity_curve.append(sermaye)
+        gunluk_getiriler.append(getiri)
+
+    # ── Performans Metrikleri ────────────────────────────────
+    toplam_islem = len(islem_df)
+    kazanc_sayisi = (islem_df["net_getiri_pct"] > 0).sum()
+    kayip_sayisi = (islem_df["net_getiri_pct"] <= 0).sum()
+    basari_orani = kazanc_sayisi / toplam_islem * 100 if toplam_islem > 0 else 0
+
+    toplam_getiri = (sermaye / baslangic_sermaye - 1) * 100
+    brut_toplam = islem_df["brut_getiri_pct"].sum()
+    komisyon_etkisi = brut_toplam - islem_df["net_getiri_pct"].sum()
+
+    ort_kazanc = islem_df.loc[islem_df["net_getiri_pct"] > 0, "net_getiri_pct"].mean() if kazanc_sayisi > 0 else 0
+    ort_kayip = islem_df.loc[islem_df["net_getiri_pct"] <= 0, "net_getiri_pct"].mean() if kayip_sayisi > 0 else 0
+
+    # Sharpe ratio (yillik)
+    getiri_array = np.array(gunluk_getiriler)
+    if len(getiri_array) > 1 and getiri_array.std() > 0:
+        # Islem basina ortalama getiri / std, yillastirilmis
+        islem_per_yil = toplam_islem / yil if yil > 0 else 252
+        sharpe = (getiri_array.mean() / getiri_array.std()) * np.sqrt(islem_per_yil)
+    else:
+        sharpe = 0
+
+    # Max drawdown
+    equity_arr = np.array(equity_curve)
+    peak = np.maximum.accumulate(equity_arr)
+    drawdown = (equity_arr - peak) / peak * 100
+    max_dd = drawdown.min()
+
+    # Bariyer dagilimi
+    tp_count = (islem_df["bariyer"] == "TP").sum()
+    sl_count = (islem_df["bariyer"] == "SL").sum()
+    time_count = (islem_df["bariyer"] == "TIME").sum()
+
+    # ── Buy & Hold XU100 Karsilastirmasi ─────────────────────
+    bh_getiri = None
+    bh_sharpe = None
+    bh_max_dd = None
+    if xu100_df is not None and len(xu100_df) > 252:
+        xu_close = xu100_df["Close"].squeeze()
+        xu_start = max(0, len(xu_close) - 252 * yil)
+        xu_slice = xu_close.iloc[xu_start:]
+        if len(xu_slice) > 1:
+            bh_getiri = (xu_slice.iloc[-1] / xu_slice.iloc[0] - 1) * 100
+
+            xu_gunluk = xu_slice.pct_change().dropna()
+            if xu_gunluk.std() > 0:
+                bh_sharpe = (xu_gunluk.mean() / xu_gunluk.std()) * np.sqrt(252)
+            else:
+                bh_sharpe = 0
+
+            xu_equity = (1 + xu_gunluk).cumprod()
+            xu_peak = xu_equity.cummax()
+            xu_dd = ((xu_equity - xu_peak) / xu_peak * 100)
+            bh_max_dd = xu_dd.min()
+
+    # ── Sonuclari Yazdir ─────────────────────────────────────
+    print("\n" + "=" * 60)
+    print("BACKTEST SONUCLARI")
+    print("=" * 60)
+    print(f"Toplam islem:        {toplam_islem}")
+    print(f"Kazanc/Kayip:        {kazanc_sayisi}/{kayip_sayisi}")
+    print(f"Basari orani:        %{basari_orani:.1f}")
+    print(f"Ort kazanc:          %{ort_kazanc:.2f}")
+    print(f"Ort kayip:           %{ort_kayip:.2f}")
+    print(f"")
+    print(f"Bariyer dagilimi:    TP={tp_count} | SL={sl_count} | TIME={time_count}")
+    print(f"")
+    print(f"BRUT toplam getiri:  %{brut_toplam:.2f}")
+    print(f"Komisyon etkisi:     %{komisyon_etkisi:.2f}")
+    print(f"NET toplam getiri:   %{toplam_getiri:.2f}")
+    print(f"Son sermaye:         {sermaye:,.0f} TL")
+    print(f"")
+    print(f"Sharpe Ratio:        {sharpe:.3f}")
+    print(f"Max Drawdown:        %{max_dd:.2f}")
+    print(f"")
+    if bh_getiri is not None:
+        print(f"--- XU100 Buy & Hold ---")
+        print(f"XU100 getiri:        %{bh_getiri:.2f}")
+        print(f"XU100 Sharpe:        {bh_sharpe:.3f}")
+        print(f"XU100 Max DD:        %{bh_max_dd:.2f}")
+        alpha = toplam_getiri - bh_getiri
+        print(f"ALPHA (strateji-BH): %{alpha:.2f}")
+    print("=" * 60)
+
+    # ── JSON kaydet ──────────────────────────────────────────
+    sonuc = {
+        "backtest_tarihi": datetime.now().strftime("%Y-%m-%d %H:%M"),
+        "parametreler": {
+            "komisyon_tek_yon": komisyon_tek_yon,
+            "slippage": slippage,
+            "toplam_maliyet_islem": toplam_maliyet_oran,
+            "baslangic_sermaye": baslangic_sermaye,
+            "yil": yil,
+            "kar_esik_pct": kar_esik,
+            "zarar_limiti_pct": zarar_limiti,
+            "tutma_gun": tutma_gun,
+        },
+        "sonuclar": {
+            "toplam_islem": int(toplam_islem),
+            "kazanc_sayisi": int(kazanc_sayisi),
+            "kayip_sayisi": int(kayip_sayisi),
+            "basari_orani_pct": round(basari_orani, 2),
+            "ort_kazanc_pct": round(ort_kazanc, 4),
+            "ort_kayip_pct": round(ort_kayip, 4),
+            "brut_toplam_getiri_pct": round(brut_toplam, 2),
+            "komisyon_etkisi_pct": round(komisyon_etkisi, 2),
+            "net_toplam_getiri_pct": round(toplam_getiri, 2),
+            "son_sermaye": round(sermaye, 2),
+            "sharpe_ratio": round(sharpe, 4),
+            "max_drawdown_pct": round(max_dd, 2),
+            "bariyer_dagilimi": {
+                "take_profit": int(tp_count),
+                "stop_loss": int(sl_count),
+                "zaman_bariyeri": int(time_count),
+            },
+        },
+        "xu100_buy_hold": {
+            "getiri_pct": round(bh_getiri, 2) if bh_getiri is not None else None,
+            "sharpe_ratio": round(bh_sharpe, 4) if bh_sharpe is not None else None,
+            "max_drawdown_pct": round(bh_max_dd, 2) if bh_max_dd is not None else None,
+            "alpha_pct": round(toplam_getiri - bh_getiri, 2) if bh_getiri is not None else None,
+        },
+    }
+
+    data_dir = Path(__file__).parent / "data"
+    data_dir.mkdir(exist_ok=True)
+    sonuc_path = data_dir / "backtest_sonuclari.json"
+    with open(sonuc_path, "w", encoding="utf-8") as f:
+        json.dump(sonuc, f, indent=2, ensure_ascii=False)
+    print(f"\nSonuclar kaydedildi: {sonuc_path}")
+
+    return sonuc

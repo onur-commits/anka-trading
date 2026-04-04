@@ -132,19 +132,73 @@ def feature_hesapla(df):
     return f.dropna()
 
 
-def hedef_hesapla(df, gun=1):
-    """N gün sonraki getiriyi hesapla — AI'nın öğreneceği hedef."""
+def hedef_hesapla(df, gun=5, kar_esik=2.0, zarar_limiti=-1.5):
+    """
+    Triple Barrier Method (Lopez de Prado, Advances in Financial ML).
+
+    Uc bariyer:
+      1. Ust bariyer: Take-profit (kar_esik, ornek +%2)
+      2. Alt bariyer: Stop-loss (zarar_limiti, ornek -%1.5)
+      3. Zaman bariyeri: Maksimum tutma suresi (gun, ornek 5 gun)
+
+    Etiket = hangi bariyer ONCE vurulursa o:
+      - Ust bariyer -> 1 (basarili)
+      - Alt bariyer -> 0 (basarisiz)
+      - Zaman bariyeri -> kapanistaki getiriye gore
+
+    Returns: (hedef_serisi, getiri_serisi)
+    """
     close = df['Close'].squeeze()
-    # N gün sonraki yüzdesel değişim
-    getiri = close.shift(-gun) / close - 1
-    # Binary: +%1 üstü = 1 (iyi), altı = 0 (kötü)
-    hedef = (getiri > 0.01).astype(int)
+    high = df['High'].squeeze()
+    low = df['Low'].squeeze()
+
+    n = len(close)
+    hedef = pd.Series(np.nan, index=close.index)
+    getiri = pd.Series(np.nan, index=close.index)
+
+    for i in range(n - 1):
+        giris = close.iloc[i]
+        if giris == 0 or np.isnan(giris):
+            continue
+
+        bariyer_vuruldu = False
+        pencere_sonu = min(i + gun, n - 1)
+
+        for j in range(i + 1, pencere_sonu + 1):
+            gun_yuksek = high.iloc[j]
+            gun_dusuk = low.iloc[j]
+
+            yukari_pct = (gun_yuksek - giris) / giris * 100
+            asagi_pct = (gun_dusuk - giris) / giris * 100
+
+            # Ust bariyer (take profit)
+            if yukari_pct >= kar_esik:
+                hedef.iloc[i] = 1
+                getiri.iloc[i] = kar_esik / 100
+                bariyer_vuruldu = True
+                break
+
+            # Alt bariyer (stop loss)
+            if asagi_pct <= zarar_limiti:
+                hedef.iloc[i] = 0
+                getiri.iloc[i] = zarar_limiti / 100
+                bariyer_vuruldu = True
+                break
+
+        # Zaman bariyeri
+        if not bariyer_vuruldu and pencere_sonu > i:
+            son_getiri_pct = (close.iloc[pencere_sonu] - giris) / giris * 100
+            hedef.iloc[i] = 1 if son_getiri_pct > 0 else 0
+            getiri.iloc[i] = son_getiri_pct / 100
+
+    hedef = hedef.fillna(0).astype(int)
+    getiri = getiri.fillna(0)
     return hedef, getiri
 
 
-def dataset_olustur(tum_veri, hedef_gun=1):
-    """Tüm hisselerden birleşik eğitim seti oluştur."""
-    print(f"\n📊 Dataset oluşturuluyor (hedef: {hedef_gun} gün sonra)...")
+def dataset_olustur(tum_veri, hedef_gun=5):
+    """Tüm hisselerden birleşik eğitim seti oluştur (Triple Barrier Method)."""
+    print(f"\n📊 Dataset oluşturuluyor (Triple Barrier: {hedef_gun} gün pencere)...")
     X_all = []
     y_all = []
     info_all = []
@@ -175,6 +229,65 @@ def dataset_olustur(tum_veri, hedef_gun=1):
     print(f"  ✅ {len(X_full)} satır, {X_full.shape[1]} özellik")
     print(f"  Pozitif: {y_full.sum()} ({y_full.mean()*100:.1f}%)")
     return X_full, y_full, info_all
+
+
+def feature_sec(X, y, max_feature=25, korelasyon_esik=0.90):
+    """
+    Doktora Raporu Y-07: 73+ feature cok fazla, cogu koreleli.
+
+    Iki asamali feature secimi:
+    1. Yuksek korelasyonlu featurelari ele (>0.90 korelasyon)
+    2. XGBoost importance ile en iyi N feature sec
+
+    Returns: (X_secilmis, secilen_feature_isimleri)
+    """
+    from xgboost import XGBClassifier
+
+    print(f"\n🔍 Feature secimi basliyor ({X.shape[1]} feature)...")
+
+    # Adim 1: Korelasyon filtresi
+    corr_matrix = X.corr().abs()
+    upper = corr_matrix.where(np.triu(np.ones(corr_matrix.shape), k=1).astype(bool))
+    cikarilacak = set()
+    for col in upper.columns:
+        yuksek_korele = upper.index[upper[col] > korelasyon_esik].tolist()
+        if yuksek_korele:
+            cikarilacak.add(col)  # koreleli olani cikar
+
+    X_filtreli = X.drop(columns=list(cikarilacak), errors='ignore')
+    print(f"  Korelasyon filtresi: {X.shape[1]} -> {X_filtreli.shape[1]} "
+          f"({len(cikarilacak)} koreleli feature cikarildi)")
+
+    # Korelasyon sonrasi zaten hedef sayinin altindaysa direkt don
+    if X_filtreli.shape[1] <= max_feature:
+        print(f"  Secilen {X_filtreli.shape[1]} feature (korelasyon filtresi yeterli)")
+        return X_filtreli, X_filtreli.columns.tolist()
+
+    # Adim 2: XGBoost feature importance ile sec
+    print(f"  XGBoost importance ile {max_feature} feature seciliyor...")
+    from sklearn.model_selection import train_test_split
+    X_tr, X_val, y_tr, y_val = train_test_split(
+        X_filtreli, y, test_size=0.2, shuffle=False
+    )
+    selector = XGBClassifier(
+        n_estimators=100, max_depth=4, learning_rate=0.05,
+        subsample=0.8, colsample_bytree=0.8,
+        eval_metric='logloss', verbosity=0, random_state=42
+    )
+    selector.fit(X_tr, y_tr)
+
+    importance = pd.Series(
+        selector.feature_importances_, index=X_filtreli.columns
+    ).sort_values(ascending=False)
+
+    secilen = importance.head(max_feature).index.tolist()
+    X_secilmis = X_filtreli[secilen]
+
+    print(f"  En onemli {max_feature} feature secildi:")
+    for i, (feat, score) in enumerate(importance.head(max_feature).items()):
+        print(f"    {i+1:2d}. {feat}: {score:.4f}")
+
+    return X_secilmis, secilen
 
 
 def model_egit(X, y):
@@ -269,14 +382,36 @@ if __name__ == "__main__":
     # 1. Veri çek
     tum_veri = veri_cek(yil=5)
 
-    # 2. Dataset oluştur
-    X, y, info = dataset_olustur(tum_veri, hedef_gun=1)
+    # 2. Dataset oluştur (Triple Barrier: 5 gün, +%2 TP, -%1.5 SL)
+    X, y, info = dataset_olustur(tum_veri, hedef_gun=5)
 
-    # 3. Model eğit
+    # 3. Feature secimi (73+ -> 20-25)
+    X, secilen_features = feature_sec(X, y, max_feature=25, korelasyon_esik=0.90)
+
+    # 4. Model eğit
     models, auc = model_egit(X, y)
 
     if models:
         print(f"\n✅ ANKA AI hazır! AUC: {auc:.4f}")
         print("Kullanım: anka_predict(df, models_dict)")
+
+        # 5. Komisyon dahil backtest (Doktora Raporu Y-09)
+        print("\n" + "=" * 50)
+        print("KOMISYON DAHIL BACKTEST (Y-09)")
+        print("=" * 50)
+        try:
+            from tahmin_motoru_v2 import komisyonlu_backtest
+            import yfinance as yf
+            xu100 = yf.download("XU100.IS", period="5y", progress=False)
+            backtest_sonuc = komisyonlu_backtest(
+                tum_veri,
+                xu100_df=xu100,
+                komisyon_tek_yon=0.0015,
+                slippage=0.001,
+                baslangic_sermaye=100000,
+                yil=3,
+            )
+        except Exception as e:
+            print(f"Backtest hatasi: {e}")
     else:
         print("\n❌ Eğitim başarısız")
