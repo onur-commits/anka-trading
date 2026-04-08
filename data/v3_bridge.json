@@ -3,8 +3,8 @@
     "regime": "BEAR",
     "xu100_change": -0.88,
     "vix": 20.0,
-    "usd_change": 0.0,
+    "usd_change": 0.01,
     "dry_run": true,
     "pos_value": 16000,
-    "last_update": "01:35:41"
+    "last_update": "05:41:15"
 }

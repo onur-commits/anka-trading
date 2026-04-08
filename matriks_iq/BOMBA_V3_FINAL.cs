@@ -42,6 +42,7 @@ namespace Matriks.Lean.Algotrader
 		[Parameter(1.2)] public double ProfitTrigger;
 		[Parameter(3.5)] public double HardStop;
 		[Parameter(1.8)] public double TrailingStop;
+		[Parameter(0.04)] public double KomisyonOrani; // % olarak (alış+satış toplam = x2)
 
 		// Dosya yolları
 		string bombaPath = @"C:\Robot\aktif_bombalar.txt";
@@ -186,8 +187,12 @@ namespace Matriks.Lean.Algotrader
 				if (close > highestPrices[s]) highestPrices[s] = close;
 				decimal pnl = (close - entryPrices[s]) / entryPrices[s] * 100m;
 
-				// Kapanış öncesi kâr realize
-				bool exitBeforeClose = (currentHour == 17 && currentMinute >= 50 && pnl > 0.5m);
+				// Komisyon maliyeti (alış + satış)
+				decimal komisyonMaliyet = (decimal)KomisyonOrani * 2m;
+				decimal netPnl = pnl - komisyonMaliyet;
+
+				// Kapanış öncesi kâr realize (komisyon düşüldükten sonra)
+				bool exitBeforeClose = (currentHour == 17 && currentMinute >= 50 && netPnl > 0.2m);
 
 				// Stop hesaplama
 				decimal stopPrice = entryPrices[s] * (1 - (decimal)HardStop / 100m);
@@ -196,14 +201,14 @@ namespace Matriks.Lean.Algotrader
 					stopPrice = Math.Max(stopPrice, highestPrices[s] * (1 - (decimal)TrailingStop / 100m));
 				}
 
-				// Sembol bomba listesinden çıktıysa ve kârdaysa sat
-				bool bombadenCikti = !aktivBombalar.Contains(s) && pnl > 0;
+				// Sembol bomba listesinden çıktıysa ve NET kârdaysa sat
+				bool bombadenCikti = !aktivBombalar.Contains(s) && netPnl > 0;
 
 				if (close <= stopPrice || !emaOk || exitBeforeClose || bombadenCikti)
 				{
 					SendMarketOrder(s, posQuantities[s], OrderSide.Sell);
 					string sebep = exitBeforeClose ? "GunSonu" : bombadenCikti ? "BombadenCikti" : "Stop/Trend";
-					Debug($"{s} SATILDI | PnL: %{pnl:F2} | Sebep: {sebep}");
+					Debug($"{s} SATILDI | BrutPnL: %{pnl:F2} | NetPnL: %{netPnl:F2} | Komisyon: %{komisyonMaliyet:F2} | Sebep: {sebep}");
 					ResetSymbol(s);
 				}
 			}
@@ -234,7 +239,7 @@ namespace Matriks.Lean.Algotrader
 					highestPrices[s] = close;
 					lastOrderBarIndex[s] = currentBarIndex;
 
-					Debug($"{s} ALINDI | Carpan: {macroMultiplier * timeMultiplier:F2} | Adet: {qty} | Fiyat: {close:F2}");
+					Debug($"{s} ALINDI | Carpan: {macroMultiplier * timeMultiplier:F2} | Adet: {qty} | Fiyat: {close:F2} | MinNetKar: %{(decimal)ProfitTrigger - (decimal)KomisyonOrani * 2m:F2}");
 				}
 			}
 		}

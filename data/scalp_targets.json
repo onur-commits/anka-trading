@@ -1,9 +1,17 @@
 {
   "scalp_targets": [
     "AYEN",
-    "EGEEN",
-    "TCELL",
-    "TTKOM"
+    "PETKM",
+    "ENJSA",
+    "SMRTG",
+    "VESTL",
+    "THYAO",
+    "AKBNK",
+    "YKBNK",
+    "TAVHL",
+    "VAKBN",
+    "ISCTR",
+    "ASTOR"
   ],
-  "scan_time": "2026-04-03T11:19:03.913293"
+  "scan_time": "2026-04-07T12:45:12.774652"
 }

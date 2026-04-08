@@ -1403,5 +1403,210 @@
   "zaman": "2026-04-05 01:35:36",
   "seviye": "BILDIRIM",
   "mesaj": "Otonom Trader başladı!"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "🤖 BIST ALPHA V2 — OTONOM TRADER"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "📅 PROGRAM:"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "  05:30 → ML model eğitimi"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "  08:30 → Bomba tarama + IQ kod üretimi"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "  08:50 → IQ bildirim (kodlar hazır)"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "  09:35 → Açılış gap kontrolü"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "  10:00 → İlk yarım saat raporu"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "  12:00 → Öğlen hacim kontrolü"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "  12:15 → Strateji güncelleme"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "  15:00 → İkindi risk kontrolü"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": "  17:35 → Gün sonu rapor"
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "INFO",
+  "mesaj": ""
+ },
+ {
+  "zaman": "2026-04-05 10:31:19",
+  "seviye": "BILDIRIM",
+  "mesaj": "Otonom Trader başladı!"
+ },
+ {
+  "zaman": "2026-04-05 12:00:20",
+  "seviye": "INFO",
+  "mesaj": "📊 [12:00] ÖĞLEN KONTROLÜ"
+ },
+ {
+  "zaman": "2026-04-05 12:00:22",
+  "seviye": "INFO",
+  "mesaj": "  AYEN: 34.40 (-5.4%) Hacim:x1.8"
+ },
+ {
+  "zaman": "2026-04-05 12:00:22",
+  "seviye": "BILDIRIM",
+  "mesaj": "⚠️ AYEN -%5.4 düşüş!"
+ },
+ {
+  "zaman": "2026-04-05 12:00:22",
+  "seviye": "INFO",
+  "mesaj": "  DOHOL: 19.46 (-1.7%) Hacim:x0.3"
+ },
+ {
+  "zaman": "2026-04-05 12:00:23",
+  "seviye": "INFO",
+  "mesaj": "  KONTR: 7.77 (-4.0%) Hacim:x1.2"
+ },
+ {
+  "zaman": "2026-04-05 12:00:23",
+  "seviye": "INFO",
+  "mesaj": "  TUPRS: 255.25 (-0.3%) Hacim:x0.5"
+ },
+ {
+  "zaman": "2026-04-05 12:00:24",
+  "seviye": "INFO",
+  "mesaj": "  KORDS: 56.60 (-4.6%) Hacim:x1.5"
+ },
+ {
+  "zaman": "2026-04-05 12:15:24",
+  "seviye": "INFO",
+  "mesaj": "🔄 [12:15] STRATEJİ GÜNCELLEME"
+ },
+ {
+  "zaman": "2026-04-05 12:15:59",
+  "seviye": "INFO",
+  "mesaj": "  ✅ Değişiklik yok"
+ },
+ {
+  "zaman": "2026-04-05 15:00:00",
+  "seviye": "INFO",
+  "mesaj": "⚖️ [15:00] İKİNDİ RİSK"
+ },
+ {
+  "zaman": "2026-04-05 15:00:01",
+  "seviye": "INFO",
+  "mesaj": "  XU100: 12936 (-0.9%)"
+ },
+ {
+  "zaman": "2026-04-05 15:00:01",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_AYEN: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-05 15:00:01",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_DOHOL: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-05 15:00:01",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_KONTR: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-05 15:00:01",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_TUPRS: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-05 15:00:01",
+  "seviye": "INFO",
+  "mesaj": "  BOMBA_KORDS: ❌ Log yok"
+ },
+ {
+  "zaman": "2026-04-05 17:35:03",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-05 17:35:03",
+  "seviye": "INFO",
+  "mesaj": "📝 [17:35] GÜN SONU RAPORU"
+ },
+ {
+  "zaman": "2026-04-05 17:35:06",
+  "seviye": "INFO",
+  "mesaj": "📊 05.04.2026 Raporu\nPiyasa: BEAR\n  AYEN: 34.40 (-5.4%) Skor:60\n  DOHOL: 19.46 (-1.7%) Skor:58\n  KONTR: 7.77 (-4.0%) Skor:53\n  TUPRS: 255.25 (-0.3%) Skor:50\n  KORDS: 56.60 (-4.6%) Skor:45"
+ },
+ {
+  "zaman": "2026-04-05 17:35:06",
+  "seviye": "BILDIRIM",
+  "mesaj": "Gün sonu rapor hazır"
+ },
+ {
+  "zaman": "2026-04-06 05:30:13",
+  "seviye": "INFO",
+  "mesaj": "=================================================="
+ },
+ {
+  "zaman": "2026-04-06 05:30:13",
+  "seviye": "INFO",
+  "mesaj": "🧠 [05:30] ML MODEL EĞİTİMİ"
+ },
+ {
+  "zaman": "2026-04-06 05:30:44",
+  "seviye": "INFO",
+  "mesaj": "  52 hisse (2 yıl)"
+ },
+ {
+  "zaman": "2026-04-06 05:31:09",
+  "seviye": "INFO",
+  "mesaj": "  ✅ AUC:0.5664 F1:0.6073"
+ },
+ {
+  "zaman": "2026-04-06 05:31:09",
+  "seviye": "BILDIRIM",
+  "mesaj": "ML güncellendi — AUC:0.5664"
  }
 ]
