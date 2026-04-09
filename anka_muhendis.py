@@ -254,6 +254,97 @@ def kontrol_dashboard():
     return sonuc
 
 
+def kontrol_coin_bot():
+    """Coin otonom bot çalışıyor mu? State güncel mi?"""
+    sonuc = {"calisiyor": False, "sorunlar": []}
+
+    # Process kontrolü
+    try:
+        import psutil
+        for proc in psutil.process_iter(["pid", "name", "cmdline"]):
+            try:
+                cmdline = " ".join(proc.info.get("cmdline") or [])
+                if "coin_otonom" in cmdline:
+                    sonuc["calisiyor"] = True
+                    break
+            except Exception:
+                continue
+    except ImportError:
+        # psutil yoksa log dosyasından kontrol
+        coin_log = DATA_DIR / "coin_otonom_log.json"
+        if coin_log.exists():
+            try:
+                with open(coin_log, encoding="utf-8") as f:
+                    logs = json.load(f)
+                if logs:
+                    son = logs[-1]
+                    son_zaman = datetime.strptime(son["zaman"], "%Y-%m-%d %H:%M:%S")
+                    fark_dk = (datetime.now() - son_zaman).total_seconds() / 60
+                    sonuc["calisiyor"] = fark_dk < 15  # 15dk içinde log varsa çalışıyor
+            except Exception:
+                pass
+
+    if not sonuc["calisiyor"]:
+        sonuc["sorunlar"].append("Coin Otonom Bot çalışmıyor!")
+
+    # State güncelliği
+    coin_state = DATA_DIR / "coin_otonom_state.json"
+    if coin_state.exists():
+        try:
+            with open(coin_state, encoding="utf-8") as f:
+                state = json.load(f)
+            son_tarama = state.get("son_tarama")
+            if son_tarama:
+                son = datetime.strptime(son_tarama, "%Y-%m-%d %H:%M:%S")
+                fark_dk = (datetime.now() - son).total_seconds() / 60
+                if fark_dk > 30:
+                    sonuc["sorunlar"].append(f"Coin bot son tarama {fark_dk:.0f}dk önce — takılmış olabilir")
+            # Pozisyon bilgisi
+            poz_sayisi = len(state.get("pozisyonlar", {}))
+            toplam_trade = state.get("toplam_trade", 0)
+            log(f"  Coin bot: {poz_sayisi} pozisyon, {toplam_trade} trade", "INFO", "KONTROL")
+        except Exception:
+            pass
+    else:
+        sonuc["sorunlar"].append("Coin bot state dosyası yok!")
+
+    # Log hataları
+    coin_log = DATA_DIR / "coin_otonom_log.json"
+    if coin_log.exists():
+        try:
+            with open(coin_log, encoding="utf-8") as f:
+                logs = json.load(f)
+            hatalar = [l for l in logs[-20:] if l.get("seviye") == "ERROR"]
+            if hatalar:
+                sonuc["sorunlar"].append(f"Coin bot son 20 log'da {len(hatalar)} hata")
+                for h in hatalar[-2:]:
+                    sonuc["sorunlar"].append(f"  → {h['mesaj'][:80]}")
+        except Exception:
+            pass
+
+    return sonuc
+
+
+def onar_coin_bot():
+    """Çökmüş coin bot'u yeniden başlat."""
+    try:
+        bat_path = BASE_DIR / "coin_bot_start.bat"
+        if bat_path.exists():
+            subprocess.Popen(f'schtasks /run /tn "ANKA_CoinBot"', shell=True)
+            log("Coin bot schtasks ile yeniden başlatıldı", "WARNING", "ONARIM")
+            return True
+        else:
+            subprocess.Popen(
+                f'"C:\\Program Files\\Python312\\python.exe" -X utf8 {BASE_DIR / "coin_otonom.py"}',
+                shell=True,
+            )
+            log("Coin bot doğrudan yeniden başlatıldı", "WARNING", "ONARIM")
+            return True
+    except Exception as e:
+        log(f"Coin bot başlatılamadı: {e}", "ERROR", "ONARIM")
+        return False
+
+
 def kontrol_veri_butunlugu():
     """JSON dosyaları bozuk mu?"""
     sorunlar = []
@@ -381,10 +472,12 @@ def kontrol_veri_guncellik():
     simdi = datetime.now()
 
     kontrol_dosyalar = {
-        "gunluk_bomba.json": 24,    # 24 saat
+        "gunluk_bomba.json": 24,         # 24 saat
         "otonom_state.json": 24,
-        "sabah_secim.json": 48,     # 48 saat
-        "ajan_skorlari.json": 168,  # 1 hafta
+        "sabah_secim.json": 48,          # 48 saat
+        "ajan_skorlari.json": 168,       # 1 hafta
+        "coin_otonom_state.json": 1,     # 1 saat (7/24 çalışıyor)
+        "coin_otonom_log.json": 1,       # 1 saat
     }
 
     for dosya, max_saat in kontrol_dosyalar.items():
@@ -451,6 +544,16 @@ def saglik_raporu():
                 rapor["toplam_onarim"] += 1
         if not dash["coin"]:
             if onar_dashboard("coin"):
+                rapor["toplam_onarim"] += 1
+
+    # 1b. Coin bot kontrolü
+    log("Coin bot kontrolü...", "INFO", "KONTROL")
+    coin_bot = kontrol_coin_bot()
+    rapor["kontroller"]["coin_bot"] = coin_bot
+    if coin_bot["sorunlar"]:
+        rapor["toplam_sorun"] += len(coin_bot["sorunlar"])
+        if not coin_bot["calisiyor"]:
+            if onar_coin_bot():
                 rapor["toplam_onarim"] += 1
 
     # 2. Veri bütünlüğü
