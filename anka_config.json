@@ -1,0 +1,211 @@
+{
+  "_aciklama": "ANKA Ana Konfigürasyon — Tüm parametreler buradan ayarlanır",
+  "_guncelleme": "2026-04-09",
+
+  "genel": {
+    "max_toplam_pozisyon_tl": 150000,
+    "max_tek_pozisyon_tl": 30000,
+    "max_pozisyon_sayisi": 5,
+    "komisyon_tek_yon": 0.0004,
+    "slippage": 0.001,
+    "gunluk_max_emir": 20,
+    "borsa_baslangic": "10:00",
+    "borsa_bitis": "18:00"
+  },
+
+  "rejim_motor": {
+    "aktif": true,
+    "kontrol_aralik_dk": 30,
+    "katman_agirliklari": {
+      "trend": 0.30,
+      "volatilite": 0.25,
+      "likidite": 0.20,
+      "duygu": 0.25
+    },
+    "rejim_esikleri": {
+      "guclu_trend_min": 70,
+      "yukari_trend_min": 55,
+      "asagi_trend_max": 45,
+      "guclu_asagi_max": 30
+    }
+  },
+
+  "strateji_havuzu": {
+    "trend_takip": {
+      "aktif": true,
+      "agresiflik": 0.8,
+      "ema_hizli": 8,
+      "ema_yavas": 21,
+      "rsi_esik": 52,
+      "stop_loss_pct": 2.0,
+      "trailing_pct": 1.5,
+      "breakeven_pct": 0.8,
+      "periyot": "15dk"
+    },
+    "momentum_scalp": {
+      "aktif": true,
+      "agresiflik": 0.6,
+      "ema_hizli": 5,
+      "ema_yavas": 13,
+      "rsi_esik": 55,
+      "stop_loss_pct": 1.5,
+      "trailing_pct": 1.0,
+      "breakeven_pct": 0.5,
+      "periyot": "5dk"
+    },
+    "bomba_al_tut": {
+      "aktif": true,
+      "agresiflik": 0.7,
+      "min_bomba_skor": 40,
+      "stop_loss_pct": 3.0,
+      "trailing_pct": 2.0,
+      "breakeven_pct": 1.0,
+      "periyot": "15dk"
+    },
+    "bant_trading": {
+      "aktif": true,
+      "agresiflik": 0.4,
+      "bollinger_periyot": 20,
+      "bollinger_std": 2.0,
+      "rsi_alt": 30,
+      "rsi_ust": 70,
+      "stop_loss_pct": 2.0,
+      "periyot": "15dk"
+    },
+    "scalp_vur_kac": {
+      "aktif": true,
+      "agresiflik": 0.5,
+      "ema_hizli": 3,
+      "ema_yavas": 8,
+      "stop_loss_pct": 1.0,
+      "trailing_pct": 0.8,
+      "max_tutma_bar": 12,
+      "periyot": "5dk"
+    },
+    "defans": {
+      "aktif": true,
+      "agresiflik": 0.1,
+      "nakit_orani": 0.8,
+      "sadece_satis": true,
+      "stop_loss_pct": 1.5
+    },
+    "breakout_bekle": {
+      "aktif": true,
+      "agresiflik": 0.4,
+      "bollinger_sikisma_esik": 4.0,
+      "hacim_patlama_esik": 2.0,
+      "stop_loss_pct": 2.5,
+      "periyot": "15dk"
+    }
+  },
+
+  "risk_yonetimi": {
+    "gunluk_max_kayip_pct": 3.0,
+    "tek_islem_max_kayip_pct": 1.5,
+    "ust_uste_kayip_kill": 3,
+    "max_drawdown_pct": 10.0,
+    "korelasyon_max_ayni_sektor": 2,
+    "saat_tuzagi_genis_stop": true,
+    "saat_tuzagi_saatler": ["10:00-10:30", "17:30-18:00"]
+  },
+
+  "duygu_motor": {
+    "vix_korku_esik": 25,
+    "vix_asiri_korku": 35,
+    "dolar_hassasiyet": true,
+    "altin_hassasiyet": true,
+    "haber_sentiment_aktif": true,
+    "mevsimsellik_aktif": true,
+    "fear_greed_api": "https://api.alternative.me/fng/"
+  },
+
+  "karakter_profilleri": {
+    "agir_abi": {
+      "hisseler": ["EREGL", "KCHOL", "SAHOL", "THYAO"],
+      "tercih_strateji": ["trend_takip", "bomba_al_tut"],
+      "sabir_carpani": 1.5,
+      "stop_genislik_carpani": 1.3
+    },
+    "hizli_agresif": {
+      "hisseler": ["KONTR", "MPARK", "SASA"],
+      "tercih_strateji": ["momentum_scalp", "scalp_vur_kac"],
+      "sabir_carpani": 0.5,
+      "stop_genislik_carpani": 0.8
+    },
+    "haber_duyarli": {
+      "hisseler": ["THYAO", "PGSUS", "TUPRS", "ARCLK", "SISE"],
+      "tercih_strateji": ["bomba_al_tut", "trend_takip"],
+      "haber_agirlik_carpani": 1.5,
+      "dolar_duyarlilik": true
+    },
+    "salincak": {
+      "hisseler": ["TKFEN", "PETKM", "AYEN"],
+      "tercih_strateji": ["bant_trading", "scalp_vur_kac"],
+      "sabir_carpani": 0.7,
+      "bollinger_uyumlu": true
+    },
+    "dengeli": {
+      "hisseler": ["GARAN", "AKBNK", "ASELS", "BIMAS"],
+      "tercih_strateji": ["trend_takip", "bomba_al_tut", "bant_trading"],
+      "sabir_carpani": 1.0,
+      "stop_genislik_carpani": 1.0
+    }
+  },
+
+  "ogrenme": {
+    "aktif": true,
+    "gun_sonu_analiz": true,
+    "hafiza_gun_sayisi": 90,
+    "min_islem_ogrenme": 10,
+    "agirlik_guncelleme_hizi": 0.1,
+    "overfitting_koruma": true,
+    "stres_testi_aktif": false
+  },
+
+  "rotasyon": {
+    "aktif": true,
+    "kontrol_aralik_dk": 30,
+    "hacim_dusus_esik": 0.5,
+    "momentum_bozulma_pct": -3.0,
+    "rsi_asiri_alim": 80,
+    "rsi_asiri_satim": 20,
+    "min_bomba_skor": 40,
+    "max_ayni_sektor": 2
+  },
+
+  "muhendis": {
+    "aktif": true,
+    "kontrol_aralik_dk": 30,
+    "dashboard_izle": true,
+    "coin_bot_izle": true,
+    "iq_strateji_izle": true,
+    "rotasyon_izle": true,
+    "beyin_izle": true,
+    "otomatik_restart": true,
+    "bildirim_gonder": true,
+    "gece_temizlik_saat": "02:00",
+    "saglik_rapor_saatler": ["06:00", "12:00", "18:00"]
+  },
+
+  "coin_bot": {
+    "aktif": true,
+    "tarama_aralik_dk": 10,
+    "min_skor": 55,
+    "max_pozisyon_oran": 0.20,
+    "max_toplam_oran": 0.60,
+    "stop_loss_pct": 3.0,
+    "trailing_pct": 2.0,
+    "komisyon_oran": 0.001,
+    "kilitli_coinler": ["SOLUSDT"]
+  },
+
+  "veri_kaynaklari": {
+    "yfinance": {"aktif": true, "ucret": "ucretsiz"},
+    "kap_rss": {"aktif": false, "url": "https://www.kap.org.tr/tr/rss/bildirim", "ucret": "ucretsiz"},
+    "tcmb_evds": {"aktif": false, "url": "https://evds2.tcmb.gov.tr/service/evds/", "ucret": "ucretsiz"},
+    "fear_greed": {"aktif": true, "url": "https://api.alternative.me/fng/", "ucret": "ucretsiz"},
+    "binance": {"aktif": true, "ucret": "ucretsiz"},
+    "glassnode": {"aktif": false, "ucret": "ucretsiz_basic", "api_key": ""},
+    "vader_sentiment": {"aktif": true, "ucret": "ucretsiz"}
+  }
+}

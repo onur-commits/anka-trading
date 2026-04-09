@@ -254,6 +254,115 @@ def kontrol_dashboard():
     return sonuc
 
 
+def kontrol_iq_stratejiler():
+    """IQ stratejileri çalışıyor mu? Midas bağlı mı?"""
+    sonuc = {"calisiyor": False, "midas_bagli": False, "sorunlar": [], "aksiyon": []}
+
+    # MatriksIQ process kontrolü
+    try:
+        r = subprocess.run(["tasklist"], capture_output=True, text=True, timeout=10)
+        sonuc["calisiyor"] = "MatriksIQ.exe" in r.stdout
+    except Exception:
+        sonuc["sorunlar"].append("Tasklist çalıştırılamadı")
+
+    if not sonuc["calisiyor"]:
+        sonuc["sorunlar"].append("MatriksIQ ÇALIŞMIYOR!")
+        sonuc["aksiyon"].append("IQ_YENIDEN_BASLAT")
+        return sonuc
+
+    # Beyin state'den strateji durumunu kontrol et
+    beyin_state = DATA_DIR / "beyin_state.json"
+    if beyin_state.exists():
+        try:
+            with open(beyin_state, encoding="utf-8") as f:
+                beyin = json.load(f)
+            son_zaman = beyin.get("zaman")
+            if son_zaman:
+                son = datetime.strptime(son_zaman, "%Y-%m-%d %H:%M:%S")
+                fark_dk = (datetime.now() - son).total_seconds() / 60
+                if fark_dk > 60:
+                    sonuc["sorunlar"].append(f"Beyin {fark_dk:.0f}dk önce güncellendi — takılmış olabilir")
+                    sonuc["aksiyon"].append("BEYIN_YENIDEN_BASLAT")
+        except Exception:
+            pass
+
+    # Rotasyon state kontrolü
+    rot_state = DATA_DIR / "rotasyon_state.json"
+    if rot_state.exists():
+        try:
+            with open(rot_state, encoding="utf-8") as f:
+                rot = json.load(f)
+            son_kontrol = rot.get("son_kontrol")
+            if son_kontrol:
+                son = datetime.strptime(son_kontrol, "%Y-%m-%d %H:%M:%S")
+                fark_dk = (datetime.now() - son).total_seconds() / 60
+                if fark_dk > 45:  # 30dk döngü + 15dk tolerans
+                    sonuc["sorunlar"].append(f"Rotasyon {fark_dk:.0f}dk önce — durmuş!")
+                    sonuc["aksiyon"].append("ROTASYON_YENIDEN_BASLAT")
+        except Exception:
+            pass
+    else:
+        sonuc["sorunlar"].append("Rotasyon state dosyası yok")
+
+    return sonuc
+
+
+def onar_iq_stratejiler(aksiyon_listesi):
+    """IQ stratejilerini ve bağlantıları onar."""
+    onarilan = 0
+
+    for aksiyon in aksiyon_listesi:
+        if aksiyon == "ROTASYON_YENIDEN_BASLAT":
+            try:
+                subprocess.Popen(
+                    f'"C:\\Program Files\\Python312\\python.exe" -X utf8 {BASE_DIR / "anka_rotasyon.py"}',
+                    shell=True,
+                )
+                log("Rotasyon yeniden başlatıldı", "WARNING", "ONARIM")
+                onarilan += 1
+            except Exception as e:
+                log(f"Rotasyon başlatılamadı: {e}", "ERROR", "ONARIM")
+
+        elif aksiyon == "BEYIN_YENIDEN_BASLAT":
+            try:
+                subprocess.Popen(
+                    f'"C:\\Program Files\\Python312\\python.exe" -X utf8 {BASE_DIR / "anka_beyin.py"} --analiz',
+                    shell=True,
+                )
+                log("Beyin analizi yeniden başlatıldı", "WARNING", "ONARIM")
+                onarilan += 1
+            except Exception as e:
+                log(f"Beyin başlatılamadı: {e}", "ERROR", "ONARIM")
+
+        elif aksiyon == "IQ_YENIDEN_BASLAT":
+            # IQ'yu yeniden başlatmak riskli — sadece bildir
+            log("MatriksIQ ÇALIŞMIYOR — manuel müdahale gerekli!", "ERROR", "ONARIM")
+            bildirim_gonder("MatriksIQ çalışmıyor! VPS'e bağlanıp kontrol et.")
+
+    return onarilan
+
+
+def bildirim_gonder(mesaj):
+    """Kullanıcıya bildirim gönder (dosya + log)."""
+    bildirim_file = DATA_DIR / "acil_bildirim.json"
+    try:
+        bildirimler = []
+        if bildirim_file.exists():
+            with open(bildirim_file, encoding="utf-8") as f:
+                bildirimler = json.load(f)
+        bildirimler.append({
+            "zaman": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+            "mesaj": mesaj,
+            "okundu": False,
+        })
+        bildirimler = bildirimler[-50:]
+        with open(bildirim_file, "w", encoding="utf-8") as f:
+            json.dump(bildirimler, f, ensure_ascii=False, indent=1)
+        log(f"BİLDİRİM: {mesaj}", "WARNING", "BILDIRIM")
+    except Exception:
+        pass
+
+
 def kontrol_coin_bot():
     """Coin otonom bot çalışıyor mu? State güncel mi?"""
     sonuc = {"calisiyor": False, "sorunlar": []}
@@ -556,6 +665,20 @@ def saglik_raporu():
             if onar_coin_bot():
                 rapor["toplam_onarim"] += 1
 
+    # 1c. IQ Strateji kontrolü
+    log("IQ strateji kontrolü...", "INFO", "KONTROL")
+    iq = kontrol_iq_stratejiler()
+    rapor["kontroller"]["iq_stratejiler"] = iq
+    if iq["sorunlar"]:
+        rapor["toplam_sorun"] += len(iq["sorunlar"])
+        for s in iq["sorunlar"]:
+            log(f"  {s}", "WARNING", "IQ")
+        if iq["aksiyon"]:
+            onarilan = onar_iq_stratejiler(iq["aksiyon"])
+            rapor["toplam_onarim"] += onarilan
+        if not iq["calisiyor"]:
+            bildirim_gonder("MatriksIQ çalışmıyor! Stratejiler durdu. VPS'e bağlan.")
+
     # 2. Veri bütünlüğü
     log("Veri bütünlüğü kontrolü...", "INFO", "KONTROL")
     veri_sorunlar = kontrol_veri_butunlugu()
@@ -651,6 +774,16 @@ def hizli_kontrol():
             onar_dashboard("bist")
         if not dash["coin"]:
             onar_dashboard("coin")
+
+    # IQ Strateji kontrolü
+    iq = kontrol_iq_stratejiler()
+    if iq["sorunlar"]:
+        for s in iq["sorunlar"]:
+            log(s, "WARNING", "IQ")
+        if iq["aksiyon"]:
+            onar_iq_stratejiler(iq["aksiyon"])
+        if not iq["calisiyor"]:
+            bildirim_gonder("ACIL: MatriksIQ çalışmıyor!")
 
     # Kritik JSON kontrolü
     for dosya in ["otonom_state.json", "gunluk_bomba.json"]:
