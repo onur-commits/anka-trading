@@ -90,7 +90,23 @@ ML: XGBoost + LightGBM + MLP ensemble, 73 feature
 ssh Administrator@78.135.87.29 
 Sifre: .env dosyasinda veya kullanicidan sor 
 . 
+## Yeni Moduller (2026-04-09)
+- anka_muhendis.py - Otonom bakim & onarim (7/24, 30dk kontrol, otomatik restart)
+- pages/2_ANKA_Danisman.py - Zeka sohbet paneli (4 ajan analiz, komisyon dahil)
+- ANKA_BILINEN_SORUNLAR.md - Bilinen sorunlar veritabani (Muhendis okur)
+- MATRIKS_IQ_STRATEJI_REHBER.md - 66 built-in strateji + API referansi
+.
 ## Gelistirme Notlari 
 - Windows'ta PYTHONUTF8=1 environment variable gerekli (Turkce karakter) 
+- Python calistirirken HER ZAMAN -X utf8 flag kullan
 - Streamlit --server.headless true --server.address 0.0.0.0 ile baslatilmali 
 - .env dosyasi git'e EKLENMEMELI (.gitignore'da) 
+- Bilinen sorunlar ANKA_BILINEN_SORUNLAR.md dosyasinda
+- Erisim noktalari ayni dosyada ve bu dosyada
+.
+## Organizasyon
+- CEO: Kullanici (kararlar, yon)
+- Direktor: Claude (strateji, gelistirme)
+- ANKA Danisman: Hisse analiz (4 ajan: TECHNO, VOLUME, MACRO, FUNDA)
+- ANKA Muhendis: Teknik bakim, onarim, hata tespiti
+- Otonom Trader: Zamanli gorevler (ML egitim, tarama, rapor)

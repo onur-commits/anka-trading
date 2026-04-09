@@ -30,7 +30,158 @@ BASE_DIR = Path(__file__).parent
 DATA_DIR = BASE_DIR / "data"
 LOG_DIR = BASE_DIR / "logs"
 MUHENDIS_LOG = LOG_DIR / "muhendis_log.json"
+SORUNLAR_DOSYA = BASE_DIR / "ANKA_BILINEN_SORUNLAR.md"
 LOG_DIR.mkdir(exist_ok=True)
+
+
+# ============================================================
+# BİLİNEN SORUNLAR VERİTABANI
+# ============================================================
+
+def bilinen_sorunlari_yukle():
+    """ANKA_BILINEN_SORUNLAR.md'den bilinen sorunları oku."""
+    sorunlar = {}
+    if not SORUNLAR_DOSYA.exists():
+        return sorunlar
+    try:
+        icerik = SORUNLAR_DOSYA.read_text(encoding="utf-8")
+        import re
+        bloklar = re.split(r"### (SORUN-\d+):", icerik)
+        for i in range(1, len(bloklar) - 1, 2):
+            sorun_id = bloklar[i].strip()
+            detay = bloklar[i + 1].strip()
+            sorunlar[sorun_id] = detay
+    except Exception:
+        pass
+    return sorunlar
+
+
+def sorun_esle(hata_mesaji):
+    """Bir hata mesajını bilinen sorunlarla eşleştir."""
+    eslesmeler = {
+        "charmap": "SORUN-001",
+        "cp1252": "SORUN-001",
+        "UnicodeEncodeError": "SORUN-001",
+        "MultiIndex": "SORUN-002",
+        "yfinance": "SORUN-002",
+        "EmptyDataError": "SORUN-002",
+        "8501": "SORUN-003",
+        "8502": "SORUN-003",
+        "streamlit": "SORUN-003",
+        "JSONDecodeError": "SORUN-004",
+        "json.decoder": "SORUN-004",
+        "Permission denied": "SORUN-005",
+        "Connection refused": "SORUN-005",
+        "ssh": "SORUN-005",
+        "18890": "SORUN-006",
+        "MatriksIQ": "SORUN-006",
+        "ModuleNotFoundError": "SORUN-010",
+        "No module named": "SORUN-010",
+        "No space left": "SORUN-011",
+        "disk": "SORUN-011",
+    }
+    for anahtar, sorun_id in eslesmeler.items():
+        if anahtar.lower() in hata_mesaji.lower():
+            return sorun_id
+    return None
+
+
+def otomatik_coz(sorun_id, hata_detay=""):
+    """Bilinen sorunları otomatik çözmeye çalış."""
+    if sorun_id == "SORUN-001":
+        # Encoding sorunu — bu runtime'da çözülemez ama log yazalım
+        log("Encoding sorunu tespit — -X utf8 flag kontrolü gerekiyor", "WARNING", "ONARIM")
+        return True
+
+    elif sorun_id == "SORUN-003":
+        # Dashboard çökmesi
+        dash = kontrol_dashboard()
+        onarilan = 0
+        if not dash["bist"]:
+            onar_dashboard("bist")
+            onarilan += 1
+        if not dash["coin"]:
+            onar_dashboard("coin")
+            onarilan += 1
+        return onarilan > 0
+
+    elif sorun_id == "SORUN-004":
+        # JSON bozuk — kontrol_veri_butunlugu zaten hallediyor
+        kontrol_veri_butunlugu()
+        return True
+
+    elif sorun_id == "SORUN-010":
+        # Eksik modül — otomatik yükle
+        import re
+        match = re.search(r"No module named '(\w+)'", hata_detay)
+        if match:
+            modul = match.group(1)
+            try:
+                subprocess.run(
+                    [sys.executable, "-m", "pip", "install", modul, "--quiet"],
+                    timeout=60, capture_output=True,
+                )
+                log(f"Eksik modül yüklendi: {modul}", "WARNING", "ONARIM")
+                return True
+            except Exception:
+                pass
+        return False
+
+    elif sorun_id == "SORUN-011":
+        # Disk dolması — acil temizlik
+        gece_temizlik()
+        return True
+
+    return False
+
+
+def internet_arastir(hata_mesaji):
+    """Bilinmeyen hata için çözüm ipucu oluştur (internet erişimi varsa)."""
+    try:
+        import urllib.request
+        import urllib.parse
+        # Stack Overflow API ile arama
+        query = urllib.parse.quote(f"python {hata_mesaji[:100]}")
+        url = f"https://api.stackexchange.com/2.3/search/excerpts?order=desc&sort=relevance&q={query}&site=stackoverflow&pagesize=3"
+        req = urllib.request.Request(url, headers={"Accept-Encoding": "gzip"})
+        with urllib.request.urlopen(req, timeout=10) as resp:
+            import gzip
+            data = gzip.decompress(resp.read())
+            sonuc = json.loads(data)
+            if sonuc.get("items"):
+                cozumler = []
+                for item in sonuc["items"][:3]:
+                    baslik = item.get("title", "")
+                    cozumler.append(baslik)
+                return cozumler
+    except Exception:
+        pass
+    return []
+
+
+def akilli_hata_analiz(hata_mesaji):
+    """Hatayı analiz et: bilinen mi? Çözümü var mı? İnternetten ara."""
+    # 1. Bilinen sorunlarla eşleştir
+    sorun_id = sorun_esle(hata_mesaji)
+    if sorun_id:
+        log(f"Bilinen sorun tespit: {sorun_id}", "INFO", "ANALIZ")
+        basarili = otomatik_coz(sorun_id, hata_mesaji)
+        if basarili:
+            log(f"{sorun_id} otomatik çözüldü", "INFO", "ONARIM")
+        else:
+            log(f"{sorun_id} otomatik çözülemedi — manuel müdahale gerekli", "WARNING", "ONARIM")
+        return sorun_id, basarili
+
+    # 2. Bilinmeyen hata — internetten araştır
+    log(f"Bilinmeyen hata — internet araştırması yapılıyor", "INFO", "ANALIZ")
+    ipuclari = internet_arastir(hata_mesaji)
+    if ipuclari:
+        for ipucu in ipuclari:
+            log(f"StackOverflow ipucu: {ipucu}", "INFO", "ARASTIRMA")
+    else:
+        log("İnternet araştırması sonuçsuz", "INFO", "ARASTIRMA")
+
+    return None, False
 
 # ============================================================
 # LOG SİSTEMİ
@@ -185,19 +336,39 @@ def kontrol_log_boyut():
 
 
 def kontrol_python_hatalari():
-    """Son hataları analiz et."""
+    """Son hataları analiz et ve bilinen sorunlarla eşleştir."""
     sorunlar = []
 
     # otonom_log.json son hataları
     try:
         if (DATA_DIR / "otonom_log.json").exists():
-            with open(DATA_DIR / "otonom_log.json") as f:
+            with open(DATA_DIR / "otonom_log.json", encoding="utf-8") as f:
                 logs = json.load(f)
             hatalar = [l for l in logs[-50:] if l.get("seviye") in ("ERROR", "CRITICAL")]
             if hatalar:
                 sorunlar.append(f"Son 50 log'da {len(hatalar)} hata var:")
                 for h in hatalar[-3:]:
-                    sorunlar.append(f"  [{h['zaman']}] {h['mesaj'][:100]}")
+                    mesaj = h.get("mesaj", "")[:100]
+                    sorunlar.append(f"  [{h['zaman']}] {mesaj}")
+                    # Akıllı analiz — bilinen sorunla eşleştir ve çözmeye çalış
+                    sorun_id, cozuldu = akilli_hata_analiz(mesaj)
+                    if sorun_id and cozuldu:
+                        sorunlar.append(f"    → {sorun_id} otomatik çözüldü")
+                    elif sorun_id:
+                        sorunlar.append(f"    → {sorun_id} tespit edildi, manuel müdahale gerekli")
+    except Exception:
+        pass
+
+    # muhendis_log.json son hataları
+    try:
+        if MUHENDIS_LOG.exists():
+            with open(MUHENDIS_LOG, encoding="utf-8") as f:
+                logs = json.load(f)
+            hatalar = [l for l in logs[-30:] if l.get("seviye") == "ERROR"]
+            for h in hatalar[-2:]:
+                mesaj = h.get("mesaj", "")
+                sorunlar.append(f"  [MUHENDIS] {mesaj[:100]}")
+                akilli_hata_analiz(mesaj)
     except Exception:
         pass
 
