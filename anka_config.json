@@ -4,8 +4,9 @@
 
   "genel": {
     "max_toplam_pozisyon_tl": 150000,
-    "max_tek_pozisyon_tl": 30000,
-    "max_pozisyon_sayisi": 5,
+    "max_tek_pozisyon_tl": 15000,
+    "max_pozisyon_sayisi": 10,
+    "toplam_limit_bitince": "satmadan_alma",
     "komisyon_tek_yon": 0.0004,
     "slippage": 0.001,
     "gunluk_max_emir": 20,
