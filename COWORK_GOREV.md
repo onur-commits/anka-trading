@@ -3,167 +3,71 @@
 ## DURUM
 - 86 adet ANKA_*.cs strateji dosyası VPS'te hazır: `C:\ANKA\matriks_iq\`
 - Her biri 15.000 TL pozisyon limiti, 15dk periyot
-- MaxPositionValue: 15000, Komisyon: 0
+- MaxPositionValue: 15000 → KOD GÜNCEL FİYATTAN ADETİ OTOMATİK HESAPLAR
 - Stop-loss %2, Trailing %1.5, Break-even %0.8
 - Saat filtresi 10:00-18:00, XU100 endeks filtresi aktif
 
+## ÖNEMLİ: ADET HESAPLAMA
+Kodda `buyQty = Math.Floor(15000 / guncelFiyat)` var.
+Fiyat değişse bile her sinyalde güncel fiyattan adet hesaplanır.
+BuyOrderQuantity parametresine dokunma veya 999999 yaz — kod kendi hesaplayacak.
+
 ## VPS BİLGİLERİ
-- IP: 78.135.87.29
+- IP: 78.135.87.29 (İstanbul Bakırköy, Markahost)
 - User: Administrator
 - Midas Menkul hesap: 0-2205905
 - MatriksIQ çalışıyor
+- Saat: İstanbul (otomatik düzeltme kuruldu)
 
 ## YAPILACAK İŞ
 MatriksIQ'da her hisse için strateji yükleme:
 
-1. IQ Algo → Yeni Strateji Oluştur → Yeni şablon
-2. Strateji adını ANKA_TICKER yap (ör: ANKA_GARAN)
-3. Kodu C:\ANKA\matriks_iq\ANKA_TICKER.cs dosyasından kopyala-yapıştır
-4. Kodu Derle → hata yoksa Çalıştır
-5. Parametreler: Period 15dk, Komisyon 0
-6. BuyOrderQuantity ve SellOrderQuantity: aşağıdaki tablodan
+### ADIM ADIM (her hisse için ~30 saniye):
+1. IQ Algo → Kullanıcı Stratejileri → "Strateji Al" veya "Yeni Strateji Oluştur"
+2. Strateji adını **ANKA_TICKER** yap (ör: ANKA_GARAN) — CLASS ADI İLE BİREBİR AYNI OLMALI
+3. Kodu `C:\ANKA\matriks_iq\ANKA_TICKER.cs` dosyasından kopyala-yapıştır
+4. **Kodu Derle** → hata yoksa devam
+5. **Çalıştır** → Parametreler:
+   - Symbol: otomatik gelir (kodda tanımlı)
+   - SymbolPeriod: **15Dakika**
+   - BuyOrderQuantity: **999999** (kod kendi hesaplar)
+   - SellOrderQuantity: **999999** (kod kendi hesaplar)
+   - MaxPositionValue: **15000** (otomatik gelir)
+   - Komisyon: **0**
+6. **İleri → Çalıştır**
 
-## 86 HİSSE LİSTESİ VE ADETLER (15.000 TL / Fiyat)
+### 86 HİSSENİN TAMAMINI YAP — seçme yok, hepsi yüklenir
 
-### Bankalar
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| GARAN | 136 | 110 |
-| AKBNK | 56 | 267 |
-| ISCTR | 13 | 1153 |
-| YKBNK | 30 | 500 |
-| HALKB | 18 | 833 |
-| VAKBN | 13 | 1153 |
-| TSKB | 11 | 1363 |
-| SKBNK | 4 | 3750 |
+Sıra farketmez. Tek tek 86'sını yükle. Her biri ~30 saniye.
+Adet yazmana gerek yok — kod güncel fiyattan otomatik hesaplar.
 
-### Holdingler
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| SAHOL | 97 | 154 |
-| KCHOL | 200 | 75 |
-| TAVHL | 293 | 51 |
-| DOHOL | 21 | 714 |
+## TAM HİSSE LİSTESİ (86 adet)
 
-### Sanayi
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| EREGL | 30 | 500 |
-| TOASO | 280 | 53 |
-| TUPRS | 257 | 58 |
-| SISE | 47 | 319 |
-| FROTO | 1200 | 12 |
-| OTKAR | 530 | 28 |
-| TTRAK | 600 | 25 |
-| KORDS | 58 | 258 |
-| BRISA | 85 | 176 |
-| CIMSA | 49 | 306 |
-| EGEEN | 400 | 37 |
-| TKFEN | 108 | 138 |
+```
+GARAN  AKBNK  ISCTR  YKBNK  HALKB  VAKBN  TSKB   SAHOL
+KCHOL  TAVHL  DOHOL  EREGL  TOASO  TUPRS  SISE   FROTO
+OTKAR  TTRAK  KORDS  BRISA  CIMSA  EGEEN  AKSEN  ODAS
+ENJSA  AYEN   ASELS  LOGO   BIMAS  MGROS  SOKM   THYAO
+PGSUS  TCELL  TTKOM  ENKAI  EKGYO  ISGYO  PETKM  GUBRF
+HEKTS  SASA   ULKER  AEFES  TKFEN  VESTL  ARCLK  GESAN
+KONTR  MPARK  KOZAL  ALFAS  ALTNY  ARDYZ  ASTOR  ASUZU
+BERA   BIOEN  BRYAT  BTCIM  CANTE  CCOLA  CEMTS  CWENE
+DOAS   ECILC  EUPWR  GWIND  KMPUR  KOPOL  KRDMD  MTRKS
+OZKGY  SKBNK  SMRTG  SUNTK  TABGD  TATGD  TKNSA  TURSG
+VESBE  YATAS  AKFGY  AKFYE  AKSA   ALARK
+```
 
-### Enerji
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| AKSEN | 79 | 189 |
-| ODAS | 30 | 500 |
-| ENJSA | 116 | 129 |
-| AYEN | 36 | 416 |
-| GESAN | 5 | 3000 |
-| EUPWR | 3 | 5000 |
-| CWENE | 5 | 3000 |
+Her hisse için dosya: `C:\ANKA\matriks_iq\ANKA_[TICKER].cs`
+Strateji adı: `ANKA_[TICKER]` (class adı ile birebir aynı)
 
-### Teknoloji/Savunma
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| ASELS | 378 | 39 |
-| LOGO | 160 | 93 |
-| KONTR | 8 | 1875 |
-| MTRKS | 22 | 681 |
-| ARDYZ | 15 | 1000 |
-
-### Perakende/Gıda
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| BIMAS | 738 | 20 |
-| MGROS | 603 | 24 |
-| SOKM | 50 | 300 |
-| ULKER | 150 | 100 |
-| AEFES | 200 | 75 |
-| MPARK | 8 | 1875 |
-| CCOLA | 200 | 75 |
-| TABGD | 25 | 600 |
-| TATGD | 30 | 500 |
-
-### Havacılık/Turizm
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| THYAO | 294 | 51 |
-| PGSUS | 500 | 30 |
-
-### Telekom
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| TCELL | 80 | 187 |
-| TTKOM | 25 | 600 |
-
-### İnşaat/GYO
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| ENKAI | 92 | 163 |
-| EKGYO | 6 | 2500 |
-| ISGYO | 10 | 1500 |
-| OZKGY | 8 | 1875 |
-
-### Kimya
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| PETKM | 21 | 714 |
-| GUBRF | 100 | 150 |
-| HEKTS | 80 | 187 |
-| SASA | 2.3 | 6521 |
-
-### Otomotiv
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| VESTL | 35 | 428 |
-| ARCLK | 180 | 83 |
-| ASUZU | 50 | 300 |
-| DOAS | 200 | 75 |
-
-### Diğer
-| Hisse | Fiyat | Adet |
-|-------|-------|------|
-| ALFAS | 60 | 250 |
-| ALTNY | 50 | 300 |
-| ASTOR | 50 | 300 |
-| BERA | 130 | 115 |
-| BIOEN | 15 | 1000 |
-| BRYAT | 10 | 1500 |
-| BTCIM | 20 | 750 |
-| CANTE | 30 | 500 |
-| CEMTS | 30 | 500 |
-| ECILC | 20 | 750 |
-| GWIND | 10 | 1500 |
-| KMPUR | 100 | 150 |
-| KOPOL | 15 | 1000 |
-| KRDMD | 30 | 500 |
-| SMRTG | 10 | 1500 |
-| SUNTK | 30 | 500 |
-| TKNSA | 25 | 600 |
-| TURSG | 15 | 1000 |
-| VESBE | 20 | 750 |
-| YATAS | 30 | 500 |
-| AKFGY | 10 | 1500 |
-| AKFYE | 15 | 1000 |
-| AKSA | 40 | 375 |
-| ALARK | 50 | 300 |
-| KOZAL | 80 | 187 |
-
-## NOT
-- Fiyatlar tahminidir, IQ çalıştırırken güncel fiyattan adet hesapla
-- Adet = 15000 / güncel_fiyat (yuvarla)
-- MaxPositionValue 15000 olduğu için kod otomatik hesaplar ama BuyOrderQuantity'yi de doğru gir
-- İlk 10 hisse ile başla, sorun yoksa kalanını ekle
+## ADET HESAPLAMA — OTOMATİK
+Kod içinde: `buyQty = Math.Floor(15000 / closePrice)`
+- Fiyat 100 TL → 150 lot alır
+- Fiyat 50 TL → 300 lot alır
+- Fiyat değişirse → sonraki sinyalde yeni fiyattan hesaplar
+- **Elle adet yazmana GEREK YOK**
+- BuyOrderQuantity: **999999** yaz (kod kendi sınırlar)
+- SellOrderQuantity: **999999** yaz
 
 ## BUGÜN KONUŞTUKLARIMIZ (9 Nisan 2026)
 
