@@ -703,6 +703,19 @@ class CoinOtonomTrader:
         self.hacim = HacimAjan()
         self.makro = MakroAjan(self.client)
         self.likidite = LikiditeAjan(self.client)
+        # Ek uzman ajanlar — coin_ajanlar.py (rally zirvesi filtresi için)
+        try:
+            from coin_ajanlar import FundingAgent, SentimentAgent, CorrelationAgent
+            self.funding = FundingAgent()
+            self.sentiment = SentimentAgent()
+            self.correlation = CorrelationAgent()
+            self._sentiment_cache = None
+            self._sentiment_cache_time = 0
+            self._uzman_ajanlar_aktif = True
+            logger.info("Uzman ajanlar yüklendi: FUNDING, SENTIMENT, CORRELATION")
+        except Exception as e:
+            logger.warning(f"Uzman ajanlar yüklenemedi ({e}) — sadece 4 temel ajan kullanılacak")
+            self._uzman_ajanlar_aktif = False
         self.risk = CoinRiskYoneticisi()
         self.cycle_count = 0
 
@@ -777,16 +790,46 @@ class CoinOtonomTrader:
                 if df is None or len(df) < 50:
                     continue
 
-                # 4 ajan analizi
+                # 4 temel ajan analizi
                 tek_p, tek_d = self.teknik.analiz(df)
                 hac_p, hac_d = self.hacim.analiz(df)
                 mak_p, mak_d = self.makro.analiz(symbol)
                 lik_p, lik_d = self.likidite.analiz(symbol)
 
-                # Ağırlıklı skor
-                skor = tek_p * 0.35 + hac_p * 0.25 + mak_p * 0.25 + lik_p * 0.15
-                puanlar = {"TEK": tek_p, "HAC": hac_p, "MAK": mak_p, "LIK": lik_p}
-                onay = sum(1 for p in [tek_p, hac_p, mak_p] if p >= 60)
+                # Uzman ajanlar — rally zirvesi / aşırı long tespiti
+                if self._uzman_ajanlar_aktif:
+                    # Sentiment global, 15dk cache (F&G index günde bir güncellenir)
+                    now = time.time()
+                    if self._sentiment_cache is None or now - self._sentiment_cache_time > 900:
+                        self._sentiment_cache = self.sentiment.analiz()
+                        self._sentiment_cache_time = now
+                    sen_p, sen_d = self._sentiment_cache
+                    fun_p, fun_d = self.funding.analiz(symbol)
+                    # Correlation BTC kendisi için 50 (nötr)
+                    if symbol == "BTCUSDT":
+                        cor_p, cor_d = 50, "BTC kendisi"
+                    else:
+                        cor_p, cor_d = self.correlation.analiz(symbol)
+                else:
+                    sen_p = fun_p = cor_p = 50
+                    sen_d = fun_d = cor_d = ""
+
+                # Ağırlıklı skor — uzman ajanlar aktifse yeni ağırlık, değilse eski
+                if self._uzman_ajanlar_aktif:
+                    skor = (tek_p * 0.30 + hac_p * 0.20 + mak_p * 0.15 + lik_p * 0.10 +
+                            sen_p * 0.15 + fun_p * 0.10)
+                    # Correlation bonus/malus olarak uygula (BTC düşerken agresif beta → -10)
+                    if cor_p <= 35:
+                        skor -= 5
+                    elif cor_p >= 70:
+                        skor += 5
+                    puanlar = {"TEK": tek_p, "HAC": hac_p, "MAK": mak_p, "LIK": lik_p,
+                               "SEN": sen_p, "FUN": fun_p, "COR": cor_p}
+                    onay = sum(1 for p in [tek_p, hac_p, mak_p, sen_p, fun_p] if p >= 60)
+                else:
+                    skor = tek_p * 0.35 + hac_p * 0.25 + mak_p * 0.25 + lik_p * 0.15
+                    puanlar = {"TEK": tek_p, "HAC": hac_p, "MAK": mak_p, "LIK": lik_p}
+                    onay = sum(1 for p in [tek_p, hac_p, mak_p] if p >= 60)
 
                 fiyat = float(df["Close"].iloc[-1])
                 atr = self._atr(df)
@@ -805,9 +848,15 @@ class CoinOtonomTrader:
 
                 karar = "AL" if skor >= Config.MIN_SKOR_AL and onay >= Config.MIN_AJAN_ONAY else ""
                 icon = ">>>" if karar else "   "
-                logger.info(f"  {icon} {symbol:10s} ${fiyat:>10,.2f} | "
-                            f"Skor:{skor:5.1f} | TEK:{tek_p:2.0f} HAC:{hac_p:2.0f} "
-                            f"MAK:{mak_p:2.0f} LIK:{lik_p:2.0f} | {karar}")
+                if self._uzman_ajanlar_aktif:
+                    logger.info(f"  {icon} {symbol:10s} ${fiyat:>10,.2f} | "
+                                f"Skor:{skor:5.1f} | TEK:{tek_p:2.0f} HAC:{hac_p:2.0f} "
+                                f"MAK:{mak_p:2.0f} LIK:{lik_p:2.0f} | "
+                                f"SEN:{sen_p:2.0f} FUN:{fun_p:2.0f} COR:{cor_p:2.0f} | {karar}")
+                else:
+                    logger.info(f"  {icon} {symbol:10s} ${fiyat:>10,.2f} | "
+                                f"Skor:{skor:5.1f} | TEK:{tek_p:2.0f} HAC:{hac_p:2.0f} "
+                                f"MAK:{mak_p:2.0f} LIK:{lik_p:2.0f} | {karar}")
 
                 time.sleep(0.2)  # Rate limit
 
