@@ -4,4 +4,6 @@ __pycache__/
 data/*.json
 models/*.pkl
 *.log
-.env 
+.env
+islem_gecmisi.json
+

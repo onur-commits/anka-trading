@@ -102,31 +102,41 @@ sshpass -p 'SIFRE' ssh -o StrictHostKeyChecking=no Administrator@78.135.87.29
 3. JSON + char(11) terminator formatı şart
 **Önem:** ORTA — canlı trade için gerekli
 
-### SORUN-007: Midas Menkul İşlem Yetkisi
+### SORUN-007: Midas Menkul İşlem Yetkisi — KAPANDI
 **Belirti:** İşlem limiti 0 görünüyor, emir gönderilemiyor
-**Sebep:** API/algo işlem yetkisi açılmamış
-**Çözüm:** Midas destek'e yazılması gerekiyor — bu teknik değil, idari sorun
-**Durum:** BEKLEMEDE
-**Önem:** KRİTİK — canlı trade'in önündeki tek engel
+**Sebep:** Midas Menkul bireysellere API/algo erişimi VERMİYOR (kesinleşti 2026-04-15)
+**Durum:** KAPANDI — Midas ile BIST canlı trade mümkün değil
+**Alternatifler:**
+1. Algolab (Deniz Yatırım) — Python API ile direkt BIST erişimi
+2. Tacirler + MatriksIQ — C# robotlar ile algo trading
+3. Paper Trading modu aktif (paper_trader.py) — gerçekçi simülasyon
+**Önem:** KRİTİK — çözüm yolu değişti, alternatif aracı kurum gerekli
 
-### SORUN-008: ML Model Düşük Performans
+### SORUN-008: ML Model Düşük Performans — İYİLEŞTİRİLDİ (2026-04-16)
 **Belirti:** AUC 0.56, TECHNO ajanı %33.7 doğruluk
-**Sebep:** BIST'in yüksek noise/sinyal oranı, yetersiz feature
-**Çözüm:**
-1. Walk-forward validation (50 fold yapıldı)
-2. Ensemble: XGBoost + LightGBM + MLP
-3. FUNDA ajanı (%61.6) ve VOLUME ajanı (%56.8) daha güvenilir
-4. ML tek başına karar vermesin, multi-ajan oylama kullan
-**Önem:** ORTA — sistem çalışıyor ama iyileştirme gerekiyor
+**Sebep:** BIST'in yüksek noise/sinyal oranı, yetersiz feature, veri sızıntısı
+**Uygulanan iyileştirmeler:**
+1. tahmin_motoru_v2.py: EnsembleModelV2 (XGBoost + LightGBM + MLP), Purged Walk-Forward CV, Triple Barrier labeling
+2. tahmin_motoru_v3.py: StackingEnsembleV3 — Level-2 meta-model (LogisticRegression), sample weighting (exponential decay), feature interactions (5 cross-feature), probability calibration (Platt scaling), F1-optimized threshold, Optuna hyperparameter tuning
+3. paper_trader.py: Pessimist Paper Trading — slippage, partial fill, market impact, latency simulation (gerçekten daha kötü koşullar)
+4. Tüm scanner'lar V2 modele güncellendi, risk_yonetimi entegre edildi
+**Durum:** V3 model hazır, veri üzerinde test gerekli
+**Önem:** ORTA → İYİLEŞTİRİLDİ
 
-### SORUN-009: Bomba Robotları Log Üretmiyor
-**Belirti:** "BOMBA_AYEN: ❌ Log yok" mesajları
+### SORUN-009: Bomba Robotları Log Üretmiyor — COZULDU (2026-04-16)
+**Belirti:** "BOMBA_AYEN: Log yok" mesajları
 **Sebep:** IQ robotları çalışıyor ama C:\ANKA\data'ya log yazmıyor
-**Çözüm:**
-1. C# kodlarında log dizin yolunu kontrol et
-2. BOMBA_*.cs dosyalarında Debug() çıktıları var ama dosyaya yazmıyor
-3. anka_api.py üzerinden log toplama mekanizması kurulmalı
-**Önem:** ORTA — performans takibi yapılamıyor
+**Cozum uygulandı:**
+1. `anka_api.py` — `robot_durum_sorgula()` ve `bomba_robot_log_topla()` metodlari eklendi
+   - IQ TCP API uzerinden pozisyon/emir/gerceklesen bilgisi toplanir
+   - `data/bomba_robot_log.json` dosyasina muhendis formatiyla uyumlu log yazilir
+2. `bomba_robot_log_bridge.py` — Bagimsiz log koprusu scripti olusturuldu
+   - `data/aktif_bombalar.txt` ve `C:\Robot\aktif_bombalar.txt` okur
+   - MatriksIQ log dizinlerini tarar (C:\MatriksIQ\Logs\, %APPDATA%\MatriksIQ\)
+   - IQ API uzerinden canli durum sorgular
+   - `data/bomba_robot_status.json` birlesik status dosyasi yazar
+   - `--surekli` moduyla 5dk arayla otomatik calisabilir
+**Onem:** COZULDU
 
 ### SORUN-010: pip Paket Eksiklikleri
 **Belirti:** `ModuleNotFoundError: No module named 'XXX'`

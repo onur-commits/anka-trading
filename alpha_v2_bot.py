@@ -294,8 +294,16 @@ def model_egit_komut():
     if "XU100.IS" in veri:
         rejim = market_rejim_tespit(veri["XU100.IS"])
 
+    # Makro veri katmanı (Faz 1)
+    try:
+        from makro_veri import makro_veri_al
+        makro = makro_veri_al(yil=5)
+    except Exception as e:
+        print(f"  ⚠ Makro veri yüklenemedi: {e}")
+        makro = None
+
     model = EnsembleModelV2()
-    meta = model.egit(veri, market_rejim=rejim)
+    meta = model.egit(veri, market_rejim=rejim, makro_veri=makro)
 
     if meta:
         print(f"\n✅ Model eğitildi — AUC: {meta['ensemble_auc']}")

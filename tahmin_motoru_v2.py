@@ -603,8 +603,10 @@ class EnsembleModelV2:
         self.feature_cols = []
         self.meta = {}
 
-    def egit(self, tum_veri, market_rejim=None):
-        """Tüm hisse verilerinden V2 ensemble model eğitir."""
+    def egit(self, tum_veri, market_rejim=None, makro_veri=None):
+        """Tüm hisse verilerinden V2 ensemble model eğitir.
+        makro_veri: makro_veri.py'den gelen dict (opsiyonel, Faz 1 makro katman)
+        """
         from xgboost import XGBClassifier
         from sklearn.neural_network import MLPClassifier
         from sklearn.preprocessing import StandardScaler
@@ -618,6 +620,14 @@ class EnsembleModelV2:
             lgb_available = False
             print("  ⚠ LightGBM yüklü değil, XGBoost+MLP ile devam ediliyor.")
 
+        # Makro feature hazırla (varsa)
+        makro_features_cache = {}
+        if makro_veri:
+            from makro_veri import makro_feature_hesapla, MAKRO_FEATURE_COLS
+            print("  🏦 Makro veri katmanı aktif!")
+        else:
+            MAKRO_FEATURE_COLS = []
+
         X_list, y_list = [], []
 
         for ticker, df in tum_veri.items():
@@ -625,8 +635,21 @@ class EnsembleModelV2:
             if features is None:
                 continue
 
+            # Makro feature'ları ekle
+            if makro_veri:
+                mf = makro_feature_hesapla(makro_veri, features.index)
+                # Sadece mevcut sütunları al
+                mf_cols = [c for c in MAKRO_FEATURE_COLS if c in mf.columns]
+                for col in mf_cols:
+                    features[col] = mf[col]
+
             hedef = hedef_olustur(df)
-            gecerli = [c for c in FEATURE_COLS_V2 if c in features.columns]
+            tum_cols = [c for c in FEATURE_COLS_V2 if c in features.columns]
+            # Makro feature'ları da ekle
+            if makro_veri:
+                tum_cols += [c for c in mf_cols if c not in tum_cols]
+            gecerli = tum_cols
+
             birlesik = features[gecerli].copy()
             birlesik["hedef"] = hedef
             birlesik = birlesik.dropna()

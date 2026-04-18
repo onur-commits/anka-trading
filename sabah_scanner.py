@@ -11,7 +11,13 @@ import numpy as np
 import json
 import os
 from datetime import datetime
-from tahmin_motoru import feature_olustur, hisse_analiz, model_yukle, model_egit
+
+# V2 ML motor
+try:
+    from tahmin_motoru_v2 import EnsembleModelV2, hisse_analiz_v2, feature_olustur_v2
+    ML_READY = True
+except ImportError:
+    ML_READY = False
 
 # ─────────────────────────────────────────────
 # BIST100 Hisse Evreni
@@ -202,9 +208,14 @@ def tarama_yap(top_n=5, ml_esik=0.55):
     print(f"📊 {len(BIST100)} hisse taranıyor...\n")
 
     # ML modelini yükle
-    ml_model = model_yukle()
+    ml_model = None
+    if ML_READY:
+        try:
+            ml_model = EnsembleModelV2.yukle()
+        except Exception:
+            pass
     if ml_model:
-        print("🤖 ML modeli yüklendi!\n")
+        print("🤖 ML modeli (V2 Ensemble) yüklendi!\n")
     else:
         print("⚠️  ML modeli bulunamadı, sadece teknik analiz kullanılacak\n")
 
@@ -216,8 +227,12 @@ def tarama_yap(top_n=5, ml_esik=0.55):
         print(f"  [{i+1:02d}/{len(BIST100)}] {sembol}...", end=" ", flush=True)
         try:
             ticker = sembol + ".IS"
-            df = yf.download(ticker, period="1y", interval="1d",
-                             progress=False, auto_adjust=True)
+            try:
+                df = yf.download(ticker, period="1y", interval="1d",
+                                 progress=False, auto_adjust=True)
+            except Exception as e_yf:
+                print(f"⚪ yfinance hatası: {str(e_yf)[:40]}")
+                continue
 
             if df is None or len(df) < 60:
                 print("⚪ atlandı (veri yetersiz)")
@@ -231,8 +246,8 @@ def tarama_yap(top_n=5, ml_esik=0.55):
 
             tum_df[sembol] = df
 
-            # Teknik + ML analiz
-            analiz = hisse_analiz(sembol, df, ml_model)
+            # Teknik + ML analiz (V2)
+            analiz = hisse_analiz_v2(ticker, df, ml_model, None) if ML_READY else None
             if analiz is None:
                 print("⚪ atlandı (analiz başarısız)")
                 continue
@@ -251,14 +266,14 @@ def tarama_yap(top_n=5, ml_esik=0.55):
                 "teknik_puan": analiz["teknik_skor"],
                 "ml_olasilik": analiz["ml_olasilik"],
                 "birlesik_puan": analiz["birlesik_skor"],
-                "rsi": analiz["features"].get("rsi", 50),
-                "adx": analiz["adx"],
-                "obv_trend": analiz["obv_trend"],
+                "rsi": analiz.get("rsi", 50),
+                "adx": analiz.get("adx", 0),
+                "obv_trend": analiz.get("obv_trend", "?"),
                 "trend_yukari": trend_yukari,
                 "getiri_5g": round(getiri_5g, 2),
-                "hacim_oran": analiz["features"].get("hacim_oran", 1.0),
-                "yillik_poz": analiz["yillik_poz"],
-                "sinyaller": analiz["sinyaller"],
+                "hacim_oran": analiz.get("hacim_oran", 1.0),
+                "yillik_poz": analiz.get("yillik_poz", 50),
+                "sinyaller": analiz.get("sinyal_ozet", []),
             }
             sonuclar.append(sonuc)
 
@@ -296,6 +311,51 @@ def tarama_yap(top_n=5, ml_esik=0.55):
     if not secilen:
         tum_sirali = sorted(sonuclar, key=lambda x: x["birlesik_puan"], reverse=True)
         secilen = tum_sirali[:top_n]
+
+    # ── Risk Yönetimi Filtresi ────────────────────────────────
+    try:
+        from risk_yonetimi import RiskYoneticisi
+        risk = RiskYoneticisi()
+        risk_onaylilar = []
+        for s in secilen:
+            degerlendirme = risk.sinyal_degerlendir(
+                ticker=s["sembol"] + ".IS",
+                fiyat=s["fiyat"],
+                atr=s["fiyat"] * s.get("atr_pct", 2.0) / 100 if s.get("atr_pct") else s["fiyat"] * 0.02,
+                ml_olasilik=s["ml_olasilik"] or 0.5,
+                teknik_skor=s["teknik_puan"],
+            )
+            if degerlendirme.get("islem", True):
+                risk_onaylilar.append(s)
+            else:
+                print(f"  ⚠️  {s['sembol']} risk filtresi: {degerlendirme.get('sebep', '?')}")
+        if risk_onaylilar:
+            secilen = risk_onaylilar
+        print(f"  Risk filtresi: {len(secilen)} hisse onaylandı")
+    except ImportError:
+        pass
+    except Exception as e_risk:
+        print(f"  ⚠️  Risk filtresi hatası: {e_risk}")
+
+    # ── Paper Trade Girişleri ─────────────────────────────────
+    try:
+        from paper_trader import PaperTrader, OrderSide
+        pt = PaperTrader()
+        for s in secilen:
+            try:
+                pt.emir_gonder(
+                    ticker=s["sembol"],
+                    side=OrderSide.BUY,
+                    lot=max(1, int(10_000 / s["fiyat"])),  # ~10.000 TL pozisyon
+                    fiyat=s["fiyat"],
+                )
+            except Exception as e_emir:
+                print(f"  ⚠️  Paper trade hatası ({s['sembol']}): {e_emir}")
+        print(f"  Paper trade: {len(secilen)} emir gönderildi")
+    except ImportError:
+        pass
+    except Exception as e_pt:
+        print(f"  ⚠️  Paper trader hatası: {e_pt}")
 
     # ── Kaydet ────────────────────────────────────────────────
     tum_sirali = sorted(sonuclar, key=lambda x: x["birlesik_puan"], reverse=True)
@@ -344,24 +404,33 @@ def tarama_yap(top_n=5, ml_esik=0.55):
 if __name__ == "__main__":
     import sys
 
-    # Argüman: --egit → modeli yeniden eğit
+    # Argüman: --egit → modeli yeniden eğit (V2 ensemble)
     if "--egit" in sys.argv:
-        print("🎓 Model eğitimi başlıyor...")
-        _, tum_veri = tarama_yap(top_n=5)
-        if tum_veri:
-            sonuc = model_egit(tum_veri)
-            if sonuc:
-                print(f"\n✅ Model eğitildi!")
-                print(f"   Doğruluk  : %{sonuc['dogruluk']*100:.1f}")
-                print(f"   F1 Skoru  : {sonuc['f1']:.3f}")
-                print(f"   Precision : {sonuc['precision']:.3f}")
-                print(f"   Eğitim    : {sonuc['egitim_boyut']:,} satır")
-                if sonuc.get("walk_forward"):
-                    wf = sonuc["walk_forward"]
-                    ort_f1 = np.mean([s["f1"] for s in wf])
-                    print(f"   WF Ort F1 : {ort_f1:.3f} ({len(wf)} fold)")
-                print(f"\n   🥇 En önemli özellikler:")
-                for feat, imp in list(sonuc["top_features"].items())[:5]:
-                    print(f"      {feat:25s}: {imp:.4f}")
+        if not ML_READY:
+            print("ML modülü (tahmin_motoru_v2) yüklenemedi, eğitim yapılamaz.")
+        else:
+            print("Model eğitimi başlıyor (V2 Ensemble)...")
+            _, tum_veri = tarama_yap(top_n=5)
+            if tum_veri:
+                try:
+                    model = EnsembleModelV2()
+                    # Tüm verileri birleştir
+                    all_features = []
+                    for sem, dframe in tum_veri.items():
+                        feat = feature_olustur_v2(dframe)
+                        if feat is not None:
+                            all_features.append(feat)
+                    if all_features:
+                        combined = pd.concat(all_features, ignore_index=True)
+                        sonuc = model.egit(combined)
+                        if sonuc:
+                            print(f"\nModel eğitildi (V2 Ensemble)!")
+                            print(f"   Doğruluk  : %{sonuc.get('dogruluk', 0)*100:.1f}")
+                            print(f"   F1 Skoru  : {sonuc.get('f1', 0):.3f}")
+                            print(f"   Precision : {sonuc.get('precision', 0):.3f}")
+                    else:
+                        print("Feature oluşturulamadı — veri yetersiz olabilir.")
+                except Exception as e:
+                    print(f"Eğitim hatası: {e}")
     else:
         secilen, _ = tarama_yap(top_n=5)

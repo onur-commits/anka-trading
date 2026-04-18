@@ -1,5 +1,5 @@
 """
-BIST Sürpriz Hisse Tahmin Sistemi - Streamlit Arayüzü
+BIST Sürpriz Hisse Tahmin Sistemi - Streamlit Arayüzü (V2)
 """
 
 import streamlit as st
@@ -9,10 +9,10 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
 
-from tahmin_motoru import (
-    feature_olustur, teknik_skor_hesapla, teknik_sinyal_detay,
-    model_egit, model_yukle, ml_tahmin, birlesik_skor_hesapla,
-    hisse_analiz, FEATURE_COLS, rsi_hesapla, macd_hesapla, bollinger_hesapla
+from tahmin_motoru_v2 import (
+    feature_olustur_v2, teknik_skor_v2,
+    EnsembleModelV2, hisse_analiz_v2, FEATURE_COLS_V2,
+    rsi_hesapla, macd_hesapla, bollinger_hesapla
 )
 from veri_isleyici import (
     BIST_TICKERS, TICKER_ISIMLERI, ticker_isim,
@@ -24,6 +24,20 @@ from matriks_scraper import (
     CANLI_VERI_PATH
 )
 from bot import BistBot, BotConfig, sinyal_gecmisi_oku, sinyal_gecmisi_temizle
+
+
+# ============================================================
+# CACHED MODEL LOADING
+# ============================================================
+
+@st.cache_resource
+def yukle_kayitli_model():
+    """Kaydedilmis modeli diskten yukle (cache ile tekrar yuklemeyi onle)."""
+    try:
+        model = EnsembleModelV2.yukle()
+        return model
+    except Exception:
+        return None
 
 # Sayfa ayarları
 st.set_page_config(
@@ -78,48 +92,70 @@ with st.sidebar:
     gun_sayisi = st.slider("Geçmiş veri (gün)", 60, 365, 120)
 
     if st.button("🔄 Verileri Çek & Analiz Et", type="primary", use_container_width=True):
-        with st.spinner("Hisse verileri çekiliyor..."):
-            progress = st.progress(0)
-            status = st.empty()
+        try:
+            with st.spinner("Hisse verileri çekiliyor..."):
+                progress = st.progress(0)
+                status = st.empty()
 
-            def callback(p, msg):
-                progress.progress(p)
-                status.text(msg)
+                def callback(p, msg):
+                    progress.progress(p)
+                    status.text(msg)
 
-            veriler = tum_verileri_cek(gun=gun_sayisi, progress_callback=callback)
-            st.session_state.veriler = veriler
-            progress.empty()
-            status.empty()
+                veriler = tum_verileri_cek(gun=gun_sayisi, progress_callback=callback)
+                st.session_state.veriler = veriler
+                progress.empty()
+                status.empty()
+        except Exception as e:
+            st.error(f"Veri cekme hatasi: {e}")
+            veriler = None
 
         if veriler:
             st.success(f"{len(veriler)} hisse yüklendi")
 
-            # ML model eğit
-            with st.spinner("ML modeli eğitiliyor..."):
-                bilgi = model_egit(veriler)
-                if bilgi:
-                    st.session_state.ml_model = bilgi["model"]
-                    st.session_state.model_bilgi = bilgi
-                    st.success(f"Model eğitildi (Doğruluk: %{bilgi['dogruluk']*100:.1f})")
-                else:
-                    # Mevcut modeli yüklemeyi dene
-                    model = model_yukle()
-                    if model:
-                        st.session_state.ml_model = model
-                        st.info("Önceki model yüklendi")
+            # ML model eğit (V2 Ensemble)
+            try:
+                with st.spinner("ML modeli eğitiliyor (V2 Ensemble)..."):
+                    ensemble = EnsembleModelV2()
+                    bilgi = ensemble.egit(veriler)
+                    if bilgi:
+                        st.session_state.ml_model = ensemble
+                        st.session_state.model_bilgi = bilgi
+                        auc = bilgi.get("ensemble_auc", 0)
+                        st.success(f"Model eğitildi (AUC: {auc:.4f})")
+                    else:
+                        # Mevcut modeli yüklemeyi dene
+                        model = yukle_kayitli_model()
+                        if model:
+                            st.session_state.ml_model = model
+                            st.session_state.model_bilgi = model.meta
+                            st.info("Önceki model yüklendi")
+            except Exception as e:
+                st.warning(f"Model eğitim hatasi: {e}")
+                # Mevcut modeli yüklemeyi dene
+                model = yukle_kayitli_model()
+                if model:
+                    st.session_state.ml_model = model
+                    st.session_state.model_bilgi = model.meta
+                    st.info("Önceki kayıtlı model yüklendi")
 
-            # Analiz
-            with st.spinner("Hisseler analiz ediliyor..."):
-                sonuclar = []
-                for ticker, df in veriler.items():
-                    sonuc = hisse_analiz(ticker, df, st.session_state.ml_model)
-                    if sonuc:
-                        sonuclar.append(sonuc)
+            # Analiz (V2)
+            try:
+                with st.spinner("Hisseler analiz ediliyor..."):
+                    sonuclar = []
+                    for ticker, df in veriler.items():
+                        try:
+                            sonuc = hisse_analiz_v2(ticker, df, st.session_state.ml_model)
+                            if sonuc:
+                                sonuclar.append(sonuc)
+                        except Exception:
+                            pass  # tek hisse hatasi atlaniyor
 
-                sonuclar.sort(key=lambda x: x["birlesik_skor"], reverse=True)
-                st.session_state.sonuclar = sonuclar
+                    sonuclar.sort(key=lambda x: x["birlesik_skor"], reverse=True)
+                    st.session_state.sonuclar = sonuclar
 
-            st.success(f"{len(sonuclar)} hisse analiz edildi!")
+                st.success(f"{len(sonuclar)} hisse analiz edildi!")
+            except Exception as e:
+                st.error(f"Analiz hatasi: {e}")
         else:
             st.error("Veri çekilemedi")
 
@@ -154,10 +190,11 @@ tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
 
 # --- TAB 1: Sürpriz Tahminleri ---
 with tab1:
+  try:
     st.header("Sürpriz Yapması Beklenen Hisseler")
 
     if st.session_state.sonuclar is None:
-        st.info("👈 Sol panelden 'Verileri Çek & Analiz Et' butonuna basın")
+        st.info("Sol panelden 'Verileri Cek & Analiz Et' butonuna basin")
     else:
         sonuclar = st.session_state.sonuclar
 
@@ -166,42 +203,42 @@ with tab1:
 
         if sinyal_filtre:
             def sinyal_kontrol(s):
-                sinyal_tipleri = [x[0] for x in s["sinyaller"]]
-                for f in sinyal_filtre:
-                    if any(f.lower() in t.lower() for t in sinyal_tipleri):
+                sinyaller = s.get("sinyal_ozet", [])
+                for f_item in sinyal_filtre:
+                    if any(f_item.lower() in t.lower() for t in sinyaller):
                         return True
                 return False
             filtreli = [s for s in filtreli if sinyal_kontrol(s)]
 
         if not filtreli:
-            st.warning("Filtrelere uyan hisse bulunamadı. Filtreleri gevşetin.")
+            st.warning("Filtrelere uyan hisse bulunamadi. Filtreleri gevsetin.")
         else:
-            # Üst metrikler
+            # Ust metrikler
             col1, col2, col3, col4 = st.columns(4)
-            col1.metric("Toplam Sürpriz", len(filtreli))
-            col2.metric("En Yüksek Skor", f"{filtreli[0]['birlesik_skor']:.0f}")
-            en_yukari = max(filtreli, key=lambda x: x["gunluk_degisim"])
-            en_asagi = min(filtreli, key=lambda x: x["gunluk_degisim"])
-            col3.metric("En Çok Yükselen", f"{en_yukari['ticker'].replace('.IS', '')} %{en_yukari['gunluk_degisim']:.1f}")
-            col4.metric("En Çok Düşen", f"{en_asagi['ticker'].replace('.IS', '')} %{en_asagi['gunluk_degisim']:.1f}")
+            col1.metric("Toplam Surpriz", len(filtreli))
+            col2.metric("En Yuksek Skor", f"{filtreli[0]['birlesik_skor']:.0f}")
+            en_yukari = max(filtreli, key=lambda x: x.get("gunluk", 0))
+            en_asagi = min(filtreli, key=lambda x: x.get("gunluk", 0))
+            col3.metric("En Cok Yukselen", f"{en_yukari['ticker'].replace('.IS', '')} %{en_yukari.get('gunluk', 0):.1f}")
+            col4.metric("En Cok Dusen", f"{en_asagi['ticker'].replace('.IS', '')} %{en_asagi.get('gunluk', 0):.1f}")
 
             st.divider()
 
-            # Sürpriz skoru bar chart
-            st.subheader("Sürpriz Skoru Sıralaması")
+            # Surpriz skoru bar chart
+            st.subheader("Surpriz Skoru Siralamasi")
             chart_df = pd.DataFrame([{
                 "Hisse": s["ticker"].replace(".IS", ""),
-                "Birleşik Skor": s["birlesik_skor"],
+                "Birlesik Skor": s["birlesik_skor"],
                 "Teknik Skor": s["teknik_skor"],
-                "ML Olasılık": (s["ml_olasilik"] or 0) * 100,
+                "ML Olasilik": (s.get("ml_olasilik") or 0) * 100,
             } for s in filtreli[:20]])
 
             fig = go.Figure()
             fig.add_trace(go.Bar(
-                x=chart_df["Hisse"], y=chart_df["Birleşik Skor"],
-                name="Birleşik Skor",
-                marker_color=["#ff4444" if v > 70 else "#ffaa00" if v > 50 else "#44aa44" for v in chart_df["Birleşik Skor"]],
-                text=chart_df["Birleşik Skor"].round(1),
+                x=chart_df["Hisse"], y=chart_df["Birlesik Skor"],
+                name="Birlesik Skor",
+                marker_color=["#ff4444" if v > 70 else "#ffaa00" if v > 50 else "#44aa44" for v in chart_df["Birlesik Skor"]],
+                text=chart_df["Birlesik Skor"].round(1),
                 textposition="outside"
             ))
             fig.update_layout(
@@ -216,177 +253,213 @@ with tab1:
             st.subheader("Detay Tablosu")
             tablo_verileri = []
             for s in filtreli:
-                sinyal_ozet = " | ".join([f"{x[0]}" for x in s["sinyaller"]]) if s["sinyaller"] else "—"
+                sinyaller = s.get("sinyal_ozet", [])
+                sinyal_str = " | ".join(sinyaller) if sinyaller else "---"
                 tablo_verileri.append({
                     "Hisse": s["ticker"].replace(".IS", ""),
-                    "Şirket": ticker_isim(s["ticker"]),
+                    "Sirket": ticker_isim(s["ticker"]),
                     "Fiyat (TL)": f"{s['fiyat']:.2f}",
-                    "Değişim %": f"{s['gunluk_degisim']:.2f}",
+                    "Degisim %": f"{s.get('gunluk', 0):.2f}",
                     "Teknik": f"{s['teknik_skor']:.0f}",
-                    "ML %": f"{(s['ml_olasilik'] or 0)*100:.0f}",
-                    "Sürpriz Skoru": f"{s['birlesik_skor']:.0f}",
-                    "Sinyaller": sinyal_ozet,
+                    "ML %": f"{(s.get('ml_olasilik') or 0)*100:.0f}",
+                    "Surpriz Skoru": f"{s['birlesik_skor']:.0f}",
+                    "Sinyaller": sinyal_str,
                 })
 
             tablo_df = pd.DataFrame(tablo_verileri)
             st.dataframe(tablo_df, use_container_width=True, height=500)
 
-            # Sinyal detayları (expandable)
-            st.subheader("Sinyal Detayları")
+            # Sinyal detaylari (expandable)
+            st.subheader("Sinyal Detaylari")
             for s in filtreli[:10]:
-                if s["sinyaller"]:
+                sinyaller = s.get("sinyal_ozet", [])
+                if sinyaller and sinyaller != ["---"]:
                     kod = s["ticker"].replace(".IS", "")
                     isim = ticker_isim(s["ticker"])
                     with st.expander(f"**{kod}** - {isim} | Skor: {s['birlesik_skor']:.0f}"):
-                        for sinyal_adi, detay, yon in s["sinyaller"]:
-                            icon = "🔴" if yon == "asagi" else "🟢" if yon == "yukari" else "🟡"
-                            st.write(f"{icon} **{sinyal_adi}**: {detay}")
+                        for sinyal_text in sinyaller:
+                            st.write(f"  {sinyal_text}")
+  except Exception as e:
+    st.error(f"Tab1 hatasi: {e}")
 
 
 # --- TAB 2: Hisse Detay ---
 with tab2:
+  try:
     st.header("Hisse Detay Analizi")
 
     if st.session_state.veriler is None:
-        st.info("Önce verileri çekin")
+        st.info("Once verileri cekin")
     else:
         mevcut = [t.replace(".IS", "") for t in st.session_state.veriler.keys()]
-        secim = st.selectbox("Hisse seç", mevcut)
+        secim = st.selectbox("Hisse sec", mevcut)
 
         if secim:
             ticker = f"{secim}.IS"
             df = st.session_state.veriler[ticker]
-            analiz = hisse_analiz(ticker, df, st.session_state.ml_model)
 
-            if analiz:
+            try:
+                analiz = hisse_analiz_v2(ticker, df, st.session_state.ml_model)
+            except Exception as e:
+                analiz = None
+                st.error(f"Hisse analiz hatasi: {e}")
+
+            if analiz is None:
+                st.warning("Bu hisse icin analiz sonucu uretilemedi. Veri yetersiz olabilir.")
+            else:
                 # Metrikler
                 c1, c2, c3, c4, c5 = st.columns(5)
                 c1.metric("Fiyat", f"{analiz['fiyat']:.2f} TL")
-                c2.metric("Değişim", f"%{analiz['gunluk_degisim']:.2f}")
+                c2.metric("Degisim", f"%{analiz.get('gunluk', 0):.2f}")
                 c3.metric("Teknik Skor", f"{analiz['teknik_skor']:.0f}/100")
-                c4.metric("ML Olasılık", f"%{(analiz['ml_olasilik'] or 0)*100:.0f}")
-                c5.metric("Sürpriz Skoru", f"{analiz['birlesik_skor']:.0f}/100")
+                c4.metric("ML Olasilik", f"%{(analiz.get('ml_olasilik') or 0)*100:.0f}")
+                c5.metric("Surpriz Skoru", f"{analiz['birlesik_skor']:.0f}/100")
 
                 st.divider()
 
-                # Fiyat grafiği + indikatörler
-                features = feature_olustur(df)
+                # Fiyat grafigi + indikatorler
+                try:
+                    features = feature_olustur_v2(df)
 
-                fig = make_subplots(
-                    rows=4, cols=1, shared_xaxes=True,
-                    vertical_spacing=0.03,
-                    row_heights=[0.45, 0.2, 0.15, 0.2],
-                    subplot_titles=["Fiyat & Bollinger Bandları", "MACD", "RSI", "Hacim"]
-                )
+                    fig = make_subplots(
+                        rows=4, cols=1, shared_xaxes=True,
+                        vertical_spacing=0.03,
+                        row_heights=[0.45, 0.2, 0.15, 0.2],
+                        subplot_titles=["Fiyat & Bollinger Bandlari", "MACD", "RSI", "Hacim"]
+                    )
 
-                # Fiyat + Bollinger
-                sma, ust, alt, _ = bollinger_hesapla(df["Close"])
-                fig.add_trace(go.Candlestick(
-                    x=df.index, open=df["Open"], high=df["High"],
-                    low=df["Low"], close=df["Close"], name="Fiyat"
-                ), row=1, col=1)
-                fig.add_trace(go.Scatter(x=df.index, y=ust, name="Üst Band", line=dict(color="rgba(255,100,100,0.5)", dash="dash")), row=1, col=1)
-                fig.add_trace(go.Scatter(x=df.index, y=alt, name="Alt Band", line=dict(color="rgba(100,255,100,0.5)", dash="dash"), fill="tonexty", fillcolor="rgba(100,100,255,0.05)"), row=1, col=1)
-                fig.add_trace(go.Scatter(x=df.index, y=sma, name="SMA20", line=dict(color="rgba(255,255,100,0.7)")), row=1, col=1)
+                    # Fiyat + Bollinger
+                    sma, ust, alt, _ = bollinger_hesapla(df["Close"])
+                    fig.add_trace(go.Candlestick(
+                        x=df.index, open=df["Open"], high=df["High"],
+                        low=df["Low"], close=df["Close"], name="Fiyat"
+                    ), row=1, col=1)
+                    fig.add_trace(go.Scatter(x=df.index, y=ust, name="Ust Band", line=dict(color="rgba(255,100,100,0.5)", dash="dash")), row=1, col=1)
+                    fig.add_trace(go.Scatter(x=df.index, y=alt, name="Alt Band", line=dict(color="rgba(100,255,100,0.5)", dash="dash"), fill="tonexty", fillcolor="rgba(100,100,255,0.05)"), row=1, col=1)
+                    fig.add_trace(go.Scatter(x=df.index, y=sma, name="SMA20", line=dict(color="rgba(255,255,100,0.7)")), row=1, col=1)
 
-                # MACD
-                macd, macd_s, hist = macd_hesapla(df["Close"])
-                colors = ["#26a69a" if v >= 0 else "#ef5350" for v in hist]
-                fig.add_trace(go.Bar(x=df.index, y=hist, name="MACD Hist", marker_color=colors), row=2, col=1)
-                fig.add_trace(go.Scatter(x=df.index, y=macd, name="MACD", line=dict(color="#2196f3")), row=2, col=1)
-                fig.add_trace(go.Scatter(x=df.index, y=macd_s, name="Sinyal", line=dict(color="#ff9800")), row=2, col=1)
+                    # MACD
+                    macd, macd_s, hist = macd_hesapla(df["Close"])
+                    colors = ["#26a69a" if v >= 0 else "#ef5350" for v in hist]
+                    fig.add_trace(go.Bar(x=df.index, y=hist, name="MACD Hist", marker_color=colors), row=2, col=1)
+                    fig.add_trace(go.Scatter(x=df.index, y=macd, name="MACD", line=dict(color="#2196f3")), row=2, col=1)
+                    fig.add_trace(go.Scatter(x=df.index, y=macd_s, name="Sinyal", line=dict(color="#ff9800")), row=2, col=1)
 
-                # RSI
-                rsi = rsi_hesapla(df["Close"])
-                fig.add_trace(go.Scatter(x=df.index, y=rsi, name="RSI", line=dict(color="#ab47bc")), row=3, col=1)
-                fig.add_hline(y=70, line_dash="dash", line_color="red", row=3, col=1)
-                fig.add_hline(y=30, line_dash="dash", line_color="green", row=3, col=1)
+                    # RSI
+                    rsi = rsi_hesapla(df["Close"])
+                    fig.add_trace(go.Scatter(x=df.index, y=rsi, name="RSI", line=dict(color="#ab47bc")), row=3, col=1)
+                    fig.add_hline(y=70, line_dash="dash", line_color="red", row=3, col=1)
+                    fig.add_hline(y=30, line_dash="dash", line_color="green", row=3, col=1)
 
-                # Hacim
-                vol_colors = ["#26a69a" if df["Close"].iloc[i] >= df["Open"].iloc[i] else "#ef5350" for i in range(len(df))]
-                fig.add_trace(go.Bar(x=df.index, y=df["Volume"], name="Hacim", marker_color=vol_colors), row=4, col=1)
+                    # Hacim
+                    vol_colors = ["#26a69a" if df["Close"].iloc[i] >= df["Open"].iloc[i] else "#ef5350" for i in range(len(df))]
+                    fig.add_trace(go.Bar(x=df.index, y=df["Volume"], name="Hacim", marker_color=vol_colors), row=4, col=1)
 
-                fig.update_layout(
-                    height=800,
-                    template="plotly_dark",
-                    showlegend=False,
-                    xaxis_rangeslider_visible=False,
-                    margin=dict(t=30, b=20),
-                )
-                st.plotly_chart(fig, use_container_width=True)
+                    fig.update_layout(
+                        height=800,
+                        template="plotly_dark",
+                        showlegend=False,
+                        xaxis_rangeslider_visible=False,
+                        margin=dict(t=30, b=20),
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                except Exception as e:
+                    st.error(f"Grafik olusturma hatasi: {e}")
 
-                # Sinyaller
-                if analiz["sinyaller"]:
+                # Sinyaller (V2 format: sinyal_ozet listesi)
+                sinyaller = analiz.get("sinyal_ozet", [])
+                if sinyaller and sinyaller != ["---"]:
                     st.subheader("Aktif Sinyaller")
-                    for sinyal_adi, detay, yon in analiz["sinyaller"]:
-                        icon = "🔴" if yon == "asagi" else "🟢" if yon == "yukari" else "🟡"
-                        st.write(f"{icon} **{sinyal_adi}**: {detay}")
+                    for sinyal_text in sinyaller:
+                        st.write(f"  {sinyal_text}")
+  except Exception as e:
+    st.error(f"Tab2 hatasi: {e}")
 
 
-# --- TAB 3: Model Performansı ---
+# --- TAB 3: Model Performansi ---
 with tab3:
-    st.header("ML Model Performansı")
+  try:
+    st.header("ML Model Performansi")
 
     bilgi = st.session_state.model_bilgi
     if bilgi is None:
-        st.info("Model henüz eğitilmedi. Verileri çektiğinizde otomatik eğitilecek.")
+        st.info("Model henuz egitilmedi. Verileri cektiginizde otomatik egitilecek.")
     else:
         c1, c2, c3, c4 = st.columns(4)
-        c1.metric("Doğruluk", f"%{bilgi['dogruluk']*100:.1f}")
-        c2.metric("F1 Skor", f"{bilgi['f1']:.3f}")
-        c3.metric("Eğitim Verisi", f"{bilgi['egitim_boyut']:,}")
-        c4.metric("Test Verisi", f"{bilgi['test_boyut']:,}")
+        c1.metric("AUC", f"{bilgi.get('ensemble_auc', 0):.4f}")
+        c2.metric("F1 Skor", f"{bilgi.get('ensemble_f1', 0):.3f}")
+        c3.metric("Egitim Verisi", f"{bilgi.get('egitim_boyut', 0):,}")
+        c4.metric("Test Verisi", f"{bilgi.get('test_boyut', 0):,}")
 
         st.divider()
 
-        st.subheader("Model Hakkında")
+        st.subheader("Model Hakkinda")
         st.markdown("""
-        **Algoritma:** XGBoost (Gradient Boosting)
+        **Algoritma:** V2 Ensemble (XGBoost + LightGBM + MLP Neural Network)
 
-        **Hedef:** Sonraki 5 günde %3+ fiyat hareketi olup olmayacağı
+        **Hedef:** Sonraki 5 gunde %2+ fiyat hareketi olup olmayacagi
 
-        **Feature'lar:**
-        - RSI, MACD, Bollinger Band göstergeleri
-        - Hacim profili ve anomalileri
-        - Fiyat momentum (5/10/20 gün)
-        - Volatilite ve değişim trendi
-        - Hareketli ortalama pozisyonları
-        - Destek/direnç yakınlığı
+        **Feature'lar (80+):**
+        - RSI, MACD, Bollinger Band, ADX, Stokastik, OBV
+        - Hacim profili, RVOL ve anomaliler
+        - Fiyat momentum (5/10/20 gun), ivme
+        - Volatilite, ATR, kanal pozisyonu
+        - Hareketli ortalama alignment
+        - Mum kaliplari (hammer, doji)
+        - Market rejim uyumu
 
-        **Birleşik Skor Formülü:**
-        `Sürpriz Skoru = Teknik Skor × 0.4 + ML Olasılığı × 0.6`
+        **Birlesik Skor Formulu:**
+        `Surpriz Skoru = Teknik Skor x 0.35 + ML Olasiligi x 0.65` (rejime gore dinamik)
         """)
 
-        # Feature importance
+        # Feature importance (V2 ensemble - top_features from meta)
         if st.session_state.ml_model is not None:
-            st.subheader("Feature Önem Sıralaması")
-            model = st.session_state.ml_model
+            st.subheader("Feature Onem Siralamasi")
             try:
-                importances = model.feature_importances_
-                fi_df = pd.DataFrame({
-                    "Feature": FEATURE_COLS,
-                    "Önem": importances
-                }).sort_values("Önem", ascending=True).tail(15)
+                model = st.session_state.ml_model
+                # V2: top_features stored in meta dict
+                top_features = bilgi.get("top_features", {})
+                if top_features:
+                    fi_df = pd.DataFrame({
+                        "Feature": list(top_features.keys()),
+                        "Onem": list(top_features.values())
+                    }).sort_values("Onem", ascending=True).tail(15)
+                elif hasattr(model, 'xgb_model') and model.xgb_model is not None:
+                    # Fallback: XGBoost feature importances directly
+                    importances = model.xgb_model.feature_importances_
+                    cols = model.feature_cols if model.feature_cols else FEATURE_COLS_V2
+                    fi_df = pd.DataFrame({
+                        "Feature": cols[:len(importances)],
+                        "Onem": importances
+                    }).sort_values("Onem", ascending=True).tail(15)
+                else:
+                    fi_df = None
 
-                fig = go.Figure(go.Bar(
-                    x=fi_df["Önem"],
-                    y=fi_df["Feature"],
-                    orientation="h",
-                    marker_color="#2196f3"
-                ))
-                fig.update_layout(
-                    height=400,
-                    template="plotly_dark",
-                    margin=dict(l=150, t=20),
-                )
-                st.plotly_chart(fig, use_container_width=True)
-            except Exception:
-                st.warning("Feature importance gösterilemiyor")
+                if fi_df is not None and len(fi_df) > 0:
+                    fig = go.Figure(go.Bar(
+                        x=fi_df["Onem"],
+                        y=fi_df["Feature"],
+                        orientation="h",
+                        marker_color="#2196f3"
+                    ))
+                    fig.update_layout(
+                        height=400,
+                        template="plotly_dark",
+                        margin=dict(l=150, t=20),
+                    )
+                    st.plotly_chart(fig, use_container_width=True)
+                else:
+                    st.info("Feature importance verisi mevcut degil.")
+            except Exception as e:
+                st.warning(f"Feature importance gosterilemiyor: {e}")
+  except Exception as e:
+    st.error(f"Tab3 hatasi: {e}")
 
 
-# --- TAB 4: Canlı Veri Girişi ---
+# --- TAB 4: Canli Veri Girisi ---
 with tab4:
-    st.header("Canlı Veri Girişi")
+  try:
+    st.header("Canli Veri Girisi")
     st.caption("Matrix IQ veya başka kaynaklardan güncel veri besleyin")
 
     giris_yontemi = st.radio(
@@ -508,11 +581,14 @@ with tab4:
                         st.success("Dosya verileri birleştirildi!")
                     else:
                         st.warning("Önce geçmiş verileri çekin")
+  except Exception as e:
+    st.error(f"Tab4 hatasi: {e}")
 
 
 # --- TAB 5: Matriks Otomatik ---
 with tab5:
-    st.header("Matriks Web Trader - Otomatik Veri Çekimi")
+  try:
+    st.header("Matriks Web Trader - Otomatik Veri Cekimi")
     st.caption("Playwright ile Matriks Web Trader'dan otomatik veri çeker")
 
     # Giriş bilgileri
@@ -537,8 +613,12 @@ with tab5:
         if not matriks_user or not matriks_pass:
             st.warning("Lütfen kullanıcı adı ve şifre girin")
         else:
-            with st.spinner("Matriks Web Trader'a bağlanılıyor... (Bu 15-30 sn sürebilir)"):
+            try:
+              with st.spinner("Matriks Web Trader'a baglaniliyor... (Bu 15-30 sn surebilir)"):
                 sonuc = matriks_veri_cek_sync(matriks_user, matriks_pass, headless=headless_mode)
+            except Exception as e:
+              st.error(f"Matriks baglanti hatasi: {e}")
+              sonuc = {"hata": str(e)}
 
             if "hata" in sonuc:
                 st.error(f"Hata: {sonuc['hata']}")
@@ -610,11 +690,14 @@ with tab5:
         else:
             st.info("Kaydedilmiş veride hisse bulunamadı")
     else:
-        st.info("Henüz Matriks'ten veri çekilmemiş")
+        st.info("Henuz Matriks'ten veri cekilmemis")
+  except Exception as e:
+    st.error(f"Tab5 hatasi: {e}")
 
 
 # --- TAB 6: Bot Kontrol Paneli ---
 with tab6:
+  try:
     st.header("Otomatik Trading Bot")
     st.caption("Periyodik tarama, sinyal tespiti ve bildirim sistemi")
 
@@ -622,36 +705,41 @@ with tab6:
     if "bot_instance" not in st.session_state:
         st.session_state.bot_instance = None
 
-    bot_config = BotConfig.yukle()
+    # BotConfig yukle (hata durumunda varsayilan config)
+    try:
+        bot_config = BotConfig.yukle()
+    except Exception:
+        bot_config = BotConfig()
+        st.warning("Bot config yuklenemedi, varsayilan ayarlar kullaniliyor.")
 
-    # Durum göstergesi
+    # Durum gostergesi
     bot_aktif = st.session_state.bot_instance is not None and st.session_state.bot_instance.calisiyor
     if bot_aktif:
-        st.success("🟢 Bot ÇALIŞIYOR")
-        st.caption(f"Son tarama: {bot_config.son_tarama or 'Henüz yok'}")
+        st.success("Bot CALISIYOR")
+        st.caption(f"Son tarama: {bot_config.son_tarama or 'Henuz yok'}")
         st.caption(f"Toplam tarama: {bot_config.toplam_tarama} | Toplam sinyal: {bot_config.toplam_sinyal}")
     else:
-        st.warning("🔴 Bot DURDU")
+        st.warning("Bot DURDU")
 
     st.divider()
 
     # --- Ayarlar ---
-    with st.expander("Tarama Ayarları", expanded=not bot_aktif):
+    with st.expander("Tarama Ayarlari", expanded=not bot_aktif):
         col1, col2 = st.columns(2)
         with col1:
-            tarama_araligi = st.number_input("Tarama aralığı (dakika)", min_value=1, max_value=120,
+            tarama_araligi = st.number_input("Tarama araligi (dakika)", min_value=1, max_value=120,
                                               value=bot_config.tarama_araligi_dk, key="bot_aralik")
-            min_skor = st.slider("Min. sürpriz skoru", 0, 100, int(bot_config.min_surpriz_skor), key="bot_min_skor")
+            bot_min_skor_val = st.slider("Min. surpriz skoru", 0, 100, int(bot_config.min_surpriz_skor), key="bot_min_skor")
             min_teknik = st.slider("Min. teknik skor", 0, 100, int(bot_config.min_teknik_skor), key="bot_min_teknik")
         with col2:
-            min_ml = st.slider("Min. ML olasılığı (%)", 0, 100, int(bot_config.min_ml_olasilik * 100), key="bot_min_ml")
-            hacim_esik = st.number_input("Hacim çarpanı eşiği", min_value=1.0, max_value=10.0,
+            min_ml = st.slider("Min. ML olasiligi (%)", 0, 100, int(bot_config.min_ml_olasilik * 100), key="bot_min_ml")
+            hacim_esik = st.number_input("Hacim carpani esigi", min_value=1.0, max_value=10.0,
                                           value=bot_config.hacim_carpan_esik, step=0.5, key="bot_hacim")
-            gun_sayisi_bot = st.number_input("Geçmiş veri (gün)", min_value=30, max_value=365,
+            gun_sayisi_bot = st.number_input("Gecmis veri (gun)", min_value=30, max_value=365,
                                               value=bot_config.gun_sayisi, key="bot_gun")
 
-    # --- Bildirim Ayarları ---
-    with st.expander("Bildirim Ayarları", expanded=False):
+    # --- Bildirim Ayarlari ---
+    with st.expander("Bildirim Ayarlari", expanded=False):
         col1, col2 = st.columns(2)
         with col1:
             st.subheader("iMessage")
@@ -669,10 +757,10 @@ with tab6:
                                             type="password", key="bot_tg_token")
             telegram_chat = st.text_input("Chat ID", value=bot_config.telegram_chat_id, key="bot_tg_chat")
 
-    # --- Ayarları Kaydet ---
-    if st.button("💾 Ayarları Kaydet", key="bot_kaydet"):
+    # --- Ayarlari Kaydet ---
+    if st.button("Ayarlari Kaydet", key="bot_kaydet"):
         bot_config.tarama_araligi_dk = tarama_araligi
-        bot_config.min_surpriz_skor = float(min_skor)
+        bot_config.min_surpriz_skor = float(bot_min_skor_val)
         bot_config.min_teknik_skor = float(min_teknik)
         bot_config.min_ml_olasilik = min_ml / 100.0
         bot_config.hacim_carpan_esik = hacim_esik
@@ -683,20 +771,23 @@ with tab6:
         bot_config.bildirim_telegram = telegram_aktif
         bot_config.telegram_token = telegram_token
         bot_config.telegram_chat_id = telegram_chat
-        bot_config.kaydet()
-        st.success("Ayarlar kaydedildi!")
+        try:
+            bot_config.kaydet()
+            st.success("Ayarlar kaydedildi!")
+        except Exception as e:
+            st.error(f"Ayar kaydetme hatasi: {e}")
 
     st.divider()
 
-    # --- Kontrol Butonları ---
+    # --- Kontrol Butonlari ---
     col1, col2, col3 = st.columns(3)
 
     with col1:
-        if st.button("▶️ Botu Başlat", type="primary", use_container_width=True, key="bot_baslat",
+        if st.button("Botu Baslat", type="primary", use_container_width=True, key="bot_baslat",
                       disabled=bot_aktif):
-            # Config güncelle
+            # Config guncelle
             bot_config.tarama_araligi_dk = tarama_araligi
-            bot_config.min_surpriz_skor = float(min_skor)
+            bot_config.min_surpriz_skor = float(bot_min_skor_val)
             bot_config.min_teknik_skor = float(min_teknik)
             bot_config.min_ml_olasilik = min_ml / 100.0
             bot_config.bildirim_imessage = imessage_aktif
@@ -710,11 +801,11 @@ with tab6:
             bot = BistBot(bot_config)
             bot.baslat()
             st.session_state.bot_instance = bot
-            st.success("Bot başlatıldı!")
+            st.success("Bot baslatildi!")
             st.rerun()
 
     with col2:
-        if st.button("⏹️ Botu Durdur", use_container_width=True, key="bot_durdur",
+        if st.button("Botu Durdur", use_container_width=True, key="bot_durdur",
                       disabled=not bot_aktif):
             if st.session_state.bot_instance:
                 st.session_state.bot_instance.durdur()
@@ -723,48 +814,56 @@ with tab6:
             st.rerun()
 
     with col3:
-        if st.button("🔍 Tek Tarama", use_container_width=True, key="bot_tek"):
-            with st.spinner("Tarama yapılıyor... (1-3 dk sürebilir)"):
-                bot = BistBot(bot_config)
-                sinyaller = bot.tek_tarama()
+        if st.button("Tek Tarama", use_container_width=True, key="bot_tek"):
+            try:
+                with st.spinner("Tarama yapiliyor... (1-3 dk surebilir)"):
+                    bot = BistBot(bot_config)
+                    sinyaller = bot.tek_tarama()
 
-            if sinyaller:
-                st.success(f"{len(sinyaller)} sinyal bulundu!")
-                sinyal_df = pd.DataFrame([{
-                    "Hisse": s["ticker"].replace(".IS", ""),
-                    "Şirket": ticker_isim(s["ticker"]),
-                    "Skor": f"{s['birlesik_skor']:.0f}",
-                    "Fiyat": f"{s['fiyat']:.2f}",
-                    "Değişim %": f"{s['gunluk_degisim']:+.2f}",
-                    "Teknik": f"{s['teknik_skor']:.0f}",
-                    "ML %": f"{(s['ml_olasilik'] or 0)*100:.0f}",
-                } for s in sinyaller])
-                st.dataframe(sinyal_df, use_container_width=True)
-            else:
-                st.info("Eşik değerlerini geçen sinyal bulunamadı")
+                if sinyaller:
+                    st.success(f"{len(sinyaller)} sinyal bulundu!")
+                    sinyal_df = pd.DataFrame([{
+                        "Hisse": s["ticker"].replace(".IS", ""),
+                        "Sirket": ticker_isim(s["ticker"]),
+                        "Skor": f"{s['birlesik_skor']:.0f}",
+                        "Fiyat": f"{s['fiyat']:.2f}",
+                        "Degisim %": f"{s.get('gunluk', s.get('gunluk_degisim', 0)):+.2f}",
+                        "Teknik": f"{s['teknik_skor']:.0f}",
+                        "ML %": f"{(s.get('ml_olasilik') or 0)*100:.0f}",
+                    } for s in sinyaller])
+                    st.dataframe(sinyal_df, use_container_width=True)
+                else:
+                    st.info("Esik degerlerini gecen sinyal bulunamadi")
+            except Exception as e:
+                st.error(f"Tarama hatasi: {e}")
 
     st.divider()
 
-    # --- Sinyal Geçmişi ---
-    st.subheader("Sinyal Geçmişi")
-    gecmis = sinyal_gecmisi_oku()
+    # --- Sinyal Gecmisi ---
+    st.subheader("Sinyal Gecmisi")
+    try:
+        gecmis = sinyal_gecmisi_oku()
+    except Exception:
+        gecmis = []
+
     if gecmis:
-        st.caption(f"Toplam {len(gecmis)} kayıt")
-        # Son 20 kayıt
+        st.caption(f"Toplam {len(gecmis)} kayit")
+        # Son 20 kayit
         for kayit in reversed(gecmis[-20:]):
             zaman = kayit.get("zaman", "?")
             mesaj = kayit.get("mesaj", "")
-            # Kısa zaman formatı
             try:
                 dt = datetime.fromisoformat(zaman)
                 zaman_str = dt.strftime("%d/%m %H:%M")
             except Exception:
-                zaman_str = zaman[:16]
+                zaman_str = str(zaman)[:16]
 
             st.text(f"[{zaman_str}] {mesaj[:150]}")
 
-        if st.button("🗑️ Geçmişi Temizle", key="bot_gecmis_temizle"):
+        if st.button("Gecmisi Temizle", key="bot_gecmis_temizle"):
             sinyal_gecmisi_temizle()
             st.rerun()
     else:
-        st.info("Henüz sinyal kaydı yok")
+        st.info("Henuz sinyal kaydi yok")
+  except Exception as e:
+    st.error(f"Tab6 hatasi: {e}")

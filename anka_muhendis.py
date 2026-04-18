@@ -785,6 +785,30 @@ def hizli_kontrol():
         if not iq["calisiyor"]:
             bildirim_gonder("ACIL: MatriksIQ çalışmıyor!")
 
+    # Otonom trader kontrolleri
+    for proc_name, script_name, start_cmd in [
+        ("otonom_trader", "otonom_trader.py",
+         r'cmd /c "cd /d C:\ANKA && "C:\Program Files\Python312\python.exe" -X utf8 -u otonom_trader.py > C:\ANKA\logs\otonom_stdout.log 2>&1"'),
+        ("coin_otonom_trader", "coin_otonom_trader.py",
+         r'cmd /c "cd /d C:\ANKA && "C:\Program Files\Python312\python.exe" -X utf8 -u coin_otonom_trader.py > C:\ANKA\logs\coin_otonom_stdout.log 2>&1"'),
+    ]:
+        try:
+            check = subprocess.run(
+                ["wmic", "process", "where",
+                 f"commandline like '%{script_name}%' and not commandline like '%wmic%'",
+                 "get", "processid"],
+                capture_output=True, text=True, timeout=10
+            )
+            pids = [l.strip() for l in check.stdout.split("\n") if l.strip().isdigit()]
+            if not pids:
+                log(f"{proc_name} ÇÖKMÜŞ — yeniden başlatılıyor!", "ERROR", "TRADER")
+                subprocess.Popen(start_cmd, shell=True)
+                log(f"{proc_name} yeniden başlatıldı", "WARNING", "ONARIM")
+            else:
+                log(f"{proc_name} çalışıyor (PID: {', '.join(pids)})", "INFO", "KONTROL")
+        except Exception as e:
+            log(f"{proc_name} kontrol hatası: {e}", "ERROR", "TRADER")
+
     # Kritik JSON kontrolü
     for dosya in ["otonom_state.json", "gunluk_bomba.json"]:
         yol = DATA_DIR / dosya
@@ -851,10 +875,8 @@ if __name__ == "__main__":
         print(f"\nDurum: {rapor['durum']}")
         print(f"Sorun: {rapor['toplam_sorun']}")
         print(f"Onarım: {rapor['toplam_onarim']}")
-
     elif "--rapor" in sys.argv:
-        rapor = saglik_raporu()
-        print(json.dumps(rapor, ensure_ascii=False, indent=2))
-
+        saglik_raporu()
     else:
+        # Argümansız = tam bakım döngüsü (7/24)
         bakim_dongusu()

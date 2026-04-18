@@ -1,4 +1,7 @@
 using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using Matriks.Data.Symbol;
 using Matriks.Engines;
 using Matriks.Indicators;
@@ -14,16 +17,9 @@ using Matriks.Enumeration;
 
 namespace Matriks.Lean.Algotrader
 {
-    // ================================================================
-    // ANKA BANKA SEKTORU STRATEJISI
-    // Karakter: Agir abi, endeks lokomotifi, CDS duyarli
-    // Hisseler: GARAN, AKBNK, ISCTR, YKBNK, HALKB, VAKBN, TSKB, SKBNK
-    // Ozel: Genis stop (%2.5), yavas trend takip, faiz hassasiyeti
-    // ================================================================
     public class ANKA_SEKTOR_BANKA : MatriksAlgo
     {
-        [SymbolParameter("GARAN")]
-        public string Symbol;
+        string[] symbols = { "AKBNK", "GARAN", "HALKB", "ISCTR", "SKBNK", "TSKB", "VAKBN", "YKBNK" };
 
         [SymbolParameter("XU100")]
         public string IndexSymbol;
@@ -34,10 +30,6 @@ namespace Matriks.Lean.Algotrader
         [Parameter(15000)]
         public decimal MaxPositionValue;
 
-        [Parameter(1)]
-        public decimal ManualQuantity;
-
-        // BANKA PARAMETRELERI — agir abi karakteri
         [Parameter(8)]
         public int FastPeriod;
 
@@ -48,13 +40,13 @@ namespace Matriks.Lean.Algotrader
         public int RsiPeriod;
 
         [Parameter(50)]
-        public decimal RsiThreshold;  // Bankalar icin 50 (daha dusuk esik)
+        public decimal RsiThreshold;
 
         [Parameter(2.5)]
-        public decimal StopLossPercent;  // Genis stop — bankalar yavas hareket eder
+        public decimal StopLossPercent;
 
         [Parameter(2.0)]
-        public decimal TrailingStopPercent;  // Genis trailing
+        public decimal TrailingStopPercent;
 
         [Parameter(1.0)]
         public decimal TrailingActivationPercent;
@@ -68,165 +60,202 @@ namespace Matriks.Lean.Algotrader
         [Parameter(true)]
         public bool UseIndexFilter;
 
+        [Parameter(true)]
+        public bool UseAiSignal;
+
         [Parameter(10)]
         public int StartHour;
-
-        [Parameter(0)]
-        public int StartMinute;
 
         [Parameter(18)]
         public int EndHour;
 
-        [Parameter(0)]
-        public int EndMinute;
+        string sinyalDosyasi = @"C:\ANKA\data\ai_sinyaller.txt";
 
-        MOV fastMov;
-        MOV slowMov;
+        Dictionary<string, bool> inPosition;
+        Dictionary<string, decimal> entryPrice;
+        Dictionary<string, decimal> highestPrice;
+        Dictionary<string, decimal> positionQty;
+        Dictionary<string, MOV> fastMovs;
+        Dictionary<string, MOV> slowMovs;
+        Dictionary<string, RSI> rsiIndicators;
+
         MOV indexFastMov;
         MOV indexSlowMov;
-        RSI rsi;
-
-        bool inPosition = false;
-        decimal entryPrice = 0m;
-        decimal highestPriceSinceEntry = 0m;
-        decimal currentPositionQty = 0m;
-
-        [Output] public decimal FastEMA;
-        [Output] public decimal SlowEMA;
-        [Output] public decimal RSIValue;
-        [Output] public decimal EffectiveStopLevel;
-        [Output] public decimal PositionQty;
-        [Output] public decimal PositionValue;
 
         public override void OnInit()
         {
-            AddSymbol(Symbol, SymbolPeriod);
+            inPosition = new Dictionary<string, bool>();
+            entryPrice = new Dictionary<string, decimal>();
+            highestPrice = new Dictionary<string, decimal>();
+            positionQty = new Dictionary<string, decimal>();
+            fastMovs = new Dictionary<string, MOV>();
+            slowMovs = new Dictionary<string, MOV>();
+            rsiIndicators = new Dictionary<string, RSI>();
+
+            foreach (var sym in symbols)
+            {
+                AddSymbol(sym, SymbolPeriod);
+                fastMovs[sym] = MOVIndicator(sym, SymbolPeriod, OHLCType.Close, FastPeriod, MovMethod.Exponential);
+                slowMovs[sym] = MOVIndicator(sym, SymbolPeriod, OHLCType.Close, SlowPeriod, MovMethod.Exponential);
+                rsiIndicators[sym] = RSIIndicator(sym, SymbolPeriod, OHLCType.Close, RsiPeriod);
+                inPosition[sym] = false;
+                entryPrice[sym] = 0m;
+                highestPrice[sym] = 0m;
+                positionQty[sym] = 0m;
+            }
+
             AddSymbol(IndexSymbol, SymbolPeriod);
-            fastMov = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, FastPeriod, MovMethod.Exponential);
-            slowMov = MOVIndicator(Symbol, SymbolPeriod, OHLCType.Close, SlowPeriod, MovMethod.Exponential);
             indexFastMov = MOVIndicator(IndexSymbol, SymbolPeriod, OHLCType.Close, FastPeriod, MovMethod.Exponential);
             indexSlowMov = MOVIndicator(IndexSymbol, SymbolPeriod, OHLCType.Close, SlowPeriod, MovMethod.Exponential);
-            rsi = RSIIndicator(Symbol, SymbolPeriod, OHLCType.Close, RsiPeriod);
+
             SendOrderSequential(true);
             WorkWithPermanentSignal(true);
         }
 
         public override void OnInitCompleted()
         {
-            Debug("ANKA BANKA [" + Symbol + "] hazir. Max:" + MaxPositionValue + " TL Stop:" + StopLossPercent + "%");
+            Debug("ANKA_SEKTOR_BANKA hazir. " + symbols.Length + " sembol takipte.");
         }
 
         public override void OnDataUpdate(BarDataEventArgs barData)
         {
             if (barData == null || barData.BarData == null) return;
-            DateTime barTime = barData.BarData.Dtime;
-            if (!IsTradingTime(barTime)) return;
+
+            string sym = barData.Symbol;
+
+            if (!symbols.Contains(sym)) return;
+
             decimal closePrice = barData.BarData.Close;
             if (closePrice <= 0) return;
+
+            DateTime barTime = barData.BarData.Dtime;
+            int nowVal = barTime.Hour * 100 + barTime.Minute;
+            if (nowVal < StartHour * 100 || nowVal > EndHour * 100) return;
+
+            // AI sinyal
+            bool aiBuy = false;
+            bool aiSell = false;
+            if (UseAiSignal)
+            {
+                try
+                {
+                    if (File.Exists(sinyalDosyasi))
+                    {
+                        var satirlar = File.ReadAllLines(sinyalDosyasi);
+                        aiBuy = satirlar.Contains(sym + "_AL");
+                        aiSell = satirlar.Contains(sym + "_SAT");
+                    }
+                }
+                catch { }
+            }
 
             // Endeks filtresi
             bool indexOk = true;
             if (UseIndexFilter)
                 indexOk = indexFastMov.CurrentValue > indexSlowMov.CurrentValue;
 
-            // Momentum — bankalar icin daha dusuk esik
-            bool momentumOk = rsi.CurrentValue > RsiThreshold;
+            // Teknik
+            bool emaOk = fastMovs[sym].CurrentValue > slowMovs[sym].CurrentValue;
+            bool momentumOk = rsiIndicators[sym].CurrentValue > RsiThreshold;
 
-            // Trend gucu
             decimal trendStrength = 0m;
-            if (slowMov.CurrentValue != 0)
-                trendStrength = Math.Abs(fastMov.CurrentValue - slowMov.CurrentValue) / slowMov.CurrentValue * 100m;
+            if (slowMovs[sym].CurrentValue != 0)
+                trendStrength = Math.Abs(fastMovs[sym].CurrentValue - slowMovs[sym].CurrentValue) / slowMovs[sym].CurrentValue * 100m;
             bool trendStrong = trendStrength >= TrendStrengthPercent;
 
-            // STOP SISTEMI — bankalar icin genis
+            // Stop sistemi
             bool stopTriggered = false;
-            decimal effectiveStopLevel = 0m;
-
-            if (inPosition && entryPrice > 0)
+            if (inPosition[sym] && entryPrice[sym] > 0)
             {
-                if (closePrice > highestPriceSinceEntry) highestPriceSinceEntry = closePrice;
+                if (closePrice > highestPrice[sym])
+                    highestPrice[sym] = closePrice;
 
-                decimal fixedStop = entryPrice * (1 - StopLossPercent / 100m);
-                effectiveStopLevel = fixedStop;
+                decimal fixedStop = entryPrice[sym] * (1 - StopLossPercent / 100m);
+                decimal effectiveStop = fixedStop;
 
-                // Break-even
-                if (highestPriceSinceEntry >= entryPrice * (1 + BreakEvenActivationPercent / 100m))
-                    effectiveStopLevel = Math.Max(effectiveStopLevel, entryPrice);
+                if (highestPrice[sym] >= entryPrice[sym] * (1 + BreakEvenActivationPercent / 100m))
+                    effectiveStop = Math.Max(effectiveStop, entryPrice[sym]);
 
-                // Trailing
-                if (highestPriceSinceEntry >= entryPrice * (1 + TrailingActivationPercent / 100m))
+                if (highestPrice[sym] >= entryPrice[sym] * (1 + TrailingActivationPercent / 100m))
                 {
-                    decimal trail = highestPriceSinceEntry * (1 - TrailingStopPercent / 100m);
-                    effectiveStopLevel = Math.Max(effectiveStopLevel, trail);
+                    decimal trailStop = highestPrice[sym] * (1 - TrailingStopPercent / 100m);
+                    effectiveStop = Math.Max(effectiveStop, trailStop);
                 }
 
-                EffectiveStopLevel = Math.Round(effectiveStopLevel, 2);
-                if (closePrice <= effectiveStopLevel) stopTriggered = true;
+                if (closePrice <= effectiveStop)
+                {
+                    stopTriggered = true;
+                    Debug(sym + " STOP @ " + Math.Round(closePrice, 2));
+                }
+            }
+
+            // Sinyal
+            bool buySignal;
+            bool sellSignal;
+
+            if (UseAiSignal && (aiBuy || aiSell))
+            {
+                buySignal = aiBuy && indexOk && !inPosition[sym];
+                sellSignal = (aiSell || stopTriggered) && inPosition[sym];
             }
             else
             {
-                EffectiveStopLevel = 0m;
+                buySignal = emaOk && indexOk && momentumOk && trendStrong && !inPosition[sym];
+                sellSignal = (!emaOk || stopTriggered) && inPosition[sym];
             }
 
-            // SINYALLER
-            bool buySignal = fastMov.CurrentValue > slowMov.CurrentValue
-                             && indexOk && momentumOk && trendStrong && !inPosition;
-
-            bool sellSignal = (fastMov.CurrentValue < slowMov.CurrentValue || stopTriggered)
-                              && inPosition;
-
-            // ALIS — otomatik adet hesaplama
+            // Alis
             if (buySignal)
             {
-                decimal buyQty;
+                decimal buyQty = 1;
                 if (MaxPositionValue > 0)
-                { buyQty = Math.Floor(MaxPositionValue / closePrice); if (buyQty < 1) buyQty = 1; }
-                else { buyQty = ManualQuantity; }
-                currentPositionQty = buyQty;
-                SendMarketOrder(Symbol, buyQty, OrderSide.Buy);
-                entryPrice = closePrice;
-                highestPriceSinceEntry = closePrice;
-                Debug("BANKA ALIS: " + Symbol + " " + buyQty + " lot @ " + Math.Round(closePrice, 2));
+                {
+                    buyQty = Math.Floor(MaxPositionValue / closePrice);
+                    if (buyQty < 1) buyQty = 1;
+                }
+                positionQty[sym] = buyQty;
+                SendMarketOrder(sym, buyQty, OrderSide.Buy);
+                entryPrice[sym] = closePrice;
+                highestPrice[sym] = closePrice;
+                Debug(sym + " ALIS: " + buyQty + " lot @ " + Math.Round(closePrice, 2));
             }
 
-            // SATIS
+            // Satis
             if (sellSignal)
             {
-                decimal sellQty = currentPositionQty > 0 ? currentPositionQty : ManualQuantity;
-                SendMarketOrder(Symbol, sellQty, OrderSide.Sell);
-                Debug("BANKA SATIS: " + Symbol + " " + sellQty + " lot");
+                decimal sellQty = positionQty[sym] > 0 ? positionQty[sym] : 1;
+                SendMarketOrder(sym, sellQty, OrderSide.Sell);
+                Debug(sym + " SATIS: " + sellQty + " lot");
             }
-
-            FastEMA = Math.Round(fastMov.CurrentValue, 2);
-            SlowEMA = Math.Round(slowMov.CurrentValue, 2);
-            RSIValue = Math.Round(rsi.CurrentValue, 2);
-            PositionQty = currentPositionQty;
-            PositionValue = inPosition ? Math.Round(currentPositionQty * closePrice, 0) : 0m;
         }
 
         public override void OnOrderUpdate(IOrder order)
         {
-            if (order == null || order.Symbol != Symbol) return;
+            if (order == null) return;
+            string sym = order.Symbol;
+            if (!symbols.Contains(sym)) return;
+
             if (order.OrdStatus.Obj == OrdStatus.Filled)
             {
-                if (order.Side.Obj == Side.Buy) { inPosition = true; }
+                if (order.Side.Obj == Side.Buy)
+                {
+                    inPosition[sym] = true;
+                    Debug(sym + " ALIS gerceklesti: " + positionQty[sym] + " lot");
+                }
                 if (order.Side.Obj == Side.Sell)
                 {
-                    inPosition = false; entryPrice = 0m; highestPriceSinceEntry = 0m;
-                    currentPositionQty = 0m; EffectiveStopLevel = 0m;
-                    PositionQty = 0m; PositionValue = 0m;
+                    inPosition[sym] = false;
+                    entryPrice[sym] = 0m;
+                    highestPrice[sym] = 0m;
+                    positionQty[sym] = 0m;
+                    Debug(sym + " SATIS gerceklesti. Pozisyon kapatildi.");
                 }
             }
         }
 
-        public override void OnStopped() { }
-
-        private bool IsTradingTime(DateTime barTime)
+        public override void OnStopped()
         {
-            int nowValue = barTime.Hour * 100 + barTime.Minute;
-            int startValue = StartHour * 100 + StartMinute;
-            int endValue = EndHour * 100 + EndMinute;
-            return nowValue >= startValue && nowValue <= endValue;
+            Debug("ANKA_SEKTOR_BANKA durduruldu.");
         }
     }
 }

@@ -12,17 +12,38 @@ import sys
 import subprocess
 import platform
 import time
+import logging
 from pathlib import Path
 from datetime import datetime
 
 PROJECT_DIR = Path(__file__).parent
 sys.path.insert(0, str(PROJECT_DIR))
 
+# ── Logging Setup ──────────────────────────────────────────
+LOG_DIR = PROJECT_DIR / "logs"
+LOG_DIR.mkdir(exist_ok=True)
+
+logger = logging.getLogger("anka_scanner")
+logger.setLevel(logging.DEBUG)
+
+# File handler — detailed logs
+_fh = logging.FileHandler(LOG_DIR / "anka_scanner.log", encoding="utf-8")
+_fh.setLevel(logging.DEBUG)
+_fh.setFormatter(logging.Formatter("%(asctime)s [%(levelname)s] %(message)s"))
+logger.addHandler(_fh)
+
+# Console handler — info and above
+_ch = logging.StreamHandler()
+_ch.setLevel(logging.INFO)
+_ch.setFormatter(logging.Formatter("%(message)s"))
+logger.addHandler(_ch)
+
 try:
     from tahmin_motoru_v2 import EnsembleModelV2, hisse_analiz_v2, feature_olustur_v2
     ML_READY = True
-except ImportError:
+except ImportError as e:
     ML_READY = False
+    logger.debug(f"tahmin_motoru_v2 yüklenemedi: {e}")
 
 # BIST50
 BIST50 = [
@@ -42,18 +63,20 @@ def ml_model_yukle():
         try:
             import joblib
             data = joblib.load(anka_path)
-            print(f"🧠 ANKA AI yüklendi (AUC: {data.get('auc', '?')})")
+            logger.info(f"🧠 ANKA AI yüklendi (AUC: {data.get('auc', '?')})")
             return {"type": "anka", "data": data}
-        except:
+        except Exception as e:
+            logger.error(f"ANKA AI model yükleme hatası: {e}")
             pass
     # 2. Eski ensemble model
     if ML_READY:
         try:
             m = EnsembleModelV2.yukle()
             if m:
-                print("🧠 Ensemble V2 yüklendi")
+                logger.info("🧠 Ensemble V2 yüklendi")
                 return {"type": "ensemble", "data": m}
-        except:
+        except Exception as e:
+            logger.error(f"Ensemble V2 yükleme hatası: {e}")
             pass
     return None
 
@@ -81,8 +104,8 @@ def ml_skor(ticker, df_daily, model_wrapper):
             analiz = hisse_analiz_v2(ticker, df_daily, model_wrapper["data"], None)
             if analiz and analiz.get("ml_olasilik"):
                 return float(analiz["ml_olasilik"])
-    except:
-        pass
+    except Exception as e:
+        logger.debug(f"ML skor hatası ({ticker}): {e}")
     return 0.5
 
 
@@ -145,8 +168,8 @@ def anka_tara(symbol_list=None, ml_model=None):
         symbol_list = BIST50
 
     saat = datetime.now().hour
-    print(f"\n🔥 ANKA TARAMA — Saat {saat:02d}:{datetime.now().minute:02d} | {len(symbol_list)} hisse")
-    print("=" * 60)
+    logger.info(f"\n🔥 ANKA TARAMA — Saat {saat:02d}:{datetime.now().minute:02d} | {len(symbol_list)} hisse")
+    logger.info("=" * 60)
 
     bombalar = []
     detaylar = []
@@ -217,34 +240,101 @@ def anka_tara(symbol_list=None, ml_model=None):
 
             if is_bomba:
                 bombalar.append(s)
-                print(f"  💣 {s:6} | ML:{ml:.2f} | Hacim:x{hacim_oran:.1f} | Kap:{kapanis_gucu:.3f} | Skor:{skor:.0f} | {sebep}")
+                logger.info(f"  💣 {s:6} | ML:{ml:.2f} | Hacim:x{hacim_oran:.1f} | Kap:{kapanis_gucu:.3f} | Skor:{skor:.0f} | {sebep}")
 
         except Exception as e:
+            logger.warning(f"  ⚠️ {s} tarama hatası: {e}")
             continue
 
     # En yüksek skorlular (bomba olmasa bile göster)
     detaylar.sort(key=lambda x: x["skor"], reverse=True)
-    print(f"\n📊 Top 10 (bomba olmayanlar dahil):")
+    logger.info(f"\n📊 Top 10 (bomba olmayanlar dahil):")
     for d in detaylar[:10]:
         emoji = "💣" if d["bomba"] else "  "
-        print(f"  {emoji} {d['ticker']:6} | ML:{d['ml']:.2f} | Hacim:x{d['hacim']:.1f} | Skor:{d['skor']:.0f} | Gün:{d['gunluk']:+.1f}%")
+        logger.info(f"  {emoji} {d['ticker']:6} | ML:{d['ml']:.2f} | Hacim:x{d['hacim']:.1f} | Skor:{d['skor']:.0f} | Gün:{d['gunluk']:+.1f}%")
+
+    # ── Risk Yönetimi Validasyonu ──────────────────────────
+    if bombalar:
+        try:
+            from risk_yonetimi import RiskYoneticisi
+            risk = RiskYoneticisi()
+            validated = []
+            for s in bombalar:
+                d = next((x for x in detaylar if x["ticker"] == s), None)
+                if d:
+                    sonuc = risk.sinyal_degerlendir(
+                        ticker=s,
+                        fiyat=d.get("gunluk", 0),
+                        atr=0,  # ATR bilgisi taramada mevcut değil
+                        ml_olasilik=d.get("ml", 0.5),
+                        teknik_skor=d["skor"],
+                    )
+                    if sonuc.get("islem"):
+                        validated.append(s)
+                    else:
+                        logger.info(f"  ⛔ {s} risk kontrolünden geçemedi: {sonuc.get('sebep', '?')}")
+            bombalar = validated if validated else bombalar  # fallback to original if all rejected
+            logger.info(f"  ✅ Risk validasyonu: {len(validated)}/{len(bombalar)} onaylandı")
+        except ImportError:
+            logger.debug("risk_yonetimi modülü bulunamadı, risk validasyonu atlandı")
+        except Exception as e:
+            logger.error(f"Risk validasyonu hatası: {e}")
 
     # Dosyaya yaz
     liste = ",".join(bombalar)
-    print(f"\n🎯 BOMBALAR: {liste if liste else 'YOK'}")
+    logger.info(f"\n🎯 BOMBALAR: {liste if liste else 'YOK'}")
 
-    # Windows'a kopyala
+    # Aktif bombalar dosyasını yaz (local + VPS fallback)
+    _write_paths = []
     if platform.system() == "Windows":
-        with open("C:/Robot/aktif_bombalar.txt", "w") as f:
-            f.write(liste)
+        _write_paths.append(Path("C:/Robot/aktif_bombalar.txt"))
+        _write_paths.append(Path("C:/ANKA/data/aktif_bombalar.txt"))
     else:
+        # Mac/Linux — local data dir
+        _write_paths.append(PROJECT_DIR / "data" / "aktif_bombalar.txt")
+
+    for _path in _write_paths:
+        try:
+            _path.parent.mkdir(parents=True, exist_ok=True)
+            _path.write_text(liste, encoding="utf-8")
+            logger.debug(f"Bombalar yazıldı: {_path}")
+        except Exception as e:
+            logger.warning(f"Dosya yazma hatası ({_path}): {e}")
+
+    # Mac'ten VPS'e kopyalama (Parallels)
+    if platform.system() != "Windows":
         try:
             subprocess.run(
                 ["prlctl", "exec", "Windows 11", "cmd", "/c",
                  f"echo {liste} > C:\\Robot\\aktif_bombalar.txt"],
                 timeout=10, capture_output=True)
-        except:
-            pass
+        except Exception as e:
+            logger.debug(f"Parallels kopyalama atlandı: {e}")
+
+    # ── Paper Trader Entegrasyonu ──────────────────────────
+    if bombalar:
+        try:
+            from paper_trader import PaperTrader, OrderSide
+            pt = PaperTrader()
+            paper_count = 0
+            for s in bombalar:
+                d = next((x for x in detaylar if x["ticker"] == s), None)
+                if d:
+                    try:
+                        pt.emir_gonder(
+                            ticker=s,
+                            side=OrderSide.BUY,
+                            lot=1,  # paper trade, 1 lot
+                            fiyat=0,  # market order
+                        )
+                        paper_count += 1
+                    except Exception as e:
+                        logger.debug(f"Paper trade hatası ({s}): {e}")
+            logger.info(f"📝 {paper_count} paper trade kaydedildi")
+        except ImportError:
+            logger.debug("paper_trader modülü bulunamadı, paper trade atlandı")
+        except Exception as e:
+            logger.error(f"Paper trader hatası: {e}")
 
     return bombalar, detaylar
 
@@ -252,21 +342,28 @@ def anka_tara(symbol_list=None, ml_model=None):
 def anka_loop(interval_dk=30):
     """Sürekli tarama döngüsü — her N dakikada bir."""
     model = ml_model_yukle()
-    print(f"🦅 ANKA SÜREKLİ TARAMA — Her {interval_dk} dakika")
+    logger.info(f"🦅 ANKA SÜREKLİ TARAMA — Her {interval_dk} dakika")
     if model:
-        print("✅ ML model yüklü")
+        logger.info("✅ ML model yüklü")
     else:
-        print("⚠️ ML model yok")
+        logger.warning("⚠️ ML model yok")
 
     while True:
-        saat = datetime.now().hour
-        # Piyasa saatleri (09:30-18:00)
-        if 9 <= saat < 18:
-            bombalar, _ = anka_tara(BIST50, model)
-        else:
-            print(f"[{datetime.now().strftime('%H:%M')}] Piyasa kapalı — bekliyorum")
+        try:
+            saat = datetime.now().hour
+            # Piyasa saatleri (09:30-18:00)
+            if 9 <= saat < 18:
+                bombalar, _ = anka_tara(BIST50, model)
+            else:
+                logger.info(f"[{datetime.now().strftime('%H:%M')}] Piyasa kapalı — bekliyorum")
 
-        time.sleep(interval_dk * 60)
+            time.sleep(interval_dk * 60)
+        except KeyboardInterrupt:
+            logger.info("🛑 Tarama döngüsü durduruldu (Ctrl+C)")
+            break
+        except Exception as e:
+            logger.error(f"Tarama döngüsü hatası: {e}")
+            time.sleep(60)  # hata durumunda 1 dk bekle, tekrar dene
 
 
 if __name__ == "__main__":

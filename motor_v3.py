@@ -449,8 +449,16 @@ def gorev_egitim():
         rejim = ScanEngine.rejim_analiz(xu)
         log(f"  {len(veri)} hisse (2 yil)")
 
+        # Makro veri katmanı (Faz 1)
+        try:
+            from makro_veri import makro_veri_al
+            makro = makro_veri_al(yil=5)
+        except Exception as e:
+            log(f"  ⚠ Makro veri yuklenemedi: {e}")
+            makro = None
+
         model = EnsembleModelV2()
-        meta = model.egit(veri, market_rejim=rejim)
+        meta = model.egit(veri, market_rejim=rejim, makro_veri=makro)
         if meta:
             log(f"  ✅ AUC:{meta['ensemble_auc']} F1:{meta['ensemble_f1']}")
             bildirim(f"🧠 ML guncellendi — AUC:{meta['ensemble_auc']}")
