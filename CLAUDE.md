@@ -142,3 +142,68 @@ Sifre: .env dosyasinda veya kullanicidan sor
 - ANKA Danisman: Hisse analiz (4 ajan: TECHNO, VOLUME, MACRO, FUNDA)
 - ANKA Muhendis: Teknik bakim, onarim, hata tespiti
 - Otonom Trader: TAM OTONOM — tarama, karar, emir, stop, gun sonu satis
+.
+## Cowork Oturumu — 2026-04-18 (Paper Deneme AKTIF)
+Cowork (onur@miknatis.net) tarafindan baslatildi. Claude Code bir sonraki oturumda devralmali.
+
+### Yeni dosyalar (commit 30e07dc, main'de push edildi)
+- earn_to_spot.py — Binance Earn → Spot redeem araci (interaktif, --dry-run, --min-usd, --yes-all)
+- backtest_v2.py — 3 strateji karsilastirma (Baseline/v2 Full/Kontrarian F&G)
+- paper_saatlik_logger.py — Saatlik snapshot logger (bot kodu degismedi, DISARIDAN okuyor)
+- paper_saatlik_rapor.py — Saatlik rapor okuma + markdown ciktisi
+- PAPER_DENEME_TALIMAT.md — 15 saatlik deneme adim adim
+- _memory_update_20260418.md — Memory'ye aktarilmasi gereken notlar
+- data/fear_greed_history.csv (730 gun), data/funding_history.csv (5475 kayit)
+- data/price_history_1h.csv (35040 bar), data/backtest_v2_rapor.md
+- _paper_bot.bat, _paper_logger.bat — VPS'te paper baslatma wrapper'lari
+
+### Backtest v2 sonucu (365 gun, 4 coin, $2500)
+- Baseline (SEN=FUN=kapali): -28.3%
+- v2 Full (SEN+FUN trend, MEVCUT BOT CONFIG): -20.6% ← EN IYI, +7.7 puan
+- Kontrarian F&G (F&G tersine): -25.7%
+- Yorum: Mevcut config (c7d5edc) dogru yon. Tum stratejiler negatif — son 365 gun bu 4 coin icin zor donem.
+
+### Paper Deneme — 2026-04-18 19:27 baslangic (VPS'te CALISIYOR)
+- VPS: C:\ANKA, Windows 2022, 78.135.87.29
+- Canli coin bot DURDURULDU + ANKA_Coin_Trader scheduler DISABLE edildi
+- State yedekleri: data/coin_otonom_state.CANLI_YEDEK.json, data/coin_otonom_trades.CANLI_YEDEK.json, data/coin_pozisyonlar_aktif.CANLI_YEDEK.json
+- Paper bot: PID 6836 — `python -X utf8 -u coin_otonom_trader.py --dry-run` (Mod: DRY-RUN dogrulandi, log'da gorundu)
+- Logger: PID 8824 — `python -X utf8 -u paper_saatlik_logger.py` (T0 snapshot alindi, cycle #14, 3 aktif poz: BNB +0.8%, ATOM -0.2%, BTC +1.6%)
+- Config: c7d5edc (SEN+FUN aktif, MIN_SKOR=65, stop %7, TP1=+8 yarim, TP2=+15 tam, trailing +3/-3)
+- Loglar: C:\ANKA\logs\paper_bot.err.log (bot stderr=INFO), C:\ANKA\logs\paper_logger.out.log
+- State dosyasi: C:\ANKA\data\paper_saatlik.json (her saat append, T0...T+15h)
+- Guvenlik: coin_otonom_trader.py satir 317/336'da `if DRY_RUN: return {"status": "DRY_RUN"}` — para hareketi SIFIR
+- Baslangic portfoy: $2237.05 (hayalet poz dahil — transfer edilmemis Earn coinleri)
+
+### Paper baslatma prosedurleri (BIR SONRAKI CLAUDE CODE OKUSUN)
+Ayni adimlari tekrar calistirmak gerekirse:
+1. SSH: `sshpass -p '*AYiMn5ZkX' ssh Administrator@78.135.87.29` (Mac'ten)
+2. VPS'te: `cd C:\ANKA && git pull`
+3. Canli bot durdur: `Get-CimInstance Win32_Process | Where CommandLine -like '*coin_otonom_trader*' | ForEach {Stop-Process -Id $_.ProcessId -Force}`
+4. Scheduler disable: `schtasks /Change /TN ANKA_Coin_Trader /DISABLE`
+5. State yedekle: `copy data\coin_otonom_state.json data\coin_otonom_state.CANLI_YEDEK.json` (trades ve pozisyonlar da)
+6. Paper bot baslat (WMI ile detached, SSH kapansa yasatir):
+   ```
+   powershell -Command "Invoke-CimMethod -ClassName Win32_Process -MethodName Create -Arguments @{CommandLine='cmd /c C:\ANKA\_paper_bot.bat'; CurrentDirectory='C:\ANKA'}"
+   ```
+7. Logger baslat (ayni mantik, `_paper_logger.bat`)
+8. Saglik kontrol: `dir data\paper_saatlik.json` + `Get-Content logs\paper_bot.err.log -Tail 20`
+
+### Paper kapatma + rapor (yarin ~10:30)
+1. `Get-CimInstance Win32_Process | Where CommandLine -like '*--dry-run*' -or CommandLine -like '*paper_saatlik_logger*' | ForEach {Stop-Process -Id $_.ProcessId -Force}`
+2. `cd C:\ANKA && python -X utf8 paper_saatlik_rapor.py && type data\paper_saatlik_rapor.md`
+3. Canli bot geri baslatma (karar pozitifse DEGIL): `schtasks /Change /TN ANKA_Coin_Trader /ENABLE` + state geri yukle (`copy *.CANLI_YEDEK.json *.json`)
+
+### HARD LIMIT (onceki oturumdan miras, ihlal edilmedi)
+- Cowork Claude: transfer/alim/satim TETIKLEMEZ — sadece script yazar, kullanici calistirir
+- earn_to_spot.py yazildi ama calistirilmadi — kullanici karari
+
+### Acik konular
+- `toplam_portfoy_degeri()` hayalet poz topluyor (ATOM/BTC Earn'de, Spot'ta yok). earn_to_spot.py ile transfer sonrasi duzeltilmeli.
+- Backtest'te stop+TP1 ayni barda cakismasi (<%1 trade). Kozmetik, ileride fix.
+- MOVRUSDT futures 4h funding (8h degil) — backtest'te 2190 kayit dogru.
+
+### Kaynak dosyalar (bir sonraki Claude Code icin)
+- `~/Desktop/ANKA/COWORK_DEVRALDIRMA_20260418.md` — tam devir notu (onceki oturum + bu oturum)
+- `~/Desktop/ANKA/_memory_update_20260418.md` — memory'e eklenmesi gereken ozet
+- `~/Desktop/ANKA/PAPER_DENEME_TALIMAT.md` — deneme prosedurleri
