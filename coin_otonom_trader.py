@@ -115,15 +115,18 @@ class Config:
     MAX_ISLEM_USDT = 500.0        # Max işlem tutarı
 
     # Sinyal parametreleri
-    MIN_SKOR_AL = 58              # Min skor (alış) — 65'ten düşürüldü, erken giriş için
+    MIN_SKOR_AL = 65              # Min skor (alış) — rally zirvesi filtresi
     MIN_AJAN_ONAY = 2             # En az N ajan >= 60 olmalı
+    DONGU_BASINA_MAX_ALIS = 2     # Tek tarama döngüsünde max alış (toplu giriş engeli)
+    POZISYON_COOLDOWN_DK = 30     # Yeni pozisyon açmadan önce bekleme (min)
 
-    # Stop / Take-profit
-    STOP_LOSS_ATR_CARPAN = 2.0    # ATR x N stop-loss
-    TRAILING_BASLA_PCT = 5.0      # %5 kârda trailing aktif
+    # Stop / Take-profit — kripto volatilitesi için ayarlanmış
+    STOP_LOSS_ATR_CARPAN = 3.5    # ATR x N stop-loss (2.0'dan gevşetildi)
+    STOP_LOSS_VARSAYILAN_PCT = 7.0  # ATR yoksa fallback stop %
+    TRAILING_BASLA_PCT = 3.0      # %3 kârda trailing aktif
     TRAILING_MESAFE_PCT = 2.0     # %2 trailing mesafe
-    TAKE_PROFIT_1_PCT = 15.0      # %15'te yarısını sat
-    TAKE_PROFIT_2_PCT = 25.0      # %25'te tümünü sat
+    TAKE_PROFIT_1_PCT = 8.0       # %8'de yarısını sat (erken kâr koruma)
+    TAKE_PROFIT_2_PCT = 15.0      # %15'te tümünü sat
     ACIL_STOP_PCT = -10.0         # %-10 acil çıkış
 
     # Kill-switch
@@ -387,13 +390,16 @@ class TeknikAjan:
             # Erken momentum — ideal giriş noktası
             puan += 20
             detay.append(f"RSI:{rsi:.0f}")
-        elif 60 <= rsi < 70:
-            # Momentum devam ediyor ama biraz geç
-            puan += 10
-            detay.append(f"RSI:{rsi:.0f} GEÇ")
+        elif 60 <= rsi < 65:
+            # Momentum devam ediyor — nötr, ödül yok
+            detay.append(f"RSI:{rsi:.0f} NÖTR")
+        elif 65 <= rsi < 70:
+            # Tepe alanı — ceza
+            puan -= 10
+            detay.append(f"RSI:{rsi:.0f} TEPE")
         elif rsi >= 70:
             # Aşırı alım — muhtemelen patlamış, sert ceza
-            puan -= 20
+            puan -= 25
             detay.append(f"RSI:{rsi:.0f} AŞIRI_ALIM")
 
         # MACD
@@ -621,10 +627,15 @@ class CoinRiskYoneticisi:
         return max(Config.MIN_ISLEM_USDT, min(Config.MAX_ISLEM_USDT, poz_usdt))
 
     def stop_loss_hesapla(self, fiyat, atr):
-        """ATR bazlı stop-loss."""
+        """ATR bazlı stop-loss. ATR çok dar ise varsayılan %'ye düş."""
+        varsayilan = fiyat * (1 - Config.STOP_LOSS_VARSAYILAN_PCT / 100)
         if atr is None or atr <= 0:
-            return fiyat * 0.95  # Varsayılan %5
-        return fiyat - (atr * Config.STOP_LOSS_ATR_CARPAN)
+            return varsayilan
+        atr_stop = fiyat - (atr * Config.STOP_LOSS_ATR_CARPAN)
+        # ATR çok dar kalırsa (kripto için %1.5'tan az) varsayılanı kullan
+        if (fiyat - atr_stop) / fiyat < 0.015:
+            return varsayilan
+        return atr_stop
 
     def pozisyon_ekle(self, symbol, giris_fiyat, miktar, atr=None):
         stop = self.stop_loss_hesapla(giris_fiyat, atr)
@@ -842,8 +853,30 @@ class CoinOtonomTrader:
             logger.info(f"Max pozisyon ({Config.MAX_POZISYON}) dolu")
             return
 
+        # Cooldown — en son pozisyon açılışından bu yana yeterli süre geçti mi?
+        son_acilis = None
+        for poz in self.risk.pozisyonlar.values():
+            try:
+                z = datetime.fromisoformat(poz.get("giris_zaman", ""))
+                if son_acilis is None or z > son_acilis:
+                    son_acilis = z
+            except Exception:
+                pass
+        if son_acilis is not None:
+            dakika = (datetime.now() - son_acilis).total_seconds() / 60
+            if dakika < Config.POZISYON_COOLDOWN_DK:
+                kalan = Config.POZISYON_COOLDOWN_DK - dakika
+                logger.info(f"⏳ Cooldown — son pozisyondan bu yana {dakika:.1f}dk, {kalan:.1f}dk bekleniyor")
+                return
+
+        # Bu döngüde kaç alış yapıldı — toplu giriş engeli
+        dongu_alis = 0
+
         for s in sonuclar:
             if bos_slot <= 0:
+                break
+            if dongu_alis >= Config.DONGU_BASINA_MAX_ALIS:
+                logger.info(f"Döngü alış limiti ({Config.DONGU_BASINA_MAX_ALIS}) doldu, kalan fırsatlar sonraki taramaya")
                 break
 
             symbol = s["symbol"]
@@ -887,6 +920,7 @@ class CoinOtonomTrader:
                 self.risk.pozisyon_ekle(symbol, avg_price, total_qty, s.get("atr"))
                 usdt -= islem_usdt
                 bos_slot -= 1
+                dongu_alis += 1
 
                 self.trade_log({
                     "zaman": datetime.now().isoformat(), "tip": "AL", "symbol": symbol,
