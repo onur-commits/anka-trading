@@ -569,6 +569,14 @@ def windows_deploy(uretilen):
 # ============================================================
 
 if __name__ == "__main__":
+    from piyasa_takvim import bist_acik_mi
+
+    acik, sebep = bist_acik_mi()
+    if not acik and "--zorla" not in sys.argv:
+        print(f"⏸️  BIST kapalı: {sebep}")
+        print("   Tarama atlandı. Zorla çalıştırmak için: --zorla")
+        sys.exit(0)
+
     uretilen = gunluk_tarama(
         top_n=5,
         min_skor=25,

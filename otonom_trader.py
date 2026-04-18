@@ -44,6 +44,7 @@ from haber_sentiment import haberleri_analiz_et
 from gunluk_bomba import (
     TICKERS, bomba_skor_hesapla, iq_kodu_uret, stop_hesapla,
 )
+from piyasa_takvim import sadece_bist_acikken, bist_acik_mi
 
 DATA_DIR = BASE_DIR / "data"
 IQ_DIR = BASE_DIR / "matriks_iq"
@@ -527,17 +528,21 @@ def otonom_baslat():
     """Tam otonom sistemi başlat — 7/24 çalışır."""
     log("=" * 50)
     log("🤖 BIST ALPHA V2 — OTONOM TRADER")
+    acik, sebep = bist_acik_mi()
+    log(f"  Piyasa: {'🟢 AÇIK' if acik else '🔴 KAPALI'} — {sebep}")
     log("=" * 50)
 
+    # ML eğitim hafta sonu da çalışabilir (geçmiş veri kullanır)
     schedule.every().day.at("05:30").do(gorev_05_30_egitim)
-    schedule.every().day.at("08:30").do(gorev_08_30_tarama)
-    schedule.every().day.at("08:50").do(gorev_08_50_iq_kontrol)
-    schedule.every().day.at("09:35").do(gorev_09_35_acilis)
-    schedule.every().day.at("10:00").do(gorev_10_00_ilk_yarim_saat)
-    schedule.every().day.at("12:00").do(gorev_12_00_ogle)
-    schedule.every().day.at("12:15").do(gorev_12_15_guncelle)
-    schedule.every().day.at("15:00").do(gorev_15_00_risk)
-    schedule.every().day.at("17:35").do(gorev_17_35_rapor)
+    # Trading job'ları BIST açık günlerde — hafta sonu ve resmi tatil atlanır
+    schedule.every().day.at("08:30").do(sadece_bist_acikken(gorev_08_30_tarama))
+    schedule.every().day.at("08:50").do(sadece_bist_acikken(gorev_08_50_iq_kontrol))
+    schedule.every().day.at("09:35").do(sadece_bist_acikken(gorev_09_35_acilis))
+    schedule.every().day.at("10:00").do(sadece_bist_acikken(gorev_10_00_ilk_yarim_saat))
+    schedule.every().day.at("12:00").do(sadece_bist_acikken(gorev_12_00_ogle))
+    schedule.every().day.at("12:15").do(sadece_bist_acikken(gorev_12_15_guncelle))
+    schedule.every().day.at("15:00").do(sadece_bist_acikken(gorev_15_00_risk))
+    schedule.every().day.at("17:35").do(sadece_bist_acikken(gorev_17_35_rapor))
 
     log("")
     log("📅 PROGRAM:")
