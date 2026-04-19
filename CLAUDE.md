@@ -207,3 +207,95 @@ Ayni adimlari tekrar calistirmak gerekirse:
 - `~/Desktop/ANKA/COWORK_DEVRALDIRMA_20260418.md` — tam devir notu (onceki oturum + bu oturum)
 - `~/Desktop/ANKA/_memory_update_20260418.md` — memory'e eklenmesi gereken ozet
 - `~/Desktop/ANKA/PAPER_DENEME_TALIMAT.md` — deneme prosedurleri
+
+## Cowork Oturumu — 2026-04-19 (Paper sonuc + Backtest turu + A/B setup)
+
+### Paper deneme 15h sonucu (2026-04-18 19:27 → 2026-04-19 09:27)
+- Toplam alim: **0** (14 saat boyunca skor 65 esigini gecen coin olmadi, en yuksek ATOM 54.2)
+- Toplam satis: **2** (ikisi de STOP_LOSS: ATOM @ $1.765, BNB @ $620.59)
+- Ilk aktif poz: 3, son: 1
+- Rapor: `C:\ANKA\data\paper_saatlik_rapor.md`
+- **Yorum: momentum bot bu piyasa kosullarinda calismiyor**
+
+### Yeni backtest: Grid Trading (2 yil, BTC+ETH)
+- Dosya: `grid_backtest.py` (+ `data_fetcher_2yil.py` yeni 2 yillik veri)
+- Veri: `data/price_history_2yil.csv` (BTC 17521 + ETH 17521 bar)
+- 10 konfigurasyon (FullRange 20/40/80 kademe + DarAralik40 20/40) — **hepsi negatif**
+- En iyi: ETH DarAralik40_20k -13.67% (B&H -22.76%'dan +9.1 puan iyi ama yine zarar)
+- BTC'de B&H +20.70%, grid -4% ile -15% arasi → BTC trend piyasasinda grid kotu
+- Rapor: `data/grid_backtest_rapor.md`
+
+### Yeni backtest: DCA (2 yil, haftalik $25)
+- Dosya: `dca_backtest.py`
+- 4 varyant (BTC only, ETH only, 50/50, RSI_dip) — **hepsi negatif**
+- DCA_BTC_only: -8.16%, DCA_ETH_only: -15.47%, DCA_50_50: -11.81%, DCA_RSI_dip: -10.60%
+- Referans: BTC B&H +20.52%, ETH B&H -22.88%
+- Rapor: `data/dca_backtest_rapor.md`
+- **Yorum: 2 yil icinde kazanan TEK strateji "bastan BTC al, sat-ma" (+20.5%). Her aktif strateji kaybediyor.**
+
+### VPS temizlik (2026-04-19)
+- `anka_rotasyon.py` iki kopya calisiyordu (PID 7096 eski, 8324 yeni) → 8324 kapatildi
+- Kalan Python prosesleri: streamlit BIST (8501), streamlit COIN (8502), otonom_trader.py (BIST), coin_otonom_trader.py (CANLI, --dry-run YOK), anka_muhendis.py, anka_rotasyon.py (tek)
+- `ANKA_Coin_Trader` scheduler DISABLED kaldi (paper'dan miras) → coin bot manuel calisiyor
+- Onemli: paper sonrasi canli coin bot yeniden basladi (PID 7780), su an BTC pozisyonu stop'a takilmis (bakiye su an sadece BNB $225)
+
+### A/B Karsilastirma Deneyi (CANLI, 30 gun, 2026-04-19 → 2026-05-19)
+**Amac:** Bot vs BTC Buy&Hold hangisi daha iyi? Gercek para, gercek piyasa.
+
+**Kurulum:**
+- Dosya: `ab_karsilastirma.py` (VPS'te `C:\ANKA\ab_karsilastirma.py`)
+- T0: 2026-04-19 11:06 UTC, BTC fiyat $75238.76
+- Bot tarafi: Binance Spot gercek bakiye (T0: $224.63, sadece BNB)
+- B&H tarafi: T0'da $224.63 → 0.002986 BTC (sanal, dokunulmayacak)
+- Esit sermaye (B&H = bot T0 degeri)
+- State: `C:\ANKA\data\ab_karsilastirma.json`
+- Rapor: `C:\ANKA\data\ab_rapor.md`
+
+**Scheduler:** `ANKA_AB_Karsilastirma` → her gun 23:00 (VPS saati), SYSTEM user
+- Wrapper batch: `C:\ANKA\_ab_karsilastirma.bat`
+- Log: `C:\ANKA\logs\ab_karsilastirma.log`
+- NextRun: 2026-04-19 23:00:00
+
+**Flag'ler:**
+- `python ab_karsilastirma.py` — snapshot al + rapor
+- `--rapor` — sadece rapor uret
+- `--reset` — T0 sifirla (yedekler eskiyi)
+
+**Bot tarafi nasil hesaplaniyor:**
+- `binance_hesap_bakiye()` → Spot'taki tum asset'leri al (free+locked)
+- Her asset'i anlik USDT fiyatiyla carp
+- Toplam USDT cinsinden "bot degeri"
+- Bot alim/satim yaptikca bakiye kompozisyonu degisir ama toplam USDT degeri takip edilir
+
+**B&H tarafi nasil hesaplaniyor:**
+- T0'da sabit BTC miktari (0.002986) belirlendi, degismez
+- Her snapshot'ta: BTC miktari × guncel BTC fiyat = B&H degeri
+- Hic alim/satim YOK (sanal pozisyon)
+
+**Karsilastirma:**
+- Bot % = (bot_deger / bot_t0 - 1) × 100
+- B&H % = (bh_deger / bh_t0 - 1) × 100
+- Fark = Bot % - B&H % (+ = bot onde)
+
+**30 gun sonra karar:**
+- Bot onde → momentum strateji isiyor, devam
+- B&H onde → momentum bot rafa, B&H'a don (2 yil backtest'in dedigi)
+
+### Yeni dosyalar (2026-04-19)
+- `~/Desktop/ANKA/grid_backtest.py` + `data/grid_backtest_rapor.md`
+- `~/Desktop/ANKA/dca_backtest.py` + `data/dca_backtest_rapor.md`
+- `~/Desktop/ANKA/data_fetcher_2yil.py` + `data/price_history_2yil.csv` (2 yil BTC+ETH 1h)
+- `~/Desktop/ANKA/ab_karsilastirma.py` (VPS'te `C:\ANKA\ab_karsilastirma.py` + `_ab_karsilastirma.bat`)
+- VPS scheduler: `ANKA_AB_Karsilastirma` (her gun 23:00)
+
+### Acik konular (bir sonraki oturum icin)
+- Commit + push gerek (ab_karsilastirma.py, grid_backtest.py, dca_backtest.py, CLAUDE.md update)
+- `earn_to_spot.py` hala calistirilmadi (kullanici karari) — Earn'de hayalet ATOM/BTC/MOVR var
+- Coin bot `toplam_portfoy_degeri()` hala hayalet poz topluyor
+- A/B deneyi 30 gun surecek, her gun 23:00'te snapshot
+- **ONEMLI:** Canli coin bot calismaya devam ediyor (kullanici karari)
+
+### HARD LIMIT (devam ediyor)
+- Cowork Claude: alim/satim/transfer TETIKLEMEZ
+- Sadece script yazar, kullanici calistirir veya izleme altyapisi kurar
+- A/B deneyinde: bot dogal olarak kendi islemlerini yapar (zaten canli), Cowork sadece snapshot alir

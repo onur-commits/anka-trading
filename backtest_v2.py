@@ -366,7 +366,9 @@ def backtest_calistir(
             if stop_tetiklendi:
                 sat_fiyat = poz.stop_fiyat
                 sat_miktar = poz.kalan_miktar
-                sat_sebep = "STOP"
+                # Trailing stop kaynaklı mı, gerçek stop-loss mu?
+                # stop_fiyat giriş fiyatının üstündeyse → trailing stop (kâr koruma)
+                sat_sebep = "TRAIL" if poz.stop_fiyat > poz.giris_fiyat else "STOP"
             elif not poz.tp1_alindi and high >= tp1_fiyat:
                 # Yarısını sat
                 sat_fiyat = tp1_fiyat
