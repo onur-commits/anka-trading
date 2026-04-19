@@ -115,8 +115,8 @@ class Config:
     MAX_ISLEM_USDT = 500.0        # Max işlem tutarı
 
     # Sinyal parametreleri
-    MIN_SKOR_AL = 65              # Min skor (alış) — rally zirvesi filtresi
-    MIN_AJAN_ONAY = 2             # En az N ajan >= 60 olmalı
+    MIN_SKOR_AL = 75              # Min skor (alış) — sıkı filtre (2 yıllık backtest sonrası)
+    MIN_AJAN_ONAY = 3             # En az 3 ajan >= 60 (5 ajan arasından)
     DONGU_BASINA_MAX_ALIS = 2     # Tek tarama döngüsünde max alış (toplu giriş engeli)
     POZISYON_COOLDOWN_DK = 30     # Yeni pozisyon açmadan önce bekleme (min)
 
