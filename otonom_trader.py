@@ -240,7 +240,7 @@ MIDAS_BROKAGE_ID = "115"
 # Risk parametreleri (bot config)
 MAX_POZISYON_SAYISI = 3           # Aynı anda max pozisyon
 MAX_POZISYON_TL = 20000           # Pozisyon başına max TL
-MIN_BOMBA_SKOR_ALIS = 60          # Alış için min skor
+MIN_BOMBA_SKOR_ALIS = 35          # Alış için min skor (canlı test için gevşetildi)
 
 
 def _trade_log_yaz(kayit):
