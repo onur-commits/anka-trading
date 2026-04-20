@@ -430,16 +430,36 @@ def gorev_09_05_otonom_alis():
         log("Bu sabah bomba yok, alış atlandı")
         return
 
-    # Mevcut pozisyonları al
+    # Mevcut pozisyonları al — hem bot state hem Midas hesabı
     mevcut = _pozisyonlari_oku()
-    bos_slot = MAX_POZISYON_SAYISI - len(mevcut)
+
+    # Midas'taki gerçek pozisyonları da çek (elle alınmışları filtrele)
+    midas_poz = set()
+    try:
+        from anka_api import AnkaAPI
+        api = AnkaAPI()
+        if api.baglan():
+            p = api.pozisyonlari_oku(brokage_id=MIDAS_BROKAGE_ID, account_id=MIDAS_ACCOUNT_ID)
+            if p and "PositionResponseList" in p:
+                for x in p["PositionResponseList"]:
+                    if x.get("QtyNet", 0) != 0:
+                        midas_poz.add(x.get("Symbol", ""))
+        api.kapat()
+    except Exception as e:
+        log(f"Midas pozisyon sorgu hatası: {e}", "WARN")
+
+    toplam_tutulan = set(mevcut.keys()) | midas_poz
+    bos_slot = MAX_POZISYON_SAYISI - len(toplam_tutulan)
+    log(f"  Bot poz: {list(mevcut.keys())} | Midas poz: {sorted(midas_poz)}")
+    log(f"  Toplam tutulan: {sorted(toplam_tutulan)} | Boş slot: {bos_slot}")
+
     if bos_slot <= 0:
         log(f"Max pozisyon ({MAX_POZISYON_SAYISI}) dolu, alış atlandı")
         return
 
-    # Skor sırasına göre filtrele
+    # Skor sırasına göre filtrele — zaten elde olanları atla
     aday = [b for b in bombalar if b.get("bomba_skor", 0) >= MIN_BOMBA_SKOR_ALIS
-            and b["ticker"] not in mevcut]
+            and b["ticker"] not in toplam_tutulan]
     aday.sort(key=lambda x: x.get("bomba_skor", 0), reverse=True)
 
     alinan = 0
@@ -472,13 +492,14 @@ def gorev_09_05_otonom_alis():
 
 
 def gorev_17_30_gun_sonu_satis():
-    """17:30 — Açık tüm pozisyonları kapat (gün sonu, intraday)."""
+    """17:30 — SADECE BOT'un açtığı pozisyonları kapat.
+    Kullanıcının manuel aldığı hisselere dokunma!"""
     log("=" * 50)
-    log("🏁 [17:30] GÜN SONU SATIS — TÜM POZİSYONLAR KAPATILIYOR")
+    log("🏁 [17:30] GÜN SONU SATIS — Bot pozisyonları kapatılıyor")
 
     pozlar = _pozisyonlari_oku()
     if not pozlar:
-        log("Açık pozisyon yok")
+        log("Bot açık pozisyon yok — kullanıcının manuel pozisyonlarına dokunmuyorum")
         return
 
     satilan = 0
@@ -487,7 +508,7 @@ def gorev_17_30_gun_sonu_satis():
         if sonuc.get("success"):
             satilan += 1
 
-    log(f"Toplam {satilan} pozisyon kapatıldı")
+    log(f"Toplam {satilan} bot pozisyonu kapatıldı")
 
 
 def gorev_durum_raporu():
