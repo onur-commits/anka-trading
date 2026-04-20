@@ -85,6 +85,36 @@ def bomba_skor_hesapla(analiz, features):
     Çok yönlü bomba skoru — 0-100 arası.
     ML + Teknik + Momentum + Hacim + Rejim uyumu.
     """
+    # --- Guard: pandas Series/ndarray değerleri scalar'a indir ---
+    # yfinance MultiIndex / squeeze edilmemiş DataFrame'den gelen Series'leri safelık
+    try:
+        import pandas as _pd
+        import numpy as _np
+        def _scalar(v, default=0):
+            if v is None:
+                return default
+            if isinstance(v, (_pd.Series, _np.ndarray)):
+                try:
+                    return float(v.iloc[-1]) if hasattr(v, "iloc") else float(v[-1])
+                except Exception:
+                    try:
+                        return float(v.item()) if hasattr(v, "item") else default
+                    except Exception:
+                        return default
+            try:
+                return float(v)
+            except Exception:
+                return default
+        if isinstance(features, dict):
+            features = {k: _scalar(v) for k, v in features.items()}
+        if isinstance(analiz, dict):
+            for k, v in list(analiz.items()):
+                if isinstance(v, (_pd.Series, _np.ndarray)):
+                    analiz[k] = _scalar(v)
+    except Exception:
+        pass
+    # ---
+
     skor = 0
     sebepler = []
 
@@ -177,16 +207,36 @@ def hibrit_bomba_kontrol(df, ml_score):
       2. Hacim >= ortalamanın 1.8 katı (kurumsal ilgi)
       3. Kapanış >= günün en yükseğinin %98.5'i (alıcılar baskın)
     """
+    # ml_score Series ise scalar'a indir
+    try:
+        import pandas as _pd
+        if isinstance(ml_score, _pd.Series):
+            ml_score = float(ml_score.iloc[-1])
+        else:
+            ml_score = float(ml_score)
+    except Exception:
+        ml_score = 0.0
+
     # 1. ML Katmanı
     ml_onay = ml_score >= 0.75
 
+    # yfinance MultiIndex guard — tek ticker olduğunda squeeze Series'e düşürür
+    try:
+        vol = df['Volume'].squeeze()
+        close = df['Close'].squeeze()
+        high = df['High'].squeeze()
+    except Exception:
+        vol = df['Volume']
+        close = df['Close']
+        high = df['High']
+
     # 2. Hacim Katmanı
-    avg_vol = df['Volume'].rolling(20).mean().iloc[-1]
-    curr_vol = df['Volume'].iloc[-1]
+    avg_vol = vol.rolling(20).mean().iloc[-1]
+    curr_vol = vol.iloc[-1]
     hacim_onay = float(curr_vol) > (float(avg_vol) * 1.8)
 
     # 3. Kapanış Gücü Katmanı
-    kapanis_onay = float(df['Close'].iloc[-1]) > (float(df['High'].iloc[-1]) * 0.985)
+    kapanis_onay = float(close.iloc[-1]) > (float(high.iloc[-1]) * 0.985)
 
     # BİRLEŞİK KARAR — hepsi onaylamalı
     return ml_onay and hacim_onay and kapanis_onay
@@ -541,6 +591,38 @@ def gunluk_tarama(top_n=5, min_skor=30):
 
     print(f"\n💾 Rapor: {rapor_path}")
     print(f"📁 Kodlar: {IQ_DIR}/BOMBA_*.cs")
+
+    # 10. Telegram bildirimi — kullanıcı telefondan görsün, Midas'tan manuel al
+    try:
+        from bildirim import gonder
+
+        if rapor["bombalar"]:
+            tarih = datetime.now().strftime("%d %b %Y")
+            rejim_ad = (rapor.get("rejim") or {}).get("rejim", "?").upper() if isinstance(rapor.get("rejim"), dict) else "?"
+            satirlar = [f"🔔 ANKA BIST Bomba — {tarih}", f"Rejim: {rejim_ad}", ""]
+            for i, b in enumerate(rapor["bombalar"][:5], 1):
+                sym = b["ticker"]
+                fiyat = float(b["fiyat"])
+                stop_pct = float(b.get("stop", 5))
+                stop_fiyat = fiyat * (1 - stop_pct / 100)
+                ml = float(b.get("ml", 0)) * 100
+                skor = b.get("bomba_skor", 0)
+                sebepler = b.get("sebepler", [])
+                kisa_sebep = ", ".join(sebepler[:2]) if sebepler else ""
+                satirlar.append(f"{i}. {sym} — {fiyat:.2f} TL")
+                satirlar.append(f"   Skor:{skor} | ML:%{ml:.0f} | Stop:{stop_fiyat:.2f}")
+                if kisa_sebep:
+                    satirlar.append(f"   {kisa_sebep}")
+                satirlar.append("")
+            satirlar.append("Manuel alım için Midas app kullan.")
+            mesaj = "\n".join(satirlar)
+            gonder(mesaj)
+            print(f"📱 Telegram bildirimi gönderildi ({len(rapor['bombalar'][:5])} öneri)")
+        else:
+            from bildirim import gonder as _g
+            _g(f"🔕 ANKA BIST — {datetime.now().strftime('%d %b')}: Bugün bomba sinyali yok.")
+    except Exception as _e:
+        print(f"⚠️  Telegram bildirimi gönderilemedi: {_e}")
 
     return uretilen
 
