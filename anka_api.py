@@ -58,10 +58,26 @@ class AnkaAPI:
                 pass
             self.sock = None
 
+    def _ensure_conn(self):
+        """Soket kapalıysa otomatik yeniden bağlan. True = hazır, False = bağlanamadım."""
+        if self.sock is None:
+            return self.baglan()
+        return True
+
     def _gonder(self, data):
-        """JSON paketi gönder + char(11) sonlandırıcı."""
+        """JSON paketi gönder + char(11) sonlandırıcı. Kapalıysa otomatik yeniden bağlan."""
+        if not self._ensure_conn():
+            raise ConnectionError("IQ TCP bağlantı kurulamadı")
         paket = json.dumps(data) + self.TERMINATOR
-        self.sock.sendall(paket.encode('utf-8'))
+        try:
+            self.sock.sendall(paket.encode('utf-8'))
+        except (BrokenPipeError, ConnectionResetError, OSError) as e:
+            # Yeniden bağlanmayı dene — 1 kere
+            print(f"⚠️ _gonder() soket kırıldı ({e}), yeniden bağlanılıyor...")
+            self.sock = None
+            if not self._ensure_conn():
+                raise ConnectionError(f"IQ yeniden bağlantı kurulamadı: {e}")
+            self.sock.sendall(paket.encode('utf-8'))
 
     def _al(self, timeout=5):
         """Yanıt al."""
