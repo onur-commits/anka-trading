@@ -895,6 +895,20 @@ def otonom_baslat():
 
     bildirim("Otonom Trader başladı!")
 
+    # Bot self-trigger — flag dosyası varsa bot kendi başına 09:05 görevini çağırır
+    tetikle_flag = DATA_DIR / "tetikle_simdi.flag"
+    if tetikle_flag.exists():
+        log("⚡ tetikle_simdi.flag bulundu — bot kendi kararıyla gorev_09_05_otonom_alis çağırıyor")
+        try:
+            gorev_09_05_otonom_alis()
+        except Exception as _e:
+            log(f"Tetikleme hatası: {_e}", "ERROR")
+        try:
+            tetikle_flag.unlink()
+            log("⚡ Flag silindi, normal schedule'a geçiliyor")
+        except Exception:
+            pass
+
     while True:
         schedule.run_pending()
         time.sleep(30)
