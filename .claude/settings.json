@@ -5,6 +5,7 @@
   },
   "language": "turkish",
   "permissions": {
+    "defaultMode": "acceptEdits",
     "allow": [
       "Bash(git status*)",
       "Bash(git diff*)",
@@ -42,8 +43,29 @@
       "Bash(which *)",
       "Bash(true)",
       "Bash(false)",
+      "Bash(python3)",
+      "Bash(python3 -m *)",
+      "Bash(pip *)",
+      "Bash(pip3 *)",
+      "Bash(test *)",
+      "Bash([ *)",
+      "Bash(sed *)",
+      "Bash(awk *)",
+      "Bash(diff *)",
+      "Bash(cp *)",
+      "Bash(mv -n *)",
+      "Bash(cmp *)",
+      "Bash(stat *)",
+      "Bash(date*)",
+      "Bash(env)",
+      "Bash(pwd)",
+      "Bash(whoami)",
+      "Bash(wc)",
+      "Bash(printf *)",
       "Read",
-      "Skill"
+      "Skill",
+      "Edit",
+      "Write"
     ],
     "ask": [
       "Bash(python3 coin_otonom_trader.py)",
