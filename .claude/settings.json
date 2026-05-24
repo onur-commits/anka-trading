@@ -4,6 +4,58 @@
     "PYTHONUTF8": "1"
   },
   "language": "turkish",
+  "permissions": {
+    "allow": [
+      "Bash(git status*)",
+      "Bash(git diff*)",
+      "Bash(git log*)",
+      "Bash(git add*)",
+      "Bash(git commit*)",
+      "Bash(git push*)",
+      "Bash(git pull*)",
+      "Bash(git fetch*)",
+      "Bash(git checkout*)",
+      "Bash(git branch*)",
+      "Bash(git rebase*)",
+      "Bash(git merge*)",
+      "Bash(git stash*)",
+      "Bash(git restore*)",
+      "Bash(git show*)",
+      "Bash(git remote*)",
+      "Bash(git reset*)",
+      "Bash(git config --get*)",
+      "Bash(python3 *)",
+      "Bash(python -c *)",
+      "Bash(ls *)",
+      "Bash(ls)",
+      "Bash(cat *)",
+      "Bash(head *)",
+      "Bash(tail *)",
+      "Bash(grep *)",
+      "Bash(find *)",
+      "Bash(wc *)",
+      "Bash(sort *)",
+      "Bash(uniq *)",
+      "Bash(mkdir *)",
+      "Bash(jq *)",
+      "Bash(echo *)",
+      "Bash(which *)",
+      "Bash(true)",
+      "Bash(false)",
+      "Read",
+      "Skill"
+    ],
+    "ask": [
+      "Bash(python3 coin_otonom_trader.py)",
+      "Bash(python coin_otonom_trader.py)",
+      "Bash(python3 otonom_trader.py)",
+      "Bash(python otonom_trader.py)",
+      "Bash(rm *)",
+      "Bash(rm -rf *)",
+      "Bash(git push --force*)",
+      "Bash(git reset --hard*)"
+    ]
+  },
   "hooks": {
     "PreToolUse": [
       {
