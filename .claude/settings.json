@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "env": {
+    "PYTHONUTF8": "1"
+  },
+  "language": "turkish",
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "jq -r '.tool_input.command // \"\"' | grep -E 'otonom_trader\\.py' | grep -vE -- '--dry-run|--paper|--tara|--durum' >/dev/null && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"Canli emir koruma: --dry-run/--paper olmadan otonom_trader calistirilmak isteniyor. Onayliyor musun?\"}}' || true"
+          }
+        ]
+      }
+    ]
+  }
+}

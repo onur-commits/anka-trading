@@ -6,4 +6,5 @@ models/*.pkl
 *.log
 .env
 islem_gecmisi.json
+.claude/settings.local.json
 
