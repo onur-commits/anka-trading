@@ -26,8 +26,10 @@ from datetime import datetime
 from pathlib import Path
 
 # ── LOGGING ────────────────────────────────────────────────
+_LOG_DIR = os.path.join(os.path.dirname(__file__), "logs")
+os.makedirs(_LOG_DIR, exist_ok=True)
 logging.basicConfig(
-    filename=os.path.join(os.path.dirname(__file__), "logs", "coin_dashboard.log"),
+    filename=os.path.join(_LOG_DIR, "coin_dashboard.log"),
     level=logging.INFO,
     format="%(asctime)s [%(levelname)s] %(message)s",
     datefmt="%Y-%m-%d %H:%M:%S",
