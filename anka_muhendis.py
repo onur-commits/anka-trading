@@ -435,20 +435,52 @@ def kontrol_coin_bot():
 
 
 def onar_coin_bot():
-    """Çökmüş coin bot'u yeniden başlat."""
+    """Çökmüş coin bot'u yeniden başlat.
+
+    Sirasiyla denenir:
+      1. ANKA_Coin_Trader scheduler task (CLAUDE.md'deki resmi ad)
+      2. ANKA_CoinBot scheduler task (eski ad — fallback)
+      3. coin_otonom_trader.py dogrudan (canli bot, CLAUDE.md)
+      4. coin_otonom.py dogrudan (eski bot — son fallback)
+    """
+    PYTHON = '"C:\\Program Files\\Python312\\python.exe"'
+    # 1) Resmi task adi
     try:
-        bat_path = BASE_DIR / "coin_bot_start.bat"
-        if bat_path.exists():
-            subprocess.Popen(f'schtasks /run /tn "ANKA_CoinBot"', shell=True)
-            log("Coin bot schtasks ile yeniden başlatıldı", "WARNING", "ONARIM")
+        r = subprocess.run('schtasks /Query /TN "ANKA_Coin_Trader"',
+                           shell=True, capture_output=True, timeout=10)
+        if r.returncode == 0:
+            subprocess.Popen('schtasks /run /tn "ANKA_Coin_Trader"', shell=True)
+            log("Coin bot ANKA_Coin_Trader scheduler ile yeniden başlatıldı", "WARNING", "ONARIM")
             return True
-        else:
-            subprocess.Popen(
-                f'"C:\\Program Files\\Python312\\python.exe" -X utf8 {BASE_DIR / "coin_otonom.py"}',
-                shell=True,
-            )
-            log("Coin bot doğrudan yeniden başlatıldı", "WARNING", "ONARIM")
+    except Exception as e:
+        log(f"ANKA_Coin_Trader query hatasi: {e}", "WARNING", "ONARIM")
+
+    # 2) Eski task adi (fallback)
+    try:
+        r = subprocess.run('schtasks /Query /TN "ANKA_CoinBot"',
+                           shell=True, capture_output=True, timeout=10)
+        if r.returncode == 0:
+            subprocess.Popen('schtasks /run /tn "ANKA_CoinBot"', shell=True)
+            log("Coin bot ANKA_CoinBot scheduler ile yeniden başlatıldı (eski ad)", "WARNING", "ONARIM")
             return True
+    except Exception:
+        pass
+
+    # 3) Dogrudan canli bot
+    try:
+        trader = BASE_DIR / "coin_otonom_trader.py"
+        if trader.exists():
+            subprocess.Popen(f'{PYTHON} -X utf8 "{trader}"', shell=True)
+            log("Coin bot coin_otonom_trader.py ile doğrudan başlatıldı", "WARNING", "ONARIM")
+            return True
+    except Exception as e:
+        log(f"coin_otonom_trader.py başlatma hatası: {e}", "ERROR", "ONARIM")
+
+    # 4) Eski bot fallback
+    try:
+        subprocess.Popen(f'{PYTHON} -X utf8 "{BASE_DIR / "coin_otonom.py"}"', shell=True)
+        log("Coin bot coin_otonom.py (eski) ile fallback başlatıldı", "WARNING", "ONARIM")
+        return True
     except Exception as e:
         log(f"Coin bot başlatılamadı: {e}", "ERROR", "ONARIM")
         return False
