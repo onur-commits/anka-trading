@@ -122,6 +122,15 @@ Sifre: .env dosyasinda veya kullanicidan sor
 - Bilinen sorunlar ANKA_BILINEN_SORUNLAR.md dosyasinda
 - Erisim noktalari ayni dosyada ve bu dosyada
 .
+## Otonom Davranis Kurali (kullanici talebi, 2026-05-24)
+- Kullanici bir sure cevap vermezse veya "yat/uyu" derse:
+  Claude kendi onerdigi en yuksek deger getiren islemi se cer ve uygulamaya
+  baslar — beklemez, izin sormaz. HARD LIMIT korunur:
+  alim/satim/transfer/VPS'te canli script TETIKLEMEZ, sadece kod yazar,
+  commit + push + PR acar/gunceller.
+- Coklu oneri sunulup secim beklenirken sessizlik gelirse, listenin ilk
+  (en cok onerilen) maddesinden baslar.
+.
 ## Otonom Trading (2026-04-16 CANLI)
 - MatriksIQ TCP API uzerinden Midas'a GERCEK emir gonderilebiliyor
 - otonom_trader.py v3: Tam otonom karar dongusu
