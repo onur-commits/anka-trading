@@ -98,22 +98,33 @@ class BinanceClient:
         return {"X-MBX-APIKEY": self.api_key}
 
     def fiyat(self, symbol):
-        r = requests.get(f"{self.BASE_URL}/api/v3/ticker/price", params={"symbol": symbol}, timeout=10)
-        return float(r.json()["price"])
+        try:
+            r = requests.get(f"{self.BASE_URL}/api/v3/ticker/price", params={"symbol": symbol}, timeout=10)
+            return float(r.json()["price"])
+        except Exception as e:
+            print(f"[HATA] fiyat({symbol}): {e}")
+            return 0.0
 
     def kline(self, symbol, interval="1h", limit=100):
-        r = requests.get(f"{self.BASE_URL}/api/v3/klines",
-                        params={"symbol": symbol, "interval": interval, "limit": limit}, timeout=10)
-        data = r.json()
-        df = pd.DataFrame(data, columns=[
-            "open_time", "Open", "High", "Low", "Close", "Volume",
-            "close_time", "quote_vol", "trades", "buy_base", "buy_quote", "ignore"
-        ])
-        for col in ["Open", "High", "Low", "Close", "Volume"]:
-            df[col] = df[col].astype(float)
-        df["time"] = pd.to_datetime(df["open_time"], unit="ms")
-        df.set_index("time", inplace=True)
-        return df
+        try:
+            r = requests.get(f"{self.BASE_URL}/api/v3/klines",
+                            params={"symbol": symbol, "interval": interval, "limit": limit}, timeout=10)
+            data = r.json()
+            if not isinstance(data, list):
+                print(f"[HATA] kline({symbol}) beklenmeyen yanit: {data}")
+                return pd.DataFrame()
+            df = pd.DataFrame(data, columns=[
+                "open_time", "Open", "High", "Low", "Close", "Volume",
+                "close_time", "quote_vol", "trades", "buy_base", "buy_quote", "ignore"
+            ])
+            for col in ["Open", "High", "Low", "Close", "Volume"]:
+                df[col] = df[col].astype(float)
+            df["time"] = pd.to_datetime(df["open_time"], unit="ms")
+            df.set_index("time", inplace=True)
+            return df
+        except Exception as e:
+            print(f"[HATA] kline({symbol}): {e}")
+            return pd.DataFrame()
 
     def bakiye_usdt(self):
         params = {"timestamp": int(time.time() * 1000)}
