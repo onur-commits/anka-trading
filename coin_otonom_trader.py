@@ -334,7 +334,12 @@ class BinanceClient:
             params = self._sign(params)
             r = requests.post(f"{self.BASE_URL}/api/v3/order",
                               headers=self._headers(), params=params, timeout=self.timeout)
-            return r.json()
+            data = r.json()
+            # Binance hata yaniti: {"code": -XXXX, "msg": "..."} — bot fantom poz kaydetmesin
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                logger.error(f"market_al({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}")
+                return {"error": f"binance:{data.get('code')} {data.get('msg')}"}
+            return data
         except Exception as e:
             logger.error(f"market_al({symbol}): {e}")
             return {"error": str(e)}
@@ -353,7 +358,11 @@ class BinanceClient:
             params = self._sign(params)
             r = requests.post(f"{self.BASE_URL}/api/v3/order",
                               headers=self._headers(), params=params, timeout=self.timeout)
-            return r.json()
+            data = r.json()
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                logger.error(f"market_sat({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}")
+                return {"error": f"binance:{data.get('code')} {data.get('msg')}"}
+            return data
         except Exception as e:
             logger.error(f"market_sat({symbol}): {e}")
             return {"error": str(e)}
