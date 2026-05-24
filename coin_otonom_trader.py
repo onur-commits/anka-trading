@@ -238,12 +238,20 @@ class BinanceClient:
 
     # ── Hesap ──
     def bakiye(self):
+        if not self.api_key or not self.api_secret:
+            logger.error("bakiye(): BINANCE_API_KEY/SECRET .env'de tanimli degil")
+            return {}
         try:
             params = {"timestamp": int(time.time() * 1000)}
             params = self._sign(params)
             r = requests.get(f"{self.BASE_URL}/api/v3/account",
                              headers=self._headers(), params=params, timeout=self.timeout)
-            return r.json()
+            data = r.json()
+            # Binance hata yanitlari: {"code": -XXXX, "msg": "..."} — sessizce 0 donmesin
+            if isinstance(data, dict) and "code" in data and "balances" not in data:
+                logger.error(f"bakiye(): Binance API hatasi code={data.get('code')} msg={data.get('msg')}")
+                return {}
+            return data
         except Exception as e:
             logger.error(f"bakiye(): {e}")
             return {}
