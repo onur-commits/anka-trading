@@ -739,8 +739,13 @@ def gorev_12_00_ogle():
                     continue
                 close = df["Close"].squeeze()
                 volume = df["Volume"].squeeze()
-                gunluk = (close.iloc[-1] / close.iloc[-2] - 1) * 100
-                rvol = volume.iloc[-1] / volume.iloc[:-1].mean()
+                # Sifir/NaN guard — delist veya yetersiz veri
+                prev_close = float(close.iloc[-2])
+                if prev_close == 0:
+                    continue
+                gunluk = (close.iloc[-1] / prev_close - 1) * 100
+                vol_mean = float(volume.iloc[:-1].mean())
+                rvol = (volume.iloc[-1] / vol_mean) if vol_mean > 0 else 0
 
                 log(f"  {t}: {close.iloc[-1]:.2f} ({gunluk:+.1f}%) Hacim:x{rvol:.1f}")
 
