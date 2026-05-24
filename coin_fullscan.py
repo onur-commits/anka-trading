@@ -28,13 +28,23 @@ DATA_DIR = PROJECT_DIR / "data"
 
 def tum_coinleri_cek(min_hacim_usdt=1000000, min_hacim_try=100000):
     """Binance'deki tüm aktif coinleri çek."""
-    r = requests.get("https://api.binance.com/api/v3/ticker/24hr", timeout=15)
-    data = r.json()
+    try:
+        r = requests.get("https://api.binance.com/api/v3/ticker/24hr", timeout=15)
+        data = r.json()
+        if not isinstance(data, list):
+            print(f"[HATA] tum_coinleri_cek beklenmeyen yanit: {data}")
+            return []
+    except Exception as e:
+        print(f"[HATA] tum_coinleri_cek: {e}")
+        return []
 
     coins = []
     for d in data:
         sym = d["symbol"]
-        hacim = float(d["quoteVolume"])
+        try:
+            hacim = float(d["quoteVolume"])
+        except (KeyError, ValueError):
+            continue
 
         if sym.endswith("USDT") and hacim > min_hacim_usdt:
             coins.append({"symbol": sym, "hacim": hacim, "tip": "USDT"})
