@@ -122,7 +122,7 @@ def uzman_analiz(symbol):
                             params={"symbol": symbol, "limit": 1}, timeout=3)
             fd = fr.json()
             if fd: funding = float(fd[0]["fundingRate"])
-        except:
+        except Exception:
             pass
 
         # Emir defteri dengesi
@@ -134,7 +134,7 @@ def uzman_analiz(symbol):
             bid_vol = sum(float(b[1]) for b in ob_data.get("bids", []))
             ask_vol = sum(float(a[1]) for a in ob_data.get("asks", []))
             bid_ask_oran = bid_vol / (ask_vol + 1e-10)
-        except:
+        except Exception:
             pass
 
         # ═══ UZMAN SKOR (0-100) ═══
@@ -200,7 +200,7 @@ def uzman_analiz(symbol):
             "bid_ask": round(bid_ask_oran, 1),
             "obv_trend": bool(obv_trend),
         }
-    except:
+    except Exception:
         return None
 
 
@@ -298,7 +298,7 @@ def kesif_analiz(symbol):
             "fiyat_poz": round(fiyat_poz, 2),
             "ivme": round(ivme, 1),
         }
-    except:
+    except Exception:
         return None
 
 

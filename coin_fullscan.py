@@ -180,7 +180,7 @@ def coin_analiz(symbol):
             "evre": evre,
         }
 
-    except:
+    except Exception:
         return None
 
 

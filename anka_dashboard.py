@@ -38,7 +38,7 @@ def bridge_oku():
     try:
         if BRIDGE.exists():
             return json.load(open(BRIDGE))
-    except:
+    except Exception:
         pass
     return {}
 
@@ -51,7 +51,7 @@ def bridge_yaz(data):
             subprocess.run(["prlctl", "exec", "Windows 11", "cmd", "/c",
                            f'copy "{mac_path}" "C:\\Robot\\v3_bridge.json" /Y'],
                           timeout=10, capture_output=True)
-        except:
+        except Exception:
             pass
 
 def bomba_oku():
@@ -63,14 +63,14 @@ def bomba_oku():
                                 capture_output=True, text=True, timeout=10).stdout.strip()
             if out:
                 return [t.strip() for t in out.split(",") if t.strip()]
-    except:
+    except Exception:
         pass
     # Fallback: lokal dosyadan oku
     try:
         lokal = BASE_DIR / "data" / "aktif_bombalar.txt"
         if lokal.exists():
             return [t.strip() for t in lokal.read_text().strip().split(",") if t.strip()]
-    except:
+    except Exception:
         pass
     # Son çare: otonom state'den oku
     try:
@@ -78,7 +78,7 @@ def bomba_oku():
         if state_file.exists():
             state = json.load(open(state_file))
             return state.get("aktif_stratejiler", [])
-    except:
+    except Exception:
         pass
     return []
 
@@ -89,7 +89,7 @@ def bomba_yaz(liste):
             subprocess.run(["prlctl", "exec", "Windows 11", "cmd", "/c",
                            f'echo {txt} > C:\\Robot\\aktif_bombalar.txt'],
                           timeout=10, capture_output=True)
-        except:
+        except Exception:
             pass
 
 def portfoy_oku():
@@ -97,7 +97,7 @@ def portfoy_oku():
     if PORTFOY_DOSYA.exists():
         try:
             return json.load(open(PORTFOY_DOSYA))
-        except:
+        except Exception:
             pass
     return {}
 
@@ -144,9 +144,9 @@ def toplu_fiyat_cek(tickers):
                     "taban": degisim < -9.0,
                     "hacim_oran": hacim_oran,
                 }
-            except:
+            except Exception:
                 continue
-    except:
+    except Exception:
         pass
     return sonuc
 
@@ -570,11 +570,11 @@ with tab4:
                     "24s %": f"{float(d['priceChangePercent']):+.1f}%",
                     "Hacim": f"${float(d['quoteVolume'])/1e6:,.0f}M",
                 })
-            except:
+            except Exception:
                 continue
         if rows:
             st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
-    except:
+    except Exception:
         st.info("Binance verisi alınamadı")
 
 
@@ -637,7 +637,7 @@ with tab5:
                 ])
                 st.dataframe(df_ajan, use_container_width=True, hide_index=True)
                 st.bar_chart(df_ajan.set_index("Ajan")["Güven %"])
-        except:
+        except Exception:
             pass
     else:
         st.info("Henüz öğrenme verisi yok")

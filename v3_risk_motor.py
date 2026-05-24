@@ -55,7 +55,7 @@ def get_master_risk():
             import json as _json
             mevcut = _json.load(open(LOCAL_BRIDGE))
             mevcut_dry_run = mevcut.get("dry_run", False)
-        except:
+        except Exception:
             pass
 
         return {
@@ -96,7 +96,7 @@ def save_to_bridge(data):
                 ["prlctl", "exec", "Windows 11", "cmd", "/c",
                  f'copy "{mac_path}" "{WIN_BRIDGE}" /Y'],
                 timeout=10, capture_output=True)
-        except:
+        except Exception:
             pass
 
     print(f"[{data['last_update']}] REJİM: {data['regime']} | XU100: %{data['xu100_change']} | VIX: {data['vix']} | ÇARPAN: {data['multiplier']}")

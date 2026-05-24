@@ -332,7 +332,7 @@ def generate_bridge(active_tickers=None):
                     if h not in tum_veri and yf is not None:
                         try:
                             tum_veri[h] = yf.download(h, period="1mo", interval="1d", progress=False)
-                        except:
+                        except Exception:
                             pass
             sector_mom = sektor_momentum_hesapla(tum_veri)
         except Exception as e:

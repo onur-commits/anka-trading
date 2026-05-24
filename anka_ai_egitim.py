@@ -43,7 +43,7 @@ def veri_cek(yil=5):
                 print(f"  [{i+1}/{len(BIST50)}] {s}: {len(df)} gün ✅")
             else:
                 print(f"  [{i+1}/{len(BIST50)}] {s}: yetersiz veri ❌")
-        except:
+        except Exception:
             print(f"  [{i+1}/{len(BIST50)}] {s}: hata ❌")
     print(f"\n✅ {len(tum_veri)} hisse yüklendi")
     return tum_veri
@@ -220,7 +220,7 @@ def dataset_olustur(tum_veri, hedef_gun=5):
             y_all.append(y)
             info_all.extend([(s, str(d.date())) for d in ortak])
 
-        except:
+        except Exception:
             continue
 
     X_full = pd.concat(X_all, ignore_index=True)

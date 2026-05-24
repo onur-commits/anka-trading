@@ -30,7 +30,7 @@ def _log_yukle() -> list:
     if FEEDBACK_PATH.exists():
         try:
             return json.loads(FEEDBACK_PATH.read_text(encoding="utf-8"))
-        except:
+        except Exception:
             return []
     return []
 

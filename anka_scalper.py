@@ -297,7 +297,7 @@ def scalp_tara(symbol_list=None):
                 "tum_puanlar": {ad: p for ad, p, _ in stratejiler},
             })
 
-        except:
+        except Exception:
             continue
 
     # Sırala

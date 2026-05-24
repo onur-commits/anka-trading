@@ -183,7 +183,7 @@ class GunlukKZTakip:
         if ISLEM_KAYIT.exists():
             try:
                 kayitlar = json.load(open(ISLEM_KAYIT))
-            except:
+            except Exception:
                 pass
 
         kayitlar.append({
@@ -210,7 +210,7 @@ class GunlukKZTakip:
 
         try:
             kayitlar = json.load(open(ISLEM_KAYIT))
-        except:
+        except Exception:
             return {"toplam_kz": 0, "islem_sayisi": 0, "komisyon_toplam": 0}
 
         bugun = str(date.today())

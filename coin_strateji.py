@@ -50,7 +50,7 @@ class DipAvciBot:
                 "extreme_fear": bugun <= 20,
                 "donus_basladi": bugun > dun and bugun <= 30,  # Dipten dönüyor
             }
-        except:
+        except Exception:
             return {"deger": 50, "extreme_fear": False, "donus_basladi": False}
 
     def balina_kontrol(self, symbol="BTCUSDT"):
@@ -97,7 +97,7 @@ class DipAvciBot:
                 "divergence": divergence,
                 "son_fiyat": round(fiyatlar[-1], 2),
             }
-        except:
+        except Exception:
             return {"accumulation": False, "divergence": False}
 
     def makro_kontrol(self):
@@ -125,7 +125,7 @@ class DipAvciBot:
                 "toplam_hacim_b": round(toplam_hacim / 1e9, 1),
                 "btc_pozitif": btc_degisim > 0,
             }
-        except:
+        except Exception:
             return {"btc_degisim": 0, "btc_pozitif": False}
 
     def strateji_degerlendir(self, symbol="BTCUSDT"):
