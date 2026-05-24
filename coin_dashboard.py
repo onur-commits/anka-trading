@@ -392,7 +392,8 @@ with tab5:
     def alarmlar_oku():
         if ALARM_DOSYA.exists():
             try:
-                return json.load(open(ALARM_DOSYA))
+                with open(ALARM_DOSYA) as f:
+                    return json.load(f)
             except Exception as e:
                 logger.error(f"Alarm dosyasi okuma hata: {e}")
         return []
@@ -405,7 +406,8 @@ with tab5:
     def notlar_oku():
         if NOT_DOSYA.exists():
             try:
-                return json.load(open(NOT_DOSYA))
+                with open(NOT_DOSYA) as f:
+                    return json.load(f)
             except Exception as e:
                 logger.error(f"Not dosyasi okuma hata: {e}")
         return []

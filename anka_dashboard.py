@@ -37,7 +37,8 @@ PORTFOY_DOSYA = BASE_DIR / "data" / "portfoy_takip.json"
 def bridge_oku():
     try:
         if BRIDGE.exists():
-            return json.load(open(BRIDGE))
+            with open(BRIDGE) as f:
+                return json.load(f)
     except Exception:
         pass
     return {}
@@ -76,7 +77,8 @@ def bomba_oku():
     try:
         state_file = BASE_DIR / "data" / "otonom_state.json"
         if state_file.exists():
-            state = json.load(open(state_file))
+            with open(state_file) as f:
+                state = json.load(f)
             return state.get("aktif_stratejiler", [])
     except Exception:
         pass
@@ -96,7 +98,8 @@ def portfoy_oku():
     """Takip edilen portföy pozisyonlarını oku."""
     if PORTFOY_DOSYA.exists():
         try:
-            return json.load(open(PORTFOY_DOSYA))
+            with open(PORTFOY_DOSYA) as f:
+                return json.load(f)
         except Exception:
             pass
     return {}
@@ -628,7 +631,8 @@ with tab5:
 
     if AJAN_SKOR.exists():
         try:
-            skorlar = json.load(open(AJAN_SKOR))
+            with open(AJAN_SKOR) as f:
+                skorlar = json.load(f)
             if skorlar:
                 df_ajan = pd.DataFrame([
                     {"Ajan": ad, "Doğru": s.get("dogru", 0), "Yanlış": s.get("yanlis", 0),

@@ -218,7 +218,8 @@ def ana_dongu():
             # 6. Durum ozeti
             log("[5/5] Durum ozeti:")
             try:
-                rot = json.load(open(DATA_DIR / "rotasyon_state.json", encoding="utf-8"))
+                with open(DATA_DIR / "rotasyon_state.json", encoding="utf-8") as f:
+                    rot = json.load(f)
                 poz_sayisi = len(rot.get("pozisyonlar", {}))
                 for t, p in rot.get("pozisyonlar", {}).items():
                     log(f"  {t:8} {p.get('adet', 0)} lot @ {p.get('giris_fiyat', 0)} TL")
@@ -247,7 +248,8 @@ def durum_goster():
     # Beyin
     beyin_file = DATA_DIR / "beyin_state.json"
     if beyin_file.exists():
-        beyin = json.load(open(beyin_file, encoding="utf-8"))
+        with open(beyin_file, encoding="utf-8") as f:
+            beyin = json.load(f)
         r = beyin.get("rejim", {})
         print(f"Rejim: {r.get('rejim', '?')} | Strateji: {r.get('strateji', '?')} | Agresiflik: {r.get('agresiflik', 0):.0%}")
     else:
@@ -256,7 +258,8 @@ def durum_goster():
     # Pozisyonlar
     rot_file = DATA_DIR / "rotasyon_state.json"
     if rot_file.exists():
-        rot = json.load(open(rot_file, encoding="utf-8"))
+        with open(rot_file, encoding="utf-8") as f:
+            rot = json.load(f)
         pozlar = rot.get("pozisyonlar", {})
         print(f"Pozisyon: {len(pozlar)}/5")
         for t, p in pozlar.items():
@@ -265,7 +268,8 @@ def durum_goster():
     # Bildirimler
     bildirim_file = DATA_DIR / "acil_bildirim.json"
     if bildirim_file.exists():
-        bild = json.load(open(bildirim_file, encoding="utf-8"))
+        with open(bildirim_file, encoding="utf-8") as f:
+            bild = json.load(f)
         okunmamis = [b for b in bild if not b.get("okundu")]
         if okunmamis:
             print(f"\n!!! {len(okunmamis)} OKUNMAMIS BILDIRIM:")

@@ -26,7 +26,10 @@ st.set_page_config(page_title="ANKA Beyin", page_icon="🧠", layout="wide")
 # VERI YUKLE
 # ============================================================
 
-def yukle(dosya, varsayilan={}):
+def yukle(dosya, varsayilan=None):
+    """varsayilan=None default — mutable default arg tuzagi onlendi."""
+    if varsayilan is None:
+        varsayilan = {}
     yol = DATA_DIR / dosya
     if yol.exists():
         try:

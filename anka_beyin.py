@@ -905,7 +905,8 @@ def tam_analiz():
     log("KARAKTER UYUM RAPORU:")
     pozlar = []
     try:
-        rot_state = json.load(open(DATA_DIR / "rotasyon_state.json", encoding="utf-8"))
+        with open(DATA_DIR / "rotasyon_state.json", encoding="utf-8") as f:
+            rot_state = json.load(f)
         pozlar = list(rot_state.get("pozisyonlar", {}).keys())
     except Exception:
         pass

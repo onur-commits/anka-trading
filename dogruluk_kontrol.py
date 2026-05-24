@@ -41,7 +41,8 @@ class DogrulukKontrol:
     def _oku(self):
         if SINYAL_LOG.exists():
             try:
-                return json.load(open(SINYAL_LOG))
+                with open(SINYAL_LOG) as f:
+                    return json.load(f)
             except Exception:
                 pass
         return []

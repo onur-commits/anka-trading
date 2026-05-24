@@ -53,7 +53,8 @@ def get_master_risk():
         mevcut_dry_run = False
         try:
             import json as _json
-            mevcut = _json.load(open(LOCAL_BRIDGE))
+            with open(LOCAL_BRIDGE) as f:
+                mevcut = _json.load(f)
             mevcut_dry_run = mevcut.get("dry_run", False)
         except Exception:
             pass
