@@ -8,13 +8,36 @@
 
 ## TL;DR
 
-10 commit. Tüm 68 Python dosyası sözdizimi temiz. Sırasıyla coin
-modüllerinden başlayıp BIST'e ve ortak altyapıya geçildi. 4 kritik
-production-blocker, ~10 orta seviye bug, 55 anti-pattern düzeltildi.
+19 commit. Tüm 70 Python dosyası sözdizimi temiz. Sırasıyla coin
+modüllerinden başlayıp BIST'e ve ortak altyapıya geçildi. **7 kritik
+production-blocker** (3'ü FANTOM POZ — state corruption düzeyinde),
+~10 orta seviye bug, 55 anti-pattern düzeltildi. İki yeni helper
+modül + entegrasyon planı (coin ML + BIST V3).
+
+> **EN KRITIK BULGU:** Hem coin hem BIST trader'ında Binance/IQ hata
+> yanitları sessizce başarı sayılıyordu — bot var olmayan pozisyon
+> kaydediyor veya gerçekten satılmamış pozisyonu "satıldı" sayıyordu.
+> 3 commit'le düzeltildi (`1e27d05`, `f510a70`, `68d31f2`, `06ab431`).
 
 ---
 
 ## 1. Kritik Bug'lar (production-blocker düzeyinde)
+
+### 1.0 [YENİ] Fantom pozisyon — coin & BIST trader'larında state corruption
+
+**Coin tarafı (`coin_otonom_trader.py` + `coin_otonom.py` + `coin_trader.py`):**
+- `market_al`/`market_sat` Binance hata yanıtlarını (`{"code": -2010, "msg": "Insufficient balance"}` vb.) sessizce başarı sayıyordu. Caller `if "error" not in sonuc` kontrolü hata kodunu görmüyor.
+- Sonuç: Bot var olmayan coin için pozisyon kaydediyor, `fills` boşken fallback fiyat/miktar uyduruyordu. Sonraki cycle'da bu fantom pozisyon için stop-loss kontrolü, fiyat çekme, satış denemesi yapılıyordu.
+- `coin_otonom.market_sell` reddedilse bile state'den pozisyon siliniyordu — gerçekten satılmamış coin "satıldı" sanılıyor.
+- **Commit'ler:** `1e27d05` (otonom_trader), `68d31f2` (otonom), `06ab431` (trader)
+
+**BIST tarafı (`otonom_trader.py`):**
+- `iq_alis_yap`/`iq_satis_yap` MatriksIQ TCP yanıtını gözetmeden pozisyon dosyası güncelliyordu.
+- IQ `None` (timeout/bağlantı kopuk) veya `OrdStatus=8` (Rejected) dönerse bot hayalet pozisyon listelerinde tutuyor / gerçek pozisyonu listeden siliyordu.
+- Yardımcı `_iq_yanit_hata(yanit)` eklendi; her iki fonksiyonda hata varsa state değiştirilmiyor.
+- **Commit:** `f510a70`
+
+### 1.1 `coin_ai_egitim.py` — model dosyası hiç üretilmiyor olabilir
 
 ### 1.1 `coin_ai_egitim.py` — model dosyası hiç üretilmiyor olabilir
 - **Hardcoded Mac yolu:** `MODEL_PATH = "/Users/onurbodur/adsız klasör/borsa_surpriz/models/coin_ai_v1.pkl"` — VPS Windows'ta bu yol yok, script kaydet aşamasında patlardı.
