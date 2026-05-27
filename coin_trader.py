@@ -188,7 +188,12 @@ class BinanceClient:
                 params=params,
                 timeout=REQUEST_TIMEOUT,
             )
-            return r.json()
+            data = r.json()
+            # Binance hata yaniti: {"code": -XXXX, "msg": "..."} -> caller "error" anahtarini bekliyor
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                logger.error(f"alis({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}")
+                return {"error": f"binance:{data.get('code')} {data.get('msg')}"}
+            return data
         except Exception as e:
             logger.error(f"alis({symbol}, {miktar}) hatasi: {e}")
             return {"error": str(e)}
@@ -213,7 +218,11 @@ class BinanceClient:
                 params=params,
                 timeout=REQUEST_TIMEOUT,
             )
-            return r.json()
+            data = r.json()
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                logger.error(f"satis({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}")
+                return {"error": f"binance:{data.get('code')} {data.get('msg')}"}
+            return data
         except Exception as e:
             logger.error(f"satis({symbol}, {miktar}) hatasi: {e}")
             return {"error": str(e)}
