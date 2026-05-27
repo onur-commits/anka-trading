@@ -478,10 +478,19 @@ def tara_ve_islem(client, state):
                     sell_qty = qty_yuvarla(gercek_miktar, info["stepSize"])
                     if sell_qty >= info["minQty"]:
                         sonuc = client.market_sell(sym, sell_qty)
-                        log(f"  SATIS: {sym} {sell_qty} | Sebep: {sebep} | Kar: %{kar_pct:.2f}", "TRADE")
-                        state["toplam_trade"] += 1
-                        state["toplam_kar"] += kar_pct
-                        del state["pozisyonlar"][sym]
+                        # Sadece basarili satista pozisyon silinsin — fantom temizleme onlensin
+                        basarili = (
+                            sonuc.get("status") in ("FILLED", "DRY_RUN", "PARTIALLY_FILLED")
+                            or sonuc.get("fills")
+                        )
+                        if basarili:
+                            log(f"  SATIS: {sym} {sell_qty} | Sebep: {sebep} | Kar: %{kar_pct:.2f}", "TRADE")
+                            state["toplam_trade"] += 1
+                            state["toplam_kar"] += kar_pct
+                            del state["pozisyonlar"][sym]
+                        else:
+                            hata = sonuc.get("msg", str(sonuc))
+                            log(f"  SATIS REDDEDILDI: {sym} — {hata} (poz korundu)", "ERROR")
                     else:
                         log(f"  {sym} miktar cok kucuk, siliyor", "WARNING")
                         del state["pozisyonlar"][sym]
