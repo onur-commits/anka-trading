@@ -278,6 +278,30 @@ def _pozisyonlari_yaz(pozlar):
         log(f"Pozisyon yazma hatası: {e}", "ERROR")
 
 
+def _iq_yanit_hata(yanit):
+    """
+    MatriksIQ TCP yanitini kontrol et. None ya da hata gostergesi varsa
+    hata mesaji dondur, yoksa None.
+
+    IQ hata yanitlari genelde sunlardan birini icerir:
+      - yanit is None (timeout/socket hatasi)
+      - {"Error": "..."} veya {"ErrorCode": X}
+      - {"ErrMessage": "..."} veya {"ErrCode": X}
+      - {"OrdStatus": "8"}  # 8 = Rejected (FIX standard)
+    """
+    if yanit is None:
+        return "yanit_yok (timeout veya baglanti kopuk)"
+    if not isinstance(yanit, dict):
+        return f"beklenmedik_format: {type(yanit).__name__}"
+    for k in ("Error", "ErrorCode", "ErrMessage", "ErrCode", "error"):
+        if k in yanit and yanit[k]:
+            return f"{k}={yanit[k]}"
+    # FIX OrdStatus "8" = Rejected
+    if yanit.get("OrdStatus") == "8":
+        return f"OrdStatus=8 (Rejected) ClientOrderID={yanit.get('ClientOrderID')}"
+    return None
+
+
 def iq_alis_yap(symbol, adet, fiyat=0, skor=None, sebep=""):
     """
     MatriksIQ TCP API üzerinden gerçek ALIŞ emri gönder.
@@ -314,6 +338,15 @@ def iq_alis_yap(symbol, adet, fiyat=0, skor=None, sebep=""):
         yanit = api.alis_emri(symbol, adet, fiyat=fiyat,
                                account_id=MIDAS_ACCOUNT_ID,
                                brokage_id=MIDAS_BROKAGE_ID)
+
+        # FANTOM POZ FIX: yanitta hata varsa pozisyon kaydetme
+        hata = _iq_yanit_hata(yanit)
+        if hata:
+            kayit = {**kayit_temel, "status": "reddedildi", "yanit": yanit, "hata": hata}
+            _trade_log_yaz(kayit)
+            log(f"❌ ALIS {symbol}: {hata}", "ERROR")
+            bildirim(f"❌ ALIS REDDEDILDI {symbol}: {hata}")
+            return {"success": False, "hata": hata, "yanit": yanit}
 
         kayit = {**kayit_temel, "status": "gonderildi", "yanit": yanit}
         _trade_log_yaz(kayit)
@@ -386,10 +419,19 @@ def iq_satis_yap(symbol, adet=None, fiyat=0, sebep=""):
                                 account_id=MIDAS_ACCOUNT_ID,
                                 brokage_id=MIDAS_BROKAGE_ID)
 
+        # IQ hata yanitinda pozisyon dosyadan silinmesin — gercekte el degmedi
+        hata = _iq_yanit_hata(yanit)
+        if hata:
+            kayit = {**kayit_temel, "status": "reddedildi", "yanit": yanit, "hata": hata}
+            _trade_log_yaz(kayit)
+            log(f"❌ SATIS {symbol}: {hata} (poz dosyada kaldi)", "ERROR")
+            bildirim(f"❌ SATIS REDDEDILDI {symbol}: {hata}")
+            return {"success": False, "hata": hata, "yanit": yanit}
+
         kayit = {**kayit_temel, "status": "gonderildi", "yanit": yanit}
         _trade_log_yaz(kayit)
 
-        # Pozisyonu sil
+        # Pozisyonu sil — sadece IQ kabul ettiyse
         if symbol in pozlar:
             del pozlar[symbol]
             _pozisyonlari_yaz(pozlar)
