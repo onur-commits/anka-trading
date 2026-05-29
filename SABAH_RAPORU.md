@@ -8,16 +8,25 @@
 
 ## TL;DR
 
-19 commit. Tüm 70 Python dosyası sözdizimi temiz. Sırasıyla coin
-modüllerinden başlayıp BIST'e ve ortak altyapıya geçildi. **7 kritik
-production-blocker** (3'ü FANTOM POZ — state corruption düzeyinde),
-~10 orta seviye bug, 55 anti-pattern düzeltildi. İki yeni helper
-modül + entegrasyon planı (coin ML + BIST V3).
+23 commit, +1236/-143 satır, 37 dosya. Tüm 70 Python dosyası sözdizimi
+temiz. Sırasıyla coin modüllerinden başlayıp BIST'e ve ortak altyapıya
+geçildi. **8 kritik production-blocker** (4'ü FANTOM POZ — state
+corruption düzeyinde, 1'i atomik write), ~10 orta seviye bug,
+55 anti-pattern düzeltildi. İki yeni helper modül + entegrasyon
+planı (coin ML + BIST V3).
 
-> **EN KRITIK BULGU:** Hem coin hem BIST trader'ında Binance/IQ hata
-> yanitları sessizce başarı sayılıyordu — bot var olmayan pozisyon
-> kaydediyor veya gerçekten satılmamış pozisyonu "satıldı" sayıyordu.
-> 3 commit'le düzeltildi (`1e27d05`, `f510a70`, `68d31f2`, `06ab431`).
+> **EN KRITIK BULGULAR:**
+>
+> 1. **Fantom pozisyon** — hem coin hem BIST trader'ında Binance/IQ
+>    hata yanıtları sessizce başarı sayılıyordu. Bot var olmayan
+>    pozisyon kaydediyor veya gerçekten satılmamış pozisyonu "satıldı"
+>    sayıyordu. 4 commit'le düzeltildi (`1e27d05`, `f510a70`,
+>    `68d31f2`, `06ab431`).
+>
+> 2. **Atomik write değil** — trader pozisyon/state JSON'ları
+>    `open("w")` ile yazılıyordu, dashboard okurken yarım dosya
+>    görüyordu. `tmp + os.replace` paterniyle atomik hale getirildi
+>    (`5d3ba7d`).
 
 ---
 
