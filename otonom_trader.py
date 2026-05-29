@@ -244,16 +244,24 @@ MIN_BOMBA_SKOR_ALIS = 35          # Alış için min skor (canlı test için gev
 
 
 def _trade_log_yaz(kayit):
-    """otonom_trades.json'a append."""
+    """otonom_trades.json'a append (atomik)."""
     try:
         trades = []
         if TRADE_LOG_FILE.exists():
-            with open(TRADE_LOG_FILE) as f:
-                trades = json.load(f)
+            try:
+                with open(TRADE_LOG_FILE) as f:
+                    trades = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                # Eski yazma kesilmis olabilir — bozuk JSON'u sifirla, log yazmaya devam et
+                log(f"Trade log JSON bozuk, sifirlaniyor", "WARN")
+                trades = []
         trades.append(kayit)
         trades = trades[-500:]  # son 500 kayıt
-        with open(TRADE_LOG_FILE, "w", encoding="utf-8") as f:
+        tmp = TRADE_LOG_FILE.with_suffix(TRADE_LOG_FILE.suffix + ".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
             json.dump(trades, f, ensure_ascii=False, indent=2, default=str)
+        import os as _os
+        _os.replace(tmp, TRADE_LOG_FILE)
     except Exception as e:
         log(f"Trade log yazma hatası: {e}", "ERROR")
 
@@ -270,10 +278,14 @@ def _pozisyonlari_oku():
 
 
 def _pozisyonlari_yaz(pozlar):
-    """Aktif pozisyonları JSON'a kaydet."""
+    """Aktif pozisyonları JSON'a kaydet (atomik — partial okuma onlenir)."""
     try:
-        with open(POZISYON_FILE, "w", encoding="utf-8") as f:
+        tmp = POZISYON_FILE.with_suffix(POZISYON_FILE.suffix + ".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
             json.dump(pozlar, f, ensure_ascii=False, indent=2, default=str)
+        # os.replace atomic on POSIX + Windows; dashboard partial JSON gormez
+        import os as _os
+        _os.replace(tmp, POZISYON_FILE)
     except Exception as e:
         log(f"Pozisyon yazma hatası: {e}", "ERROR")
 

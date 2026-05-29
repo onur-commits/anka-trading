@@ -771,10 +771,12 @@ class CoinOtonomTrader:
                 logger.warning(f"Pozisyon yükleme hatası: {e}")
 
     def _pozisyon_kaydet(self):
-        """Aktif pozisyonları dosyaya kaydet."""
+        """Aktif pozisyonları dosyaya kaydet (atomik write — dashboard partial JSON gormesin)."""
         try:
-            with open(self.POZ_FILE, "w") as f:
+            tmp = self.POZ_FILE.with_suffix(self.POZ_FILE.suffix + ".tmp")
+            with open(tmp, "w") as f:
                 json.dump(self.risk.pozisyonlar, f, indent=2, ensure_ascii=False, default=str)
+            os.replace(tmp, self.POZ_FILE)
         except Exception as e:
             logger.warning(f"Pozisyon kaydetme hatası: {e}")
 
@@ -790,8 +792,11 @@ class CoinOtonomTrader:
         }
         if ekstra:
             state.update(ekstra)
-        with open(STATE_FILE, "w") as f:
+        # Atomik write
+        tmp = STATE_FILE.with_suffix(STATE_FILE.suffix + ".tmp")
+        with open(tmp, "w") as f:
             json.dump(state, f, indent=2, ensure_ascii=False, default=str)
+        os.replace(tmp, STATE_FILE)
         # Pozisyonları ayrıca kaydet
         self._pozisyon_kaydet()
 
