@@ -35,20 +35,32 @@ def log(mesaj, seviye="INFO"):
     try:
         logs = []
         if ORKESTRA_LOG.exists():
-            with open(ORKESTRA_LOG, encoding="utf-8") as f:
-                logs = json.load(f)
+            try:
+                with open(ORKESTRA_LOG, encoding="utf-8") as f:
+                    logs = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                logs = []
         logs.append({"zaman": zaman, "seviye": seviye, "mesaj": mesaj})
         logs = logs[-500:]
-        with open(ORKESTRA_LOG, "w", encoding="utf-8") as f:
+        # Atomik write
+        _tmp = ORKESTRA_LOG.with_suffix(ORKESTRA_LOG.suffix + ".tmp")
+        with open(_tmp, "w", encoding="utf-8") as f:
             json.dump(logs, f, ensure_ascii=False, indent=1)
+        import os as _os
+        _os.replace(_tmp, ORKESTRA_LOG)
     except Exception:
         pass
 
 
 def config_oku():
     if CONFIG_FILE.exists():
-        with open(CONFIG_FILE, encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(CONFIG_FILE, encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError) as e:
+            log(f"config_oku: bozuk JSON ({e}) — bos config doner", "WARN")
+        except Exception as e:
+            log(f"config_oku: {e}", "ERROR")
     return {}
 
 
