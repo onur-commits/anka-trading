@@ -66,12 +66,19 @@ def log(mesaj, seviye="INFO"):
     try:
         logs = []
         if LOG_FILE.exists():
-            with open(LOG_FILE) as f:
-                logs = json.load(f)
+            try:
+                with open(LOG_FILE) as f:
+                    logs = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                logs = []
         logs.append({"zaman": zaman, "seviye": seviye, "mesaj": mesaj})
         logs = logs[-500:]
-        with open(LOG_FILE, "w") as f:
+        # Atomik write
+        import os as _os
+        _tmp = LOG_FILE.with_suffix(LOG_FILE.suffix + ".tmp")
+        with open(_tmp, "w") as f:
             json.dump(logs, f, ensure_ascii=False, indent=1)
+        _os.replace(_tmp, LOG_FILE)
     except Exception:
         pass
 
@@ -162,8 +169,12 @@ def state_oku():
 
 
 def state_kaydet(data):
-    with open(STATE_FILE, "w") as f:
+    """Atomik state yazma — dashboard partial JSON gormesin."""
+    import os as _os
+    tmp = STATE_FILE.with_suffix(STATE_FILE.suffix + ".tmp")
+    with open(tmp, "w") as f:
         json.dump(data, f, ensure_ascii=False, indent=2, default=str)
+    _os.replace(tmp, STATE_FILE)
 
 
 def dosya_windows_kopyala(ticker_list):
