@@ -161,9 +161,17 @@ class BinanceClient:
             "timestamp": int(time.time() * 1000),
         }
         params = self._sign(params)
-        r = requests.post(f"{self.BASE_URL}/api/v3/order",
-                         headers=self._headers(), params=params, timeout=10)
-        return r.json()
+        try:
+            r = requests.post(f"{self.BASE_URL}/api/v3/order",
+                             headers=self._headers(), params=params, timeout=10)
+            data = r.json()
+            # Binance hata yaniti — caller status=="FILLED" arar, bos status hatadir
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                log(f"  market_buy({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}", "ERROR")
+            return data
+        except Exception as e:
+            log(f"  market_buy({symbol}) network hatasi: {e}", "ERROR")
+            return {"status": "ERROR", "msg": str(e)}
 
     def market_sell(self, symbol, qty):
         """Coin miktarı ile market satış."""
@@ -178,9 +186,16 @@ class BinanceClient:
             "timestamp": int(time.time() * 1000),
         }
         params = self._sign(params)
-        r = requests.post(f"{self.BASE_URL}/api/v3/order",
-                         headers=self._headers(), params=params, timeout=10)
-        return r.json()
+        try:
+            r = requests.post(f"{self.BASE_URL}/api/v3/order",
+                             headers=self._headers(), params=params, timeout=10)
+            data = r.json()
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                log(f"  market_sell({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}", "ERROR")
+            return data
+        except Exception as e:
+            log(f"  market_sell({symbol}) network hatasi: {e}", "ERROR")
+            return {"status": "ERROR", "msg": str(e)}
 
     def symbol_info(self, symbol):
         """Sembol min lot, step size bilgisi."""
