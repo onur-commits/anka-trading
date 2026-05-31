@@ -151,8 +151,13 @@ def veri_cek(period="6mo"):
 
 def state_oku():
     if STATE_FILE.exists():
-        with open(STATE_FILE) as f:
-            return json.load(f)
+        try:
+            with open(STATE_FILE) as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError) as e:
+            log(f"state_oku: bozuk JSON ({e}) — bos state donduruluyor", "WARN")
+        except Exception as e:
+            log(f"state_oku: {e}", "ERROR")
     return {}
 
 
@@ -1006,10 +1011,13 @@ def durum():
         print("Henüz tarama yok")
 
     if LOG_FILE.exists():
-        with open(LOG_FILE) as f:
-            logs = json.load(f)
-        if logs:
-            print(f"\nSon log: {logs[-1]['mesaj']}")
+        try:
+            with open(LOG_FILE) as f:
+                logs = json.load(f)
+            if logs:
+                print(f"\nSon log: {logs[-1]['mesaj']}")
+        except Exception as e:
+            print(f"Log okunamadi: {e}")
 
 
 if __name__ == "__main__":

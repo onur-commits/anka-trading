@@ -747,12 +747,20 @@ class CoinOtonomTrader:
         try:
             trades = []
             if TRADE_LOG.exists():
-                with open(TRADE_LOG) as f:
-                    trades = json.load(f)
+                try:
+                    with open(TRADE_LOG) as f:
+                        trades = json.load(f)
+                except (json.JSONDecodeError, ValueError):
+                    # Onceki yazma kesilmis — log korumak yerine sifirla, append'e devam
+                    logger.warning("Coin trade log JSON bozuk, sifirlaniyor")
+                    trades = []
             trades.append(kayit)
             trades = trades[-1000:]
-            with open(TRADE_LOG, "w") as f:
+            # Atomik write — dashboard partial okumayi onler
+            tmp = TRADE_LOG.with_suffix(TRADE_LOG.suffix + ".tmp")
+            with open(tmp, "w") as f:
                 json.dump(trades, f, indent=2, ensure_ascii=False, default=str)
+            os.replace(tmp, TRADE_LOG)
         except Exception as e:
             logger.error(f"Trade log: {e}")
 
@@ -1166,8 +1174,12 @@ class CoinOtonomTrader:
             print("\nAçık pozisyon yok")
 
         if TRADE_LOG.exists():
-            with open(TRADE_LOG) as f:
-                trades = json.load(f)
+            try:
+                with open(TRADE_LOG) as f:
+                    trades = json.load(f)
+            except Exception as e:
+                print(f"Trade log okunamadi: {e}")
+                trades = []
             bugun = datetime.now().strftime("%Y-%m-%d")
             bugun_t = [t for t in trades if t.get("zaman", "").startswith(bugun)]
             if bugun_t:
