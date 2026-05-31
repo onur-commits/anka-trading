@@ -201,12 +201,18 @@ def log(mesaj, seviye="INFO", kategori="GENEL"):
     try:
         logs = []
         if MUHENDIS_LOG.exists():
-            with open(MUHENDIS_LOG) as f:
-                logs = json.load(f)
+            try:
+                with open(MUHENDIS_LOG) as f:
+                    logs = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                logs = []
         logs.append(entry)
         logs = logs[-1000:]  # Son 1000 kayıt
-        with open(MUHENDIS_LOG, "w", encoding="utf-8") as f:
+        # Atomik write — engineer log dashboard'da partial okuma riski
+        _tmp = MUHENDIS_LOG.with_suffix(MUHENDIS_LOG.suffix + ".tmp")
+        with open(_tmp, "w", encoding="utf-8") as f:
             json.dump(logs, f, ensure_ascii=False, indent=1)
+        os.replace(_tmp, MUHENDIS_LOG)
     except Exception:
         pass
 
@@ -348,16 +354,22 @@ def bildirim_gonder(mesaj):
     try:
         bildirimler = []
         if bildirim_file.exists():
-            with open(bildirim_file, encoding="utf-8") as f:
-                bildirimler = json.load(f)
+            try:
+                with open(bildirim_file, encoding="utf-8") as f:
+                    bildirimler = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                bildirimler = []
         bildirimler.append({
             "zaman": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "mesaj": mesaj,
             "okundu": False,
         })
         bildirimler = bildirimler[-50:]
-        with open(bildirim_file, "w", encoding="utf-8") as f:
+        # Atomik — dashboard bildirim okurken yarim JSON gormesin
+        _tmp = bildirim_file.with_suffix(bildirim_file.suffix + ".tmp")
+        with open(_tmp, "w", encoding="utf-8") as f:
             json.dump(bildirimler, f, ensure_ascii=False, indent=1)
+        os.replace(_tmp, bildirim_file)
         log(f"BİLDİRİM: {mesaj}", "WARNING", "BILDIRIM")
     except Exception:
         pass
@@ -748,10 +760,12 @@ def saglik_raporu():
     else:
         rapor["durum"] = "KRITIK"
 
-    # Raporu kaydet
+    # Raporu kaydet — atomik
     rapor_dosya = DATA_DIR / f"saglik_rapor_{datetime.now().strftime('%Y%m%d')}.json"
-    with open(rapor_dosya, "w", encoding="utf-8") as f:
+    _tmp = rapor_dosya.with_suffix(rapor_dosya.suffix + ".tmp")
+    with open(_tmp, "w", encoding="utf-8") as f:
         json.dump(rapor, f, ensure_ascii=False, indent=2)
+    os.replace(_tmp, rapor_dosya)
 
     log(
         f"Sağlık raporu: {rapor['durum']} — "
