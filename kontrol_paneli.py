@@ -76,10 +76,12 @@ def save_params(params):
     """Parametreleri kaydet ve bridge dosyasını güncelle."""
     params["last_update"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    # Params dosyasına yaz
+    # Params dosyasına yaz — atomik (panel sik sik bu dosyayi rebuild eder)
     PARAMS_FILE.parent.mkdir(parents=True, exist_ok=True)
-    with open(PARAMS_FILE, "w") as f:
+    _params_tmp = str(PARAMS_FILE) + ".tmp"
+    with open(_params_tmp, "w") as f:
         json.dump(params, f, indent=4, ensure_ascii=False)
+    os.replace(_params_tmp, str(PARAMS_FILE))
 
     # Bridge dosyasını güncelle (robot bunu okur)
     bridge = {
