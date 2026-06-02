@@ -8,3 +8,14 @@ models/*.pkl
 islem_gecmisi.json
 .claude/settings.local.json
 
+# Yerel venv
+.venv/
+.python-version-local
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+
+# VS Code kullanici-spesifik
+.vscode/launch.json
+.vscode/tasks.json
