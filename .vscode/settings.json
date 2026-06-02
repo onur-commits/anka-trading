@@ -35,5 +35,26 @@
   },
   "terminal.integrated.env.windows": {
     "PYTHONUTF8": "1"
-  }
+  },
+
+  // === Sekme/pencere dagilmasini engelle ===
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.value": 10,
+  "workbench.editor.limit.perEditorGroup": true,
+  "workbench.editor.limit.excludeDirty": true,
+  "workbench.editor.enablePreview": true,
+  "workbench.editor.enablePreviewFromQuickOpen": true,
+  "workbench.editor.closeEmptyGroups": true,
+  "workbench.editor.tabSizing": "shrink",
+  "workbench.editor.wrapTabs": true,
+  "workbench.editor.showTabs": "multiple",
+
+  // === Acilista temiz baslangic ===
+  "window.restoreWindows": "one",
+  "workbench.startupEditor": "none",
+
+  // === Pylance/Python yavasligi azalt ===
+  "python.analysis.indexing": true,
+  "python.analysis.userFileIndexingLimit": 2000,
+  "python.analysis.persistAllIndices": true
 }
