@@ -1,0 +1,27 @@
+[project]
+name = "anka-trading"
+version = "0.1.0"
+description = "ANKA Trading System — BIST + Binance otonom trading"
+# 3.13+ ve 3.15-alpha'da bazi paketler (xgboost, lightgbm) henuz wheel
+# saglamiyor; VPS 3.12.8 kullaniyor — local da 3.12 sabit.
+requires-python = ">=3.12,<3.13"
+readme = "CLAUDE.md"
+
+# Bagimliklar requirements.txt'de — uv pip install -r requirements.txt
+# veya pip install -r requirements.txt ile yuklenir.
+
+[tool.uv]
+# Python surumunu .python-version'dan al; 3.13/3.15'e dusurmesin.
+python-preference = "managed"
+
+[tool.ruff]
+target-version = "py312"
+line-length = 110
+
+[tool.pyright]
+pythonVersion = "3.12"
+typeCheckingMode = "off"   # Mevcut kod tip annotasyonsuz; off -> false positive yok
+
+[tool.black]
+target-version = ["py312"]
+line-length = 110

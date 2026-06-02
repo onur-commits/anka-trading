@@ -1,0 +1,60 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.terminal.activateEnvironment": true,
+  "python.analysis.typeCheckingMode": "off",
+  "python.analysis.diagnosticMode": "openFilesOnly",
+  "python.analysis.autoSearchPaths": true,
+  "python.analysis.extraPaths": [
+    "${workspaceFolder}"
+  ],
+  "python.testing.pytestEnabled": false,
+  "python.testing.unittestEnabled": false,
+  "[python]": {
+    "editor.formatOnSave": false,
+    "editor.codeActionsOnSave": {},
+    "editor.tabSize": 4
+  },
+  "files.exclude": {
+    "**/__pycache__": true,
+    "**/*.pyc": true,
+    ".venv": true,
+    "models/*.pkl": true
+  },
+  "files.watcherExclude": {
+    "**/.venv/**": true,
+    "**/__pycache__/**": true,
+    "**/data/*.csv": true,
+    "**/models/*.pkl": true,
+    "**/logs/**": true
+  },
+  "terminal.integrated.env.osx": {
+    "PYTHONUTF8": "1"
+  },
+  "terminal.integrated.env.linux": {
+    "PYTHONUTF8": "1"
+  },
+  "terminal.integrated.env.windows": {
+    "PYTHONUTF8": "1"
+  },
+
+  // === Sekme/pencere dagilmasini engelle ===
+  "workbench.editor.limit.enabled": true,
+  "workbench.editor.limit.value": 10,
+  "workbench.editor.limit.perEditorGroup": true,
+  "workbench.editor.limit.excludeDirty": true,
+  "workbench.editor.enablePreview": true,
+  "workbench.editor.enablePreviewFromQuickOpen": true,
+  "workbench.editor.closeEmptyGroups": true,
+  "workbench.editor.tabSizing": "shrink",
+  "workbench.editor.wrapTabs": true,
+  "workbench.editor.showTabs": "multiple",
+
+  // === Acilista temiz baslangic ===
+  "window.restoreWindows": "one",
+  "workbench.startupEditor": "none",
+
+  // === Pylance/Python yavasligi azalt ===
+  "python.analysis.indexing": true,
+  "python.analysis.userFileIndexingLimit": 2000,
+  "python.analysis.persistAllIndices": true
+}

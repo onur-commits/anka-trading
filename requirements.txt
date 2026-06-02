@@ -1,3 +1,7 @@
+# Python: 3.12 (VPS 3.12.8). 3.13+ ve 3.15-alpha xgboost/lightgbm wheel
+# bulamaz; bkz pyproject.toml requires-python ve .python-version.
+# Kurulum: bash scripts/setup_venv.sh   (uv varsa uv, yoksa python3.12)
+
 streamlit>=1.30.0
 yfinance>=0.2.30
 xgboost>=2.0.0

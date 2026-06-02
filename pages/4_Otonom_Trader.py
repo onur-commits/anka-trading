@@ -21,28 +21,42 @@ TRADE_LOG = os.path.join(BASE, "logs", "trade_log.json")
 
 def devralma_oku():
     if os.path.exists(DEVRALMA_PATH):
-        with open(DEVRALMA_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(DEVRALMA_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError):
+            return []
+        except Exception:
+            return []
     return []
 
 
 def devralma_kaydet(data):
     os.makedirs(os.path.dirname(DEVRALMA_PATH), exist_ok=True)
-    with open(DEVRALMA_PATH, "w", encoding="utf-8") as f:
+    # Atomik write — trader bu dosyayi okuyacaksa partial JSON gormez
+    _tmp = DEVRALMA_PATH + ".tmp"
+    with open(_tmp, "w", encoding="utf-8") as f:
         json.dump(data, f, ensure_ascii=False, indent=2)
+    os.replace(_tmp, DEVRALMA_PATH)
 
 
 def state_oku():
     if os.path.exists(STATE_PATH):
-        with open(STATE_PATH, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(STATE_PATH, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return {}
     return {}
 
 
 def trade_log_oku():
     if os.path.exists(TRADE_LOG):
-        with open(TRADE_LOG, "r", encoding="utf-8") as f:
-            return json.load(f)
+        try:
+            with open(TRADE_LOG, "r", encoding="utf-8") as f:
+                return json.load(f)
+        except Exception:
+            return []
     return []
 
 

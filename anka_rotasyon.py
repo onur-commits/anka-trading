@@ -48,26 +48,43 @@ def log(mesaj, seviye="INFO"):
     try:
         logs = []
         if LOG_FILE.exists():
-            with open(LOG_FILE, encoding="utf-8") as f:
-                logs = json.load(f)
+            try:
+                with open(LOG_FILE, encoding="utf-8") as f:
+                    logs = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                logs = []
         logs.append({"zaman": zaman, "seviye": seviye, "mesaj": mesaj})
         logs = logs[-500:]
-        with open(LOG_FILE, "w", encoding="utf-8") as f:
+        # Atomik write
+        import os as _os
+        _tmp = LOG_FILE.with_suffix(LOG_FILE.suffix + ".tmp")
+        with open(_tmp, "w", encoding="utf-8") as f:
             json.dump(logs, f, ensure_ascii=False, indent=1)
+        _os.replace(_tmp, LOG_FILE)
     except Exception:
         pass
 
 
 def state_yukle():
+    bos = {"pozisyonlar": {}, "son_kontrol": None, "rotasyon_sayisi": 0}
     if STATE_FILE.exists():
-        with open(STATE_FILE, encoding="utf-8") as f:
-            return json.load(f)
-    return {"pozisyonlar": {}, "son_kontrol": None, "rotasyon_sayisi": 0}
+        try:
+            with open(STATE_FILE, encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError) as e:
+            print(f"[WARN] rotasyon state_yukle bozuk JSON ({e}) — sifirlaniyor")
+        except Exception as e:
+            print(f"[ERROR] rotasyon state_yukle: {e}")
+    return bos
 
 
 def state_kaydet(state):
-    with open(STATE_FILE, "w", encoding="utf-8") as f:
+    """Atomik write."""
+    import os as _os
+    _tmp = STATE_FILE.with_suffix(STATE_FILE.suffix + ".tmp")
+    with open(_tmp, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
+    _os.replace(_tmp, STATE_FILE)
 
 
 def veri_cek(ticker, period="5d"):
@@ -156,9 +173,14 @@ def bomba_tara():
     """Guncel bomba skorlarini oku veya taze tara."""
     bomba_file = DATA_DIR / "gunluk_bomba.json"
     if bomba_file.exists():
-        with open(bomba_file, encoding="utf-8") as f:
-            data = json.load(f)
-        return data.get("bombalar", [])
+        try:
+            with open(bomba_file, encoding="utf-8") as f:
+                data = json.load(f)
+            return data.get("bombalar", [])
+        except (json.JSONDecodeError, ValueError) as e:
+            log(f"bomba_tara: bozuk gunluk_bomba.json ({e})", "WARN")
+        except Exception as e:
+            log(f"bomba_tara: {e}", "ERROR")
     return []
 
 
