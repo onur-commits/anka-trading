@@ -67,7 +67,7 @@ def load_params():
                 if k not in saved:
                     saved[k] = v
             return saved
-        except:
+        except Exception:
             pass
     return DEFAULT_PARAMS.copy()
 
@@ -120,7 +120,7 @@ def save_params(params):
                 ["prlctl", "exec", "Windows 11", "cmd", "/c",
                  f'copy "{mac_params}" "C:\\Robot\\v3_params.json" /Y'],
                 timeout=10, capture_output=True)
-        except:
+        except Exception:
             pass
 
     return True
@@ -137,7 +137,7 @@ def update_bomba_list(symbol_list):
                 ["prlctl", "exec", "Windows 11", "cmd", "/c",
                  f'echo {symbol_list} > C:\\Robot\\aktif_bombalar.txt'],
                 timeout=10, capture_output=True)
-        except:
+        except Exception:
             pass
 
 
@@ -147,7 +147,7 @@ def read_bridge():
         try:
             with open(BRIDGE_FILE) as f:
                 return json.load(f)
-        except:
+        except Exception:
             pass
     return None
 
@@ -392,7 +392,7 @@ with tab4:
                     logs = json.load(f)
                 for entry in logs[-20:]:
                     st.text(f"{entry['zaman']} [{entry['seviye']}] {entry['mesaj']}")
-            except:
+            except Exception:
                 st.warning("Log okunamadı")
 
 # --- KAYDET BUTONU ---

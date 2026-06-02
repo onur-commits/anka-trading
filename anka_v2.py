@@ -194,7 +194,7 @@ class FundamentalAgent:
                     puan += 10
                     detay.append(f"Borç:{de:.0f}%✅")
 
-        except:
+        except Exception:
             detay.append("Veri alınamadı")
 
         return max(0, min(100, puan)), " ".join(detay) if detay else "Nötr"
@@ -237,7 +237,7 @@ class MacroAgent:
                 vix = yf.download("^VIX", period="5d", progress=False)
                 if len(vix) > 0:
                     vix_val = float(vix['Close'].iloc[-1])
-            except:
+            except Exception:
                 pass
 
             if vix_val < 18:
@@ -262,7 +262,7 @@ class MacroAgent:
                         detay.append(f"USD:{usd_chg:+.1f}%✅")
                     else:
                         detay.append(f"USD:{usd_chg:+.1f}%")
-            except:
+            except Exception:
                 pass
 
             # S&P 500 — global yön
@@ -282,7 +282,7 @@ class MacroAgent:
                     elif sp_chg > 1.0:
                         puan += 10
                         detay.append(f"S&P:{sp_chg:+.1f}%✅")
-            except:
+            except Exception:
                 pass
 
             # Petrol (Brent) — enerji hisseleri için kritik
@@ -298,7 +298,7 @@ class MacroAgent:
                         detay.append(f"Petrol:{oil_chg:+.1f}%⬆️")
                     elif oil_chg < -2:
                         detay.append(f"Petrol:{oil_chg:+.1f}%⬇️")
-            except:
+            except Exception:
                 pass
 
             # Altın — güvenli liman göstergesi
@@ -309,10 +309,10 @@ class MacroAgent:
                     if gold_chg > 1.5:
                         puan -= 5  # Altın yükseliyorsa risk-off
                         detay.append(f"Altın:{gold_chg:+.1f}%⚠️")
-            except:
+            except Exception:
                 pass
 
-        except:
+        except Exception:
             detay.append("Veri hatası")
 
         return max(0, min(100, puan)), " ".join(detay) if detay else "Nötr"
@@ -418,7 +418,7 @@ def rejim_tespit():
             return "BEAR", min(90, 50 + abs(chg_20d) * 5)
         else:
             return "SIDEWAYS", 50
-    except:
+    except Exception:
         return "SIDEWAYS", 50
 
 
@@ -624,7 +624,7 @@ class AnkaBrain:
                     "konusma": konusma,
                 })
 
-            except:
+            except Exception:
                 continue
 
         # ════════════════════════════════════════════════════════
@@ -664,7 +664,7 @@ class AnkaBrain:
                         ["prlctl", "exec", "Windows 11", "cmd", "/c",
                          f"echo {liste} > C:\\Robot\\aktif_bombalar.txt"],
                         timeout=10, capture_output=True)
-                except:
+                except Exception:
                     pass
 
         return bombalar, tum

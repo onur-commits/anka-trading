@@ -41,8 +41,9 @@ class DogrulukKontrol:
     def _oku(self):
         if SINYAL_LOG.exists():
             try:
-                return json.load(open(SINYAL_LOG))
-            except:
+                with open(SINYAL_LOG) as f:
+                    return json.load(f)
+            except Exception:
                 pass
         return []
 
@@ -102,7 +103,7 @@ class DogrulukKontrol:
                 else:  # ANKA
                     df = yf.download(f"{symbol}.IS", period="2d", progress=False)
                     guncel_fiyat = float(df['Close'].iloc[-1]) if len(df) > 0 else 0
-            except:
+            except Exception:
                 continue
 
             if guncel_fiyat == 0:

@@ -66,12 +66,19 @@ def log(mesaj, seviye="INFO"):
     try:
         logs = []
         if LOG_FILE.exists():
-            with open(LOG_FILE) as f:
-                logs = json.load(f)
+            try:
+                with open(LOG_FILE) as f:
+                    logs = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                logs = []
         logs.append({"zaman": zaman, "seviye": seviye, "mesaj": mesaj})
         logs = logs[-500:]
-        with open(LOG_FILE, "w") as f:
+        # Atomik write
+        import os as _os
+        _tmp = LOG_FILE.with_suffix(LOG_FILE.suffix + ".tmp")
+        with open(_tmp, "w") as f:
             json.dump(logs, f, ensure_ascii=False, indent=1)
+        _os.replace(_tmp, LOG_FILE)
     except Exception:
         pass
 
@@ -151,14 +158,23 @@ def veri_cek(period="6mo"):
 
 def state_oku():
     if STATE_FILE.exists():
-        with open(STATE_FILE) as f:
-            return json.load(f)
+        try:
+            with open(STATE_FILE) as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError) as e:
+            log(f"state_oku: bozuk JSON ({e}) — bos state donduruluyor", "WARN")
+        except Exception as e:
+            log(f"state_oku: {e}", "ERROR")
     return {}
 
 
 def state_kaydet(data):
-    with open(STATE_FILE, "w") as f:
+    """Atomik state yazma — dashboard partial JSON gormesin."""
+    import os as _os
+    tmp = STATE_FILE.with_suffix(STATE_FILE.suffix + ".tmp")
+    with open(tmp, "w") as f:
         json.dump(data, f, ensure_ascii=False, indent=2, default=str)
+    _os.replace(tmp, STATE_FILE)
 
 
 def dosya_windows_kopyala(ticker_list):
@@ -244,16 +260,24 @@ MIN_BOMBA_SKOR_ALIS = 35          # Alış için min skor (canlı test için gev
 
 
 def _trade_log_yaz(kayit):
-    """otonom_trades.json'a append."""
+    """otonom_trades.json'a append (atomik)."""
     try:
         trades = []
         if TRADE_LOG_FILE.exists():
-            with open(TRADE_LOG_FILE) as f:
-                trades = json.load(f)
+            try:
+                with open(TRADE_LOG_FILE) as f:
+                    trades = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                # Eski yazma kesilmis olabilir — bozuk JSON'u sifirla, log yazmaya devam et
+                log(f"Trade log JSON bozuk, sifirlaniyor", "WARN")
+                trades = []
         trades.append(kayit)
         trades = trades[-500:]  # son 500 kayıt
-        with open(TRADE_LOG_FILE, "w", encoding="utf-8") as f:
+        tmp = TRADE_LOG_FILE.with_suffix(TRADE_LOG_FILE.suffix + ".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
             json.dump(trades, f, ensure_ascii=False, indent=2, default=str)
+        import os as _os
+        _os.replace(tmp, TRADE_LOG_FILE)
     except Exception as e:
         log(f"Trade log yazma hatası: {e}", "ERROR")
 
@@ -270,12 +294,40 @@ def _pozisyonlari_oku():
 
 
 def _pozisyonlari_yaz(pozlar):
-    """Aktif pozisyonları JSON'a kaydet."""
+    """Aktif pozisyonları JSON'a kaydet (atomik — partial okuma onlenir)."""
     try:
-        with open(POZISYON_FILE, "w", encoding="utf-8") as f:
+        tmp = POZISYON_FILE.with_suffix(POZISYON_FILE.suffix + ".tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
             json.dump(pozlar, f, ensure_ascii=False, indent=2, default=str)
+        # os.replace atomic on POSIX + Windows; dashboard partial JSON gormez
+        import os as _os
+        _os.replace(tmp, POZISYON_FILE)
     except Exception as e:
         log(f"Pozisyon yazma hatası: {e}", "ERROR")
+
+
+def _iq_yanit_hata(yanit):
+    """
+    MatriksIQ TCP yanitini kontrol et. None ya da hata gostergesi varsa
+    hata mesaji dondur, yoksa None.
+
+    IQ hata yanitlari genelde sunlardan birini icerir:
+      - yanit is None (timeout/socket hatasi)
+      - {"Error": "..."} veya {"ErrorCode": X}
+      - {"ErrMessage": "..."} veya {"ErrCode": X}
+      - {"OrdStatus": "8"}  # 8 = Rejected (FIX standard)
+    """
+    if yanit is None:
+        return "yanit_yok (timeout veya baglanti kopuk)"
+    if not isinstance(yanit, dict):
+        return f"beklenmedik_format: {type(yanit).__name__}"
+    for k in ("Error", "ErrorCode", "ErrMessage", "ErrCode", "error"):
+        if k in yanit and yanit[k]:
+            return f"{k}={yanit[k]}"
+    # FIX OrdStatus "8" = Rejected
+    if yanit.get("OrdStatus") == "8":
+        return f"OrdStatus=8 (Rejected) ClientOrderID={yanit.get('ClientOrderID')}"
+    return None
 
 
 def iq_alis_yap(symbol, adet, fiyat=0, skor=None, sebep=""):
@@ -314,6 +366,15 @@ def iq_alis_yap(symbol, adet, fiyat=0, skor=None, sebep=""):
         yanit = api.alis_emri(symbol, adet, fiyat=fiyat,
                                account_id=MIDAS_ACCOUNT_ID,
                                brokage_id=MIDAS_BROKAGE_ID)
+
+        # FANTOM POZ FIX: yanitta hata varsa pozisyon kaydetme
+        hata = _iq_yanit_hata(yanit)
+        if hata:
+            kayit = {**kayit_temel, "status": "reddedildi", "yanit": yanit, "hata": hata}
+            _trade_log_yaz(kayit)
+            log(f"❌ ALIS {symbol}: {hata}", "ERROR")
+            bildirim(f"❌ ALIS REDDEDILDI {symbol}: {hata}")
+            return {"success": False, "hata": hata, "yanit": yanit}
 
         kayit = {**kayit_temel, "status": "gonderildi", "yanit": yanit}
         _trade_log_yaz(kayit)
@@ -386,10 +447,19 @@ def iq_satis_yap(symbol, adet=None, fiyat=0, sebep=""):
                                 account_id=MIDAS_ACCOUNT_ID,
                                 brokage_id=MIDAS_BROKAGE_ID)
 
+        # IQ hata yanitinda pozisyon dosyadan silinmesin — gercekte el degmedi
+        hata = _iq_yanit_hata(yanit)
+        if hata:
+            kayit = {**kayit_temel, "status": "reddedildi", "yanit": yanit, "hata": hata}
+            _trade_log_yaz(kayit)
+            log(f"❌ SATIS {symbol}: {hata} (poz dosyada kaldi)", "ERROR")
+            bildirim(f"❌ SATIS REDDEDILDI {symbol}: {hata}")
+            return {"success": False, "hata": hata, "yanit": yanit}
+
         kayit = {**kayit_temel, "status": "gonderildi", "yanit": yanit}
         _trade_log_yaz(kayit)
 
-        # Pozisyonu sil
+        # Pozisyonu sil — sadece IQ kabul ettiyse
         if symbol in pozlar:
             del pozlar[symbol]
             _pozisyonlari_yaz(pozlar)
@@ -739,8 +809,13 @@ def gorev_12_00_ogle():
                     continue
                 close = df["Close"].squeeze()
                 volume = df["Volume"].squeeze()
-                gunluk = (close.iloc[-1] / close.iloc[-2] - 1) * 100
-                rvol = volume.iloc[-1] / volume.iloc[:-1].mean()
+                # Sifir/NaN guard — delist veya yetersiz veri
+                prev_close = float(close.iloc[-2])
+                if prev_close == 0:
+                    continue
+                gunluk = (close.iloc[-1] / prev_close - 1) * 100
+                vol_mean = float(volume.iloc[:-1].mean())
+                rvol = (volume.iloc[-1] / vol_mean) if vol_mean > 0 else 0
 
                 log(f"  {t}: {close.iloc[-1]:.2f} ({gunluk:+.1f}%) Hacim:x{rvol:.1f}")
 
@@ -947,10 +1022,13 @@ def durum():
         print("Henüz tarama yok")
 
     if LOG_FILE.exists():
-        with open(LOG_FILE) as f:
-            logs = json.load(f)
-        if logs:
-            print(f"\nSon log: {logs[-1]['mesaj']}")
+        try:
+            with open(LOG_FILE) as f:
+                logs = json.load(f)
+            if logs:
+                print(f"\nSon log: {logs[-1]['mesaj']}")
+        except Exception as e:
+            print(f"Log okunamadi: {e}")
 
 
 if __name__ == "__main__":

@@ -238,12 +238,20 @@ class BinanceClient:
 
     # ── Hesap ──
     def bakiye(self):
+        if not self.api_key or not self.api_secret:
+            logger.error("bakiye(): BINANCE_API_KEY/SECRET .env'de tanimli degil")
+            return {}
         try:
             params = {"timestamp": int(time.time() * 1000)}
             params = self._sign(params)
             r = requests.get(f"{self.BASE_URL}/api/v3/account",
                              headers=self._headers(), params=params, timeout=self.timeout)
-            return r.json()
+            data = r.json()
+            # Binance hata yanitlari: {"code": -XXXX, "msg": "..."} — sessizce 0 donmesin
+            if isinstance(data, dict) and "code" in data and "balances" not in data:
+                logger.error(f"bakiye(): Binance API hatasi code={data.get('code')} msg={data.get('msg')}")
+                return {}
+            return data
         except Exception as e:
             logger.error(f"bakiye(): {e}")
             return {}
@@ -326,7 +334,12 @@ class BinanceClient:
             params = self._sign(params)
             r = requests.post(f"{self.BASE_URL}/api/v3/order",
                               headers=self._headers(), params=params, timeout=self.timeout)
-            return r.json()
+            data = r.json()
+            # Binance hata yaniti: {"code": -XXXX, "msg": "..."} — bot fantom poz kaydetmesin
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                logger.error(f"market_al({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}")
+                return {"error": f"binance:{data.get('code')} {data.get('msg')}"}
+            return data
         except Exception as e:
             logger.error(f"market_al({symbol}): {e}")
             return {"error": str(e)}
@@ -345,7 +358,11 @@ class BinanceClient:
             params = self._sign(params)
             r = requests.post(f"{self.BASE_URL}/api/v3/order",
                               headers=self._headers(), params=params, timeout=self.timeout)
-            return r.json()
+            data = r.json()
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                logger.error(f"market_sat({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}")
+                return {"error": f"binance:{data.get('code')} {data.get('msg')}"}
+            return data
         except Exception as e:
             logger.error(f"market_sat({symbol}): {e}")
             return {"error": str(e)}
@@ -730,12 +747,20 @@ class CoinOtonomTrader:
         try:
             trades = []
             if TRADE_LOG.exists():
-                with open(TRADE_LOG) as f:
-                    trades = json.load(f)
+                try:
+                    with open(TRADE_LOG) as f:
+                        trades = json.load(f)
+                except (json.JSONDecodeError, ValueError):
+                    # Onceki yazma kesilmis — log korumak yerine sifirla, append'e devam
+                    logger.warning("Coin trade log JSON bozuk, sifirlaniyor")
+                    trades = []
             trades.append(kayit)
             trades = trades[-1000:]
-            with open(TRADE_LOG, "w") as f:
+            # Atomik write — dashboard partial okumayi onler
+            tmp = TRADE_LOG.with_suffix(TRADE_LOG.suffix + ".tmp")
+            with open(tmp, "w") as f:
                 json.dump(trades, f, indent=2, ensure_ascii=False, default=str)
+            os.replace(tmp, TRADE_LOG)
         except Exception as e:
             logger.error(f"Trade log: {e}")
 
@@ -754,10 +779,12 @@ class CoinOtonomTrader:
                 logger.warning(f"Pozisyon yükleme hatası: {e}")
 
     def _pozisyon_kaydet(self):
-        """Aktif pozisyonları dosyaya kaydet."""
+        """Aktif pozisyonları dosyaya kaydet (atomik write — dashboard partial JSON gormesin)."""
         try:
-            with open(self.POZ_FILE, "w") as f:
+            tmp = self.POZ_FILE.with_suffix(self.POZ_FILE.suffix + ".tmp")
+            with open(tmp, "w") as f:
                 json.dump(self.risk.pozisyonlar, f, indent=2, ensure_ascii=False, default=str)
+            os.replace(tmp, self.POZ_FILE)
         except Exception as e:
             logger.warning(f"Pozisyon kaydetme hatası: {e}")
 
@@ -773,8 +800,11 @@ class CoinOtonomTrader:
         }
         if ekstra:
             state.update(ekstra)
-        with open(STATE_FILE, "w") as f:
+        # Atomik write
+        tmp = STATE_FILE.with_suffix(STATE_FILE.suffix + ".tmp")
+        with open(tmp, "w") as f:
             json.dump(state, f, indent=2, ensure_ascii=False, default=str)
+        os.replace(tmp, STATE_FILE)
         # Pozisyonları ayrıca kaydet
         self._pozisyon_kaydet()
 
@@ -1144,8 +1174,12 @@ class CoinOtonomTrader:
             print("\nAçık pozisyon yok")
 
         if TRADE_LOG.exists():
-            with open(TRADE_LOG) as f:
-                trades = json.load(f)
+            try:
+                with open(TRADE_LOG) as f:
+                    trades = json.load(f)
+            except Exception as e:
+                print(f"Trade log okunamadi: {e}")
+                trades = []
             bugun = datetime.now().strftime("%Y-%m-%d")
             bugun_t = [t for t in trades if t.get("zaman", "").startswith(bugun)]
             if bugun_t:

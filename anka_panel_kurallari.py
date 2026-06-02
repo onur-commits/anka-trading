@@ -182,8 +182,9 @@ class GunlukKZTakip:
         kayitlar = []
         if ISLEM_KAYIT.exists():
             try:
-                kayitlar = json.load(open(ISLEM_KAYIT))
-            except:
+                with open(ISLEM_KAYIT) as f:
+                    kayitlar = json.load(f)
+            except Exception:
                 pass
 
         kayitlar.append({
@@ -209,8 +210,9 @@ class GunlukKZTakip:
             return {"toplam_kz": 0, "islem_sayisi": 0, "komisyon_toplam": 0}
 
         try:
-            kayitlar = json.load(open(ISLEM_KAYIT))
-        except:
+            with open(ISLEM_KAYIT) as f:
+                kayitlar = json.load(f)
+        except Exception:
             return {"toplam_kz": 0, "islem_sayisi": 0, "komisyon_toplam": 0}
 
         bugun = str(date.today())
@@ -372,7 +374,8 @@ def bridge_panel_guncelle(bridge_path=None):
 
     try:
         if bridge_path.exists():
-            bridge = json.load(open(bridge_path))
+            with open(bridge_path) as f:
+                bridge = json.load(f)
         else:
             bridge = {}
 

@@ -6,7 +6,7 @@ Crypto AI Egitim Scripti
 - Triple Barrier labeling: +3% TP / -2% SL / 24h time barrier
 - XGBoost modeli egitir
 - AUC, feature importance, per-coin accuracy yazdirir
-- Modeli kaydeder: borsa_surpriz/models/coin_ai_v1.pkl
+- Modeli kaydeder: models/coin_ai_v1.pkl (proje koku altinda, cross-platform)
 """
 
 import os
@@ -16,22 +16,25 @@ import warnings
 import requests
 import numpy as np
 import pandas as pd
+from pathlib import Path
 from datetime import datetime, timedelta, timezone
 
 warnings.filterwarnings("ignore")
 
 # ── Sabitler ─────────────────────────────────────────────────────────────────
+# 2024 rebrand sonrasi guncellendi: MATIC→POL, FTM→S (Sonic). Aktif Binance pairleri.
 COINS = [
     "BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT",
-    "ADAUSDT", "AVAXUSDT", "DOTUSDT", "MATICUSDT", "LINKUSDT",
-    "ATOMUSDT", "NEARUSDT", "FTMUSDT", "ARBUSDT", "OPUSDT",
+    "ADAUSDT", "AVAXUSDT", "DOTUSDT", "POLUSDT", "LINKUSDT",
+    "ATOMUSDT", "NEARUSDT", "SUSDT", "ARBUSDT", "OPUSDT",
 ]
 INTERVAL       = "1h"
 YEARS          = 2
 TP_PCT         = 0.03    # +3%  üst bariyer
 SL_PCT         = 0.02    # -2%  alt bariyer
 TIME_BARRIER   = 24      # bar sayisi (1h → 24 saat)
-MODEL_PATH     = "/Users/onurbodur/adsız klasör/borsa_surpriz/models/coin_ai_v1.pkl"
+PROJECT_DIR    = Path(__file__).parent
+MODEL_PATH     = str(PROJECT_DIR / "models" / "coin_ai_v1.pkl")
 BINANCE_URL    = "https://api.binance.com/api/v3/klines"
 LIMIT_PER_REQ  = 1000    # Binance max limit
 
@@ -222,8 +225,9 @@ def main():
         print("[KRITIK] BTC verisi alinamadi, cikiliyor.")
         return
 
-    # BTC returns referans
-    btc_returns = raw_data["BTCUSDT"]["close"].pct_change()
+    # BTC returns referans — open_time'a gore indexle (pozisyonel hizalama yanlis sonuc verir)
+    btc_df_idx = raw_data["BTCUSDT"].set_index("open_time")
+    btc_returns_by_time = btc_df_idx["close"].pct_change()
 
     # 2) Feature engineering + labeling
     print("\n[2/5] Feature engineering & Triple Barrier labeling...")
@@ -232,8 +236,8 @@ def main():
     for coin, df in raw_data.items():
         print(f"  {coin} isleniyor...", end=" ", flush=True)
 
-        # BTC returns ile hizala (index esitle)
-        btc_ret_aligned = btc_returns.reindex(df.index).fillna(0)
+        # BTC returns ile timestamp uzerinden hizala (pozisyonel reindex BUG'liydi)
+        btc_ret_aligned = btc_returns_by_time.reindex(df["open_time"]).fillna(0).reset_index(drop=True)
 
         df = build_features(df.copy(), btc_ret_aligned)
         df["label"]  = triple_barrier_labels(df["close"], TP_PCT, SL_PCT, TIME_BARRIER)
@@ -287,7 +291,6 @@ def main():
         subsample        = 0.8,
         colsample_bytree = 0.8,
         scale_pos_weight = scale_pos,
-        use_label_encoder= False,
         eval_metric      = "auc",
         random_state     = 42,
         n_jobs           = -1,

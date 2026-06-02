@@ -11,3 +11,12 @@ Pillow>=10.0.0
 openpyxl>=3.1.0
 joblib>=1.3.0
 playwright>=1.40.0
+
+# HTTP + env + scheduler (kodda kullaniliyordu, eksiklerdi)
+requests>=2.31.0
+python-dotenv>=1.0.0
+schedule>=1.2.0
+
+# Opsiyonel — anka_muhendis psutil fallback + V3 Optuna tuning
+psutil>=5.9.0
+optuna>=3.5.0

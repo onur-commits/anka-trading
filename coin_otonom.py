@@ -98,22 +98,33 @@ class BinanceClient:
         return {"X-MBX-APIKEY": self.api_key}
 
     def fiyat(self, symbol):
-        r = requests.get(f"{self.BASE_URL}/api/v3/ticker/price", params={"symbol": symbol}, timeout=10)
-        return float(r.json()["price"])
+        try:
+            r = requests.get(f"{self.BASE_URL}/api/v3/ticker/price", params={"symbol": symbol}, timeout=10)
+            return float(r.json()["price"])
+        except Exception as e:
+            print(f"[HATA] fiyat({symbol}): {e}")
+            return 0.0
 
     def kline(self, symbol, interval="1h", limit=100):
-        r = requests.get(f"{self.BASE_URL}/api/v3/klines",
-                        params={"symbol": symbol, "interval": interval, "limit": limit}, timeout=10)
-        data = r.json()
-        df = pd.DataFrame(data, columns=[
-            "open_time", "Open", "High", "Low", "Close", "Volume",
-            "close_time", "quote_vol", "trades", "buy_base", "buy_quote", "ignore"
-        ])
-        for col in ["Open", "High", "Low", "Close", "Volume"]:
-            df[col] = df[col].astype(float)
-        df["time"] = pd.to_datetime(df["open_time"], unit="ms")
-        df.set_index("time", inplace=True)
-        return df
+        try:
+            r = requests.get(f"{self.BASE_URL}/api/v3/klines",
+                            params={"symbol": symbol, "interval": interval, "limit": limit}, timeout=10)
+            data = r.json()
+            if not isinstance(data, list):
+                print(f"[HATA] kline({symbol}) beklenmeyen yanit: {data}")
+                return pd.DataFrame()
+            df = pd.DataFrame(data, columns=[
+                "open_time", "Open", "High", "Low", "Close", "Volume",
+                "close_time", "quote_vol", "trades", "buy_base", "buy_quote", "ignore"
+            ])
+            for col in ["Open", "High", "Low", "Close", "Volume"]:
+                df[col] = df[col].astype(float)
+            df["time"] = pd.to_datetime(df["open_time"], unit="ms")
+            df.set_index("time", inplace=True)
+            return df
+        except Exception as e:
+            print(f"[HATA] kline({symbol}): {e}")
+            return pd.DataFrame()
 
     def bakiye_usdt(self):
         params = {"timestamp": int(time.time() * 1000)}
@@ -150,9 +161,17 @@ class BinanceClient:
             "timestamp": int(time.time() * 1000),
         }
         params = self._sign(params)
-        r = requests.post(f"{self.BASE_URL}/api/v3/order",
-                         headers=self._headers(), params=params, timeout=10)
-        return r.json()
+        try:
+            r = requests.post(f"{self.BASE_URL}/api/v3/order",
+                             headers=self._headers(), params=params, timeout=10)
+            data = r.json()
+            # Binance hata yaniti — caller status=="FILLED" arar, bos status hatadir
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                log(f"  market_buy({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}", "ERROR")
+            return data
+        except Exception as e:
+            log(f"  market_buy({symbol}) network hatasi: {e}", "ERROR")
+            return {"status": "ERROR", "msg": str(e)}
 
     def market_sell(self, symbol, qty):
         """Coin miktarı ile market satış."""
@@ -167,9 +186,16 @@ class BinanceClient:
             "timestamp": int(time.time() * 1000),
         }
         params = self._sign(params)
-        r = requests.post(f"{self.BASE_URL}/api/v3/order",
-                         headers=self._headers(), params=params, timeout=10)
-        return r.json()
+        try:
+            r = requests.post(f"{self.BASE_URL}/api/v3/order",
+                             headers=self._headers(), params=params, timeout=10)
+            data = r.json()
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                log(f"  market_sell({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}", "ERROR")
+            return data
+        except Exception as e:
+            log(f"  market_sell({symbol}) network hatasi: {e}", "ERROR")
+            return {"status": "ERROR", "msg": str(e)}
 
     def symbol_info(self, symbol):
         """Sembol min lot, step size bilgisi."""
@@ -197,12 +223,19 @@ def log(mesaj, seviye="INFO"):
     try:
         logs = []
         if LOG_FILE.exists():
-            with open(LOG_FILE, encoding="utf-8") as f:
-                logs = json.load(f)
+            try:
+                with open(LOG_FILE, encoding="utf-8") as f:
+                    logs = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                logs = []
         logs.append({"zaman": zaman, "seviye": seviye, "mesaj": mesaj})
         logs = logs[-500:]
-        with open(LOG_FILE, "w", encoding="utf-8") as f:
+        # Atomik write
+        import os as _os
+        _tmp = LOG_FILE.with_suffix(LOG_FILE.suffix + ".tmp")
+        with open(_tmp, "w", encoding="utf-8") as f:
             json.dump(logs, f, ensure_ascii=False, indent=1)
+        _os.replace(_tmp, LOG_FILE)
     except Exception:
         pass
 
@@ -345,15 +378,25 @@ def atr_hesapla(df, period=14):
 # ============================================================
 
 def state_yukle():
+    bos = {"pozisyonlar": {}, "son_tarama": None, "toplam_trade": 0, "toplam_kar": 0}
     if STATE_FILE.exists():
-        with open(STATE_FILE, encoding="utf-8") as f:
-            return json.load(f)
-    return {"pozisyonlar": {}, "son_tarama": None, "toplam_trade": 0, "toplam_kar": 0}
+        try:
+            with open(STATE_FILE, encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError) as e:
+            print(f"[WARN] state_yukle: bozuk JSON ({e}) — sifirlaniyor")
+        except Exception as e:
+            print(f"[ERROR] state_yukle: {e}")
+    return bos
 
 
 def state_kaydet(state):
-    with open(STATE_FILE, "w", encoding="utf-8") as f:
+    """Atomik state yazma — dashboard partial JSON gormesin."""
+    import os as _os
+    _tmp = STATE_FILE.with_suffix(STATE_FILE.suffix + ".tmp")
+    with open(_tmp, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
+    _os.replace(_tmp, STATE_FILE)
 
 
 def komisyon_karli_mi(beklenen_getiri_pct):
@@ -467,10 +510,19 @@ def tara_ve_islem(client, state):
                     sell_qty = qty_yuvarla(gercek_miktar, info["stepSize"])
                     if sell_qty >= info["minQty"]:
                         sonuc = client.market_sell(sym, sell_qty)
-                        log(f"  SATIS: {sym} {sell_qty} | Sebep: {sebep} | Kar: %{kar_pct:.2f}", "TRADE")
-                        state["toplam_trade"] += 1
-                        state["toplam_kar"] += kar_pct
-                        del state["pozisyonlar"][sym]
+                        # Sadece basarili satista pozisyon silinsin — fantom temizleme onlensin
+                        basarili = (
+                            sonuc.get("status") in ("FILLED", "DRY_RUN", "PARTIALLY_FILLED")
+                            or sonuc.get("fills")
+                        )
+                        if basarili:
+                            log(f"  SATIS: {sym} {sell_qty} | Sebep: {sebep} | Kar: %{kar_pct:.2f}", "TRADE")
+                            state["toplam_trade"] += 1
+                            state["toplam_kar"] += kar_pct
+                            del state["pozisyonlar"][sym]
+                        else:
+                            hata = sonuc.get("msg", str(sonuc))
+                            log(f"  SATIS REDDEDILDI: {sym} — {hata} (poz korundu)", "ERROR")
                     else:
                         log(f"  {sym} miktar cok kucuk, siliyor", "WARNING")
                         del state["pozisyonlar"][sym]

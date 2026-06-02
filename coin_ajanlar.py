@@ -104,7 +104,7 @@ class OnChainAgent:
             else:
                 detay.append(f"Hacim:${hacim/1e9:.1f}B")
 
-        except:
+        except Exception:
             detay.append("Veri hatası")
 
         return max(0, min(100, puan)), " ".join(detay)
@@ -159,7 +159,7 @@ class SentimentAgent:
                 elif fng_value < ort_7g - 10:
                     detay.append("↓Trend")
 
-        except:
+        except Exception:
             detay.append("Veri hatası")
 
         return max(0, min(100, puan)), " ".join(detay)
@@ -215,7 +215,7 @@ class LiquidationAgent:
                 oi_val = float(oi.get("openInterest", 0))
                 detay.append(f"OI:{oi_val:,.0f}")
 
-        except:
+        except Exception:
             detay.append("Veri hatası")
 
         return max(0, min(100, puan)), " ".join(detay)
@@ -264,7 +264,7 @@ class OrderBookAgent:
             max_ask = min(asks, key=lambda x: float(x[1]))
             detay.append(f"Destek:{float(max_bid[0]):,.0f} Direnç:{float(max_ask[0]):,.0f}")
 
-        except:
+        except Exception:
             detay.append("Veri hatası")
 
         return max(0, min(100, puan)), " ".join(detay)
@@ -321,7 +321,7 @@ class CorrelationAgent:
 
             detay.append(f"BTC 24s:{btc_24s:+.1f}%")
 
-        except:
+        except Exception:
             detay.append("Veri hatası")
 
         return max(0, min(100, puan)), " ".join(detay)

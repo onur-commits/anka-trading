@@ -37,8 +37,9 @@ PORTFOY_DOSYA = BASE_DIR / "data" / "portfoy_takip.json"
 def bridge_oku():
     try:
         if BRIDGE.exists():
-            return json.load(open(BRIDGE))
-    except:
+            with open(BRIDGE) as f:
+                return json.load(f)
+    except Exception:
         pass
     return {}
 
@@ -51,7 +52,7 @@ def bridge_yaz(data):
             subprocess.run(["prlctl", "exec", "Windows 11", "cmd", "/c",
                            f'copy "{mac_path}" "C:\\Robot\\v3_bridge.json" /Y'],
                           timeout=10, capture_output=True)
-        except:
+        except Exception:
             pass
 
 def bomba_oku():
@@ -63,22 +64,23 @@ def bomba_oku():
                                 capture_output=True, text=True, timeout=10).stdout.strip()
             if out:
                 return [t.strip() for t in out.split(",") if t.strip()]
-    except:
+    except Exception:
         pass
     # Fallback: lokal dosyadan oku
     try:
         lokal = BASE_DIR / "data" / "aktif_bombalar.txt"
         if lokal.exists():
             return [t.strip() for t in lokal.read_text().strip().split(",") if t.strip()]
-    except:
+    except Exception:
         pass
     # Son çare: otonom state'den oku
     try:
         state_file = BASE_DIR / "data" / "otonom_state.json"
         if state_file.exists():
-            state = json.load(open(state_file))
+            with open(state_file) as f:
+                state = json.load(f)
             return state.get("aktif_stratejiler", [])
-    except:
+    except Exception:
         pass
     return []
 
@@ -89,15 +91,16 @@ def bomba_yaz(liste):
             subprocess.run(["prlctl", "exec", "Windows 11", "cmd", "/c",
                            f'echo {txt} > C:\\Robot\\aktif_bombalar.txt'],
                           timeout=10, capture_output=True)
-        except:
+        except Exception:
             pass
 
 def portfoy_oku():
     """Takip edilen portföy pozisyonlarını oku."""
     if PORTFOY_DOSYA.exists():
         try:
-            return json.load(open(PORTFOY_DOSYA))
-        except:
+            with open(PORTFOY_DOSYA) as f:
+                return json.load(f)
+        except Exception:
             pass
     return {}
 
@@ -144,9 +147,9 @@ def toplu_fiyat_cek(tickers):
                     "taban": degisim < -9.0,
                     "hacim_oran": hacim_oran,
                 }
-            except:
+            except Exception:
                 continue
-    except:
+    except Exception:
         pass
     return sonuc
 
@@ -570,11 +573,11 @@ with tab4:
                     "24s %": f"{float(d['priceChangePercent']):+.1f}%",
                     "Hacim": f"${float(d['quoteVolume'])/1e6:,.0f}M",
                 })
-            except:
+            except Exception:
                 continue
         if rows:
             st.dataframe(pd.DataFrame(rows), use_container_width=True, hide_index=True)
-    except:
+    except Exception:
         st.info("Binance verisi alınamadı")
 
 
@@ -628,7 +631,8 @@ with tab5:
 
     if AJAN_SKOR.exists():
         try:
-            skorlar = json.load(open(AJAN_SKOR))
+            with open(AJAN_SKOR) as f:
+                skorlar = json.load(f)
             if skorlar:
                 df_ajan = pd.DataFrame([
                     {"Ajan": ad, "Doğru": s.get("dogru", 0), "Yanlış": s.get("yanlis", 0),
@@ -637,7 +641,7 @@ with tab5:
                 ])
                 st.dataframe(df_ajan, use_container_width=True, hide_index=True)
                 st.bar_chart(df_ajan.set_index("Ajan")["Güven %"])
-        except:
+        except Exception:
             pass
     else:
         st.info("Henüz öğrenme verisi yok")

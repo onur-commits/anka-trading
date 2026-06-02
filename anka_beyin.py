@@ -115,12 +115,19 @@ def log(mesaj, seviye="INFO"):
     try:
         logs = []
         if BEYIN_LOG.exists():
-            with open(BEYIN_LOG, encoding="utf-8") as f:
-                logs = json.load(f)
+            try:
+                with open(BEYIN_LOG, encoding="utf-8") as f:
+                    logs = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                logs = []
         logs.append({"zaman": zaman, "seviye": seviye, "mesaj": mesaj})
         logs = logs[-1000:]
-        with open(BEYIN_LOG, "w", encoding="utf-8") as f:
+        # Atomik write
+        import os as _os
+        _tmp = BEYIN_LOG.with_suffix(BEYIN_LOG.suffix + ".tmp")
+        with open(_tmp, "w", encoding="utf-8") as f:
             json.dump(logs, f, ensure_ascii=False, indent=1)
+        _os.replace(_tmp, BEYIN_LOG)
     except Exception:
         pass
 
@@ -656,15 +663,26 @@ def karakter_uyum_raporu(pozisyonlar, rejim):
 # ============================================================
 
 def hafiza_yukle():
+    """Beyin hafizasini diskten oku. Bozuk JSON'da bos hafiza doner."""
+    bos = {"islemler": [], "dersler": [], "istatistik": {}}
     if HAFIZA_FILE.exists():
-        with open(HAFIZA_FILE, encoding="utf-8") as f:
-            return json.load(f)
-    return {"islemler": [], "dersler": [], "istatistik": {}}
+        try:
+            with open(HAFIZA_FILE, encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError) as e:
+            log(f"hafiza_yukle: bozuk JSON ({e}) — sifirlaniyor", "WARN")
+        except Exception as e:
+            log(f"hafiza_yukle: {e}", "ERROR")
+    return bos
 
 
 def hafiza_kaydet(hafiza):
-    with open(HAFIZA_FILE, "w", encoding="utf-8") as f:
+    """Beyin hafizasini diske yaz (atomik — dashboard partial okumaz)."""
+    import os as _os
+    _tmp = HAFIZA_FILE.with_suffix(HAFIZA_FILE.suffix + ".tmp")
+    with open(_tmp, "w", encoding="utf-8") as f:
         json.dump(hafiza, f, ensure_ascii=False, indent=2)
+    _os.replace(_tmp, HAFIZA_FILE)
 
 
 def islem_kaydet(hafiza, ticker, yon, fiyat, adet, rejim, sebep, sonuc=None):
@@ -772,8 +790,11 @@ def ogrenme_egrisi_raporu(hafiza):
 def rejim_gecis_kaydet(eski_rejim, yeni_rejim):
     gecisler = []
     if REJIM_GECIS_FILE.exists():
-        with open(REJIM_GECIS_FILE, encoding="utf-8") as f:
-            gecisler = json.load(f)
+        try:
+            with open(REJIM_GECIS_FILE, encoding="utf-8") as f:
+                gecisler = json.load(f)
+        except (json.JSONDecodeError, ValueError):
+            gecisler = []
 
     gecisler.append({
         "zaman": datetime.now().strftime("%Y-%m-%d %H:%M"),
@@ -782,8 +803,12 @@ def rejim_gecis_kaydet(eski_rejim, yeni_rejim):
     })
     gecisler = gecisler[-200:]
 
-    with open(REJIM_GECIS_FILE, "w", encoding="utf-8") as f:
+    # Atomik write
+    import os as _os
+    _tmp = REJIM_GECIS_FILE.with_suffix(REJIM_GECIS_FILE.suffix + ".tmp")
+    with open(_tmp, "w", encoding="utf-8") as f:
         json.dump(gecisler, f, ensure_ascii=False, indent=1)
+    _os.replace(_tmp, REJIM_GECIS_FILE)
 
 
 def rejim_gecis_analizi():
@@ -791,8 +816,11 @@ def rejim_gecis_analizi():
     if not REJIM_GECIS_FILE.exists():
         return {"durum": "veri_yok"}
 
-    with open(REJIM_GECIS_FILE, encoding="utf-8") as f:
-        gecisler = json.load(f)
+    try:
+        with open(REJIM_GECIS_FILE, encoding="utf-8") as f:
+            gecisler = json.load(f)
+    except (json.JSONDecodeError, ValueError):
+        return {"durum": "bozuk_dosya"}
 
     if len(gecisler) < 2:
         return {"durum": "yetersiz_gecis", "toplam": len(gecisler)}
@@ -892,9 +920,12 @@ def tam_analiz():
     # Onceki rejim ile karsilastir
     eski_rejim = None
     if BEYIN_STATE.exists():
-        with open(BEYIN_STATE, encoding="utf-8") as f:
-            eski = json.load(f)
-        eski_rejim = eski.get("rejim", {}).get("rejim")
+        try:
+            with open(BEYIN_STATE, encoding="utf-8") as f:
+                eski = json.load(f)
+            eski_rejim = eski.get("rejim", {}).get("rejim")
+        except (json.JSONDecodeError, ValueError):
+            pass
 
     if eski_rejim and eski_rejim != rejim["rejim"]:
         log(f"  REJIM DEGISTI: {eski_rejim} -> {rejim['rejim']}", "TRADE")
@@ -905,7 +936,8 @@ def tam_analiz():
     log("KARAKTER UYUM RAPORU:")
     pozlar = []
     try:
-        rot_state = json.load(open(DATA_DIR / "rotasyon_state.json", encoding="utf-8"))
+        with open(DATA_DIR / "rotasyon_state.json", encoding="utf-8") as f:
+            rot_state = json.load(f)
         pozlar = list(rot_state.get("pozisyonlar", {}).keys())
     except Exception:
         pass

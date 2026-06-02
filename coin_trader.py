@@ -188,7 +188,12 @@ class BinanceClient:
                 params=params,
                 timeout=REQUEST_TIMEOUT,
             )
-            return r.json()
+            data = r.json()
+            # Binance hata yaniti: {"code": -XXXX, "msg": "..."} -> caller "error" anahtarini bekliyor
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                logger.error(f"alis({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}")
+                return {"error": f"binance:{data.get('code')} {data.get('msg')}"}
+            return data
         except Exception as e:
             logger.error(f"alis({symbol}, {miktar}) hatasi: {e}")
             return {"error": str(e)}
@@ -213,7 +218,11 @@ class BinanceClient:
                 params=params,
                 timeout=REQUEST_TIMEOUT,
             )
-            return r.json()
+            data = r.json()
+            if isinstance(data, dict) and "code" in data and "fills" not in data:
+                logger.error(f"satis({symbol}) Binance hata: code={data.get('code')} msg={data.get('msg')}")
+                return {"error": f"binance:{data.get('code')} {data.get('msg')}"}
+            return data
         except Exception as e:
             logger.error(f"satis({symbol}, {miktar}) hatasi: {e}")
             return {"error": str(e)}
@@ -390,8 +399,12 @@ class CoinBrain:
                         for b in hesap["balances"] if b["asset"] == "USDT"
                     ),
                 }
-                with open(COIN_STATE, "w") as f:
+                # Atomik write — dashboard partial JSON gormesin
+                _tmp = COIN_STATE.with_suffix(COIN_STATE.suffix + ".tmp") if hasattr(COIN_STATE, "with_suffix") else str(COIN_STATE) + ".tmp"
+                with open(_tmp, "w") as f:
                     json.dump(state, f, indent=2, ensure_ascii=False)
+                import os as _os
+                _os.replace(_tmp, COIN_STATE)
                 logger.info(f"Pozisyon guncellendi: {len(aktif)} aktif varlik, "
                             f"USDT: {state['toplam_usdt']:.2f}")
                 return state
@@ -437,13 +450,20 @@ class CoinBrain:
         try:
             loglar = []
             if COIN_LOG.exists():
-                with open(COIN_LOG) as f:
-                    loglar = json.load(f)
+                try:
+                    with open(COIN_LOG) as f:
+                        loglar = json.load(f)
+                except (json.JSONDecodeError, ValueError):
+                    loglar = []
             loglar.append(kayit)
             # Son 500 kayit tut
             loglar = loglar[-500:]
-            with open(COIN_LOG, "w") as f:
+            # Atomik write
+            _tmp = COIN_LOG.with_suffix(COIN_LOG.suffix + ".tmp") if hasattr(COIN_LOG, "with_suffix") else str(COIN_LOG) + ".tmp"
+            with open(_tmp, "w") as f:
                 json.dump(loglar, f, indent=2, ensure_ascii=False)
+            import os as _os
+            _os.replace(_tmp, COIN_LOG)
         except Exception as e:
             logger.error(f"Islem log hatasi: {e}")
 
@@ -515,13 +535,16 @@ class CoinBrain:
         print(f"\n  BOMBA ({len(al_listesi)}/{len(bombalar)}): "
               f"{', '.join(b['symbol'] for b in al_listesi) if al_listesi else 'YOK'}")
 
-        # Bridge dosyasina yaz
+        # Bridge dosyasina yaz — atomik (dashboard partial okumaz)
         try:
-            with open(COIN_BRIDGE, "w") as f:
+            _tmp = COIN_BRIDGE.with_suffix(COIN_BRIDGE.suffix + ".tmp") if hasattr(COIN_BRIDGE, "with_suffix") else str(COIN_BRIDGE) + ".tmp"
+            with open(_tmp, "w") as f:
                 json.dump({
                     "zaman": datetime.now().isoformat(),
                     "bombalar": bombalar,
                 }, f, indent=2, ensure_ascii=False)
+            import os as _os
+            _os.replace(_tmp, COIN_BRIDGE)
         except Exception as e:
             logger.error(f"Bridge yazma hatasi: {e}")
 

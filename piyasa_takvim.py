@@ -18,8 +18,13 @@ Kullanım:
       ...
 """
 
-from datetime import date, datetime
+from datetime import date, datetime, time as dtime
 from functools import wraps
+
+# BIST seans saatleri (yerel TR saati)
+# Surekli isleme: 10:00-18:00 (acilis muzayedesi 09:55-10:00, kapanis muzayedesi 18:00-18:05)
+BIST_SEANS_BASLA = dtime(10, 0)
+BIST_SEANS_BIT   = dtime(18, 5)
 
 # BIST resmi tatil günleri (yıllık güncellenmeli)
 # Sabit tarihler + dini bayramlar (yaklaşık — yıl başında doğrulayın)
@@ -77,6 +82,35 @@ def bist_acik_mi(tarih=None):
         return False, f"Resmi tatil: {BIST_TATIL_GUNLERI[iso]}"
 
     return True, "Piyasa açık"
+
+
+def bist_seans_acik_mi(an=None):
+    """
+    BIST seans saati AKTIF mi (tarih + saat kontrolu).
+    bist_acik_mi yalnizca gunluk kontrol yapar — bu fonksiyon ayrica
+    seans saatlerini de dogrular (varsayilan 10:00-18:05 TR saati).
+
+    Args:
+        an: datetime veya None (su an)
+
+    Returns:
+        (acik: bool, sebep: str)
+    """
+    if an is None:
+        an = datetime.now()
+    elif isinstance(an, date) and not isinstance(an, datetime):
+        an = datetime.combine(an, dtime(12, 0))
+
+    acik, sebep = bist_acik_mi(an)
+    if not acik:
+        return False, sebep
+
+    saat = an.time()
+    if saat < BIST_SEANS_BASLA:
+        return False, f"Seans henuz acilmadi (acilis {BIST_SEANS_BASLA.strftime('%H:%M')})"
+    if saat > BIST_SEANS_BIT:
+        return False, f"Seans kapandi (kapanis {BIST_SEANS_BIT.strftime('%H:%M')})"
+    return True, "Seans acik"
 
 
 def sadece_bist_acikken(fn):

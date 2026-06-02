@@ -29,14 +29,14 @@ def ml_model_yukle():
     try:
         model = EnsembleModelV2.yukle()
         return model
-    except:
+    except Exception:
         pass
     # Fallback: joblib
     model_path = PROJECT_DIR / "models" / "ensemble_v2.pkl"
     if model_path.exists():
         try:
             return joblib.load(model_path)
-        except:
+        except Exception:
             pass
     return None
 
@@ -52,7 +52,7 @@ def ml_skor_hesapla(df, model):
         if analiz and analiz.get("ml_olasilik"):
             return float(analiz["ml_olasilik"])
         return 0.5
-    except:
+    except Exception:
         return 0.5
 
 def hibrit_v3_scanner(symbol_list, ml_model=None):
@@ -120,7 +120,7 @@ def hibrit_v3_scanner(symbol_list, ml_model=None):
                 ["prlctl", "exec", "Windows 11", "cmd", "/c",
                  f"echo {liste} > C:\\Robot\\aktif_bombalar.txt"],
                 timeout=10, capture_output=True)
-        except:
+        except Exception:
             pass
 
     return bombalar

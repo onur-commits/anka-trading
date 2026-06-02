@@ -128,7 +128,7 @@ class MakroAI:
                 vix = yf.download("^VIX", period="5d", progress=False)
                 if len(vix) > 0:
                     vix_val = float(vix['Close'].iloc[-1])
-            except:
+            except Exception:
                 pass
 
             # USD/TRY
@@ -137,7 +137,7 @@ class MakroAI:
                 usd = yf.download("USDTRY=X", period="5d", progress=False)
                 if len(usd) >= 2:
                     usd_chg = float((usd['Close'].iloc[-1] / usd['Close'].iloc[-2] - 1) * 100)
-            except:
+            except Exception:
                 pass
 
             # Karar
@@ -160,7 +160,7 @@ class MakroAI:
                 "sinyal": sinyal, "guven": guven,
                 "detay": f"XU100:{xu100_chg:+.1f}% VIX:{vix_val:.1f} USD:{usd_chg:+.2f}%"
             }
-        except:
+        except Exception:
             return {"sinyal": "BEKLE", "guven": 50, "detay": "Veri hatası"}
 
 
@@ -184,7 +184,7 @@ class HaberAI:
                     if ticker_clean.lower() in str(item).lower():
                         return {"sinyal": "AL", "guven": 60, "detay": f"Pozitif haber: {ticker_clean}"}
             return {"sinyal": "BEKLE", "guven": 50, "detay": "Nötr sentiment"}
-        except:
+        except Exception:
             return {"sinyal": "BEKLE", "guven": 50, "detay": "Sentiment verisi yok"}
 
 
@@ -214,7 +214,7 @@ class KurumsalAI:
                     return {"sinyal": "SAT", "guven": 35, "detay": f"Yabancı çıkışı ({spread:.2f}%)"}
 
             return {"sinyal": "BEKLE", "guven": 50, "detay": "Nötr akış"}
-        except:
+        except Exception:
             return {"sinyal": "BEKLE", "guven": 50, "detay": "Akış verisi yok"}
 
 
@@ -338,7 +338,7 @@ class AnkaKararVerici:
             self.rejim_guven = max(0, min(100, guven))
             return rejim, self.rejim_guven
 
-        except:
+        except Exception:
             return "SIDEWAYS", 50
 
     def karar_ver(self, ticker, df_daily):
@@ -460,7 +460,7 @@ class AnkaKararVerici:
                 if karar["karar"] == "AL":
                     bombalar.append(s)
 
-            except:
+            except Exception:
                 continue
 
         # Sonuçları sırala
@@ -480,7 +480,7 @@ class AnkaKararVerici:
                         ["prlctl", "exec", "Windows 11", "cmd", "/c",
                          f"echo {liste} > C:\\Robot\\aktif_bombalar.txt"],
                         timeout=10, capture_output=True)
-                except:
+                except Exception:
                     pass
 
         return bombalar, tum_sonuclar

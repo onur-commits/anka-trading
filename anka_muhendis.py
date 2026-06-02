@@ -201,12 +201,18 @@ def log(mesaj, seviye="INFO", kategori="GENEL"):
     try:
         logs = []
         if MUHENDIS_LOG.exists():
-            with open(MUHENDIS_LOG) as f:
-                logs = json.load(f)
+            try:
+                with open(MUHENDIS_LOG) as f:
+                    logs = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                logs = []
         logs.append(entry)
         logs = logs[-1000:]  # Son 1000 kayıt
-        with open(MUHENDIS_LOG, "w", encoding="utf-8") as f:
+        # Atomik write — engineer log dashboard'da partial okuma riski
+        _tmp = MUHENDIS_LOG.with_suffix(MUHENDIS_LOG.suffix + ".tmp")
+        with open(_tmp, "w", encoding="utf-8") as f:
             json.dump(logs, f, ensure_ascii=False, indent=1)
+        os.replace(_tmp, MUHENDIS_LOG)
     except Exception:
         pass
 
@@ -348,16 +354,22 @@ def bildirim_gonder(mesaj):
     try:
         bildirimler = []
         if bildirim_file.exists():
-            with open(bildirim_file, encoding="utf-8") as f:
-                bildirimler = json.load(f)
+            try:
+                with open(bildirim_file, encoding="utf-8") as f:
+                    bildirimler = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                bildirimler = []
         bildirimler.append({
             "zaman": datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
             "mesaj": mesaj,
             "okundu": False,
         })
         bildirimler = bildirimler[-50:]
-        with open(bildirim_file, "w", encoding="utf-8") as f:
+        # Atomik — dashboard bildirim okurken yarim JSON gormesin
+        _tmp = bildirim_file.with_suffix(bildirim_file.suffix + ".tmp")
+        with open(_tmp, "w", encoding="utf-8") as f:
             json.dump(bildirimler, f, ensure_ascii=False, indent=1)
+        os.replace(_tmp, bildirim_file)
         log(f"BİLDİRİM: {mesaj}", "WARNING", "BILDIRIM")
     except Exception:
         pass
@@ -435,20 +447,52 @@ def kontrol_coin_bot():
 
 
 def onar_coin_bot():
-    """Çökmüş coin bot'u yeniden başlat."""
+    """Çökmüş coin bot'u yeniden başlat.
+
+    Sirasiyla denenir:
+      1. ANKA_Coin_Trader scheduler task (CLAUDE.md'deki resmi ad)
+      2. ANKA_CoinBot scheduler task (eski ad — fallback)
+      3. coin_otonom_trader.py dogrudan (canli bot, CLAUDE.md)
+      4. coin_otonom.py dogrudan (eski bot — son fallback)
+    """
+    PYTHON = '"C:\\Program Files\\Python312\\python.exe"'
+    # 1) Resmi task adi
     try:
-        bat_path = BASE_DIR / "coin_bot_start.bat"
-        if bat_path.exists():
-            subprocess.Popen(f'schtasks /run /tn "ANKA_CoinBot"', shell=True)
-            log("Coin bot schtasks ile yeniden başlatıldı", "WARNING", "ONARIM")
+        r = subprocess.run('schtasks /Query /TN "ANKA_Coin_Trader"',
+                           shell=True, capture_output=True, timeout=10)
+        if r.returncode == 0:
+            subprocess.Popen('schtasks /run /tn "ANKA_Coin_Trader"', shell=True)
+            log("Coin bot ANKA_Coin_Trader scheduler ile yeniden başlatıldı", "WARNING", "ONARIM")
             return True
-        else:
-            subprocess.Popen(
-                f'"C:\\Program Files\\Python312\\python.exe" -X utf8 {BASE_DIR / "coin_otonom.py"}',
-                shell=True,
-            )
-            log("Coin bot doğrudan yeniden başlatıldı", "WARNING", "ONARIM")
+    except Exception as e:
+        log(f"ANKA_Coin_Trader query hatasi: {e}", "WARNING", "ONARIM")
+
+    # 2) Eski task adi (fallback)
+    try:
+        r = subprocess.run('schtasks /Query /TN "ANKA_CoinBot"',
+                           shell=True, capture_output=True, timeout=10)
+        if r.returncode == 0:
+            subprocess.Popen('schtasks /run /tn "ANKA_CoinBot"', shell=True)
+            log("Coin bot ANKA_CoinBot scheduler ile yeniden başlatıldı (eski ad)", "WARNING", "ONARIM")
             return True
+    except Exception:
+        pass
+
+    # 3) Dogrudan canli bot
+    try:
+        trader = BASE_DIR / "coin_otonom_trader.py"
+        if trader.exists():
+            subprocess.Popen(f'{PYTHON} -X utf8 "{trader}"', shell=True)
+            log("Coin bot coin_otonom_trader.py ile doğrudan başlatıldı", "WARNING", "ONARIM")
+            return True
+    except Exception as e:
+        log(f"coin_otonom_trader.py başlatma hatası: {e}", "ERROR", "ONARIM")
+
+    # 4) Eski bot fallback
+    try:
+        subprocess.Popen(f'{PYTHON} -X utf8 "{BASE_DIR / "coin_otonom.py"}"', shell=True)
+        log("Coin bot coin_otonom.py (eski) ile fallback başlatıldı", "WARNING", "ONARIM")
+        return True
     except Exception as e:
         log(f"Coin bot başlatılamadı: {e}", "ERROR", "ONARIM")
         return False
@@ -716,10 +760,12 @@ def saglik_raporu():
     else:
         rapor["durum"] = "KRITIK"
 
-    # Raporu kaydet
+    # Raporu kaydet — atomik
     rapor_dosya = DATA_DIR / f"saglik_rapor_{datetime.now().strftime('%Y%m%d')}.json"
-    with open(rapor_dosya, "w", encoding="utf-8") as f:
+    _tmp = rapor_dosya.with_suffix(rapor_dosya.suffix + ".tmp")
+    with open(_tmp, "w", encoding="utf-8") as f:
         json.dump(rapor, f, ensure_ascii=False, indent=2)
+    os.replace(_tmp, rapor_dosya)
 
     log(
         f"Sağlık raporu: {rapor['durum']} — "

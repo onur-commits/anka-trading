@@ -443,7 +443,11 @@ def gunluk_tarama(top_n=5, min_skor=30):
         except Exception:
             pass
 
-    xu = yf.download("XU100.IS", period="6mo", progress=False)
+    xu = pd.DataFrame()
+    try:
+        xu = yf.download("XU100.IS", period="6mo", progress=False)
+    except Exception as e:
+        print(f"   ⚠ XU100.IS indirilemedi: {e}")
     print(f"   ✅ {len(veri)} hisse yüklendi")
 
     # 3. Rejim

@@ -193,7 +193,7 @@ def _oku_log():
         try:
             with open(ISLEM_LOG) as f:
                 return json.load(f)
-        except:
+        except Exception:
             pass
     return []
 
@@ -203,7 +203,7 @@ def _oku_skorlar():
         try:
             with open(AJAN_SKOR) as f:
                 return json.load(f)
-        except:
+        except Exception:
             pass
     return {}
 
