@@ -223,12 +223,19 @@ def log(mesaj, seviye="INFO"):
     try:
         logs = []
         if LOG_FILE.exists():
-            with open(LOG_FILE, encoding="utf-8") as f:
-                logs = json.load(f)
+            try:
+                with open(LOG_FILE, encoding="utf-8") as f:
+                    logs = json.load(f)
+            except (json.JSONDecodeError, ValueError):
+                logs = []
         logs.append({"zaman": zaman, "seviye": seviye, "mesaj": mesaj})
         logs = logs[-500:]
-        with open(LOG_FILE, "w", encoding="utf-8") as f:
+        # Atomik write
+        import os as _os
+        _tmp = LOG_FILE.with_suffix(LOG_FILE.suffix + ".tmp")
+        with open(_tmp, "w", encoding="utf-8") as f:
             json.dump(logs, f, ensure_ascii=False, indent=1)
+        _os.replace(_tmp, LOG_FILE)
     except Exception:
         pass
 
@@ -371,15 +378,25 @@ def atr_hesapla(df, period=14):
 # ============================================================
 
 def state_yukle():
+    bos = {"pozisyonlar": {}, "son_tarama": None, "toplam_trade": 0, "toplam_kar": 0}
     if STATE_FILE.exists():
-        with open(STATE_FILE, encoding="utf-8") as f:
-            return json.load(f)
-    return {"pozisyonlar": {}, "son_tarama": None, "toplam_trade": 0, "toplam_kar": 0}
+        try:
+            with open(STATE_FILE, encoding="utf-8") as f:
+                return json.load(f)
+        except (json.JSONDecodeError, ValueError) as e:
+            print(f"[WARN] state_yukle: bozuk JSON ({e}) — sifirlaniyor")
+        except Exception as e:
+            print(f"[ERROR] state_yukle: {e}")
+    return bos
 
 
 def state_kaydet(state):
-    with open(STATE_FILE, "w", encoding="utf-8") as f:
+    """Atomik state yazma — dashboard partial JSON gormesin."""
+    import os as _os
+    _tmp = STATE_FILE.with_suffix(STATE_FILE.suffix + ".tmp")
+    with open(_tmp, "w", encoding="utf-8") as f:
         json.dump(state, f, ensure_ascii=False, indent=2)
+    _os.replace(_tmp, STATE_FILE)
 
 
 def komisyon_karli_mi(beklenen_getiri_pct):
