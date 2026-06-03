@@ -1,0 +1,72 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "ANKA BIST Dashboard",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "streamlit",
+      "args": [
+        "run",
+        "app.py",
+        "--server.port",
+        "8501",
+        "--server.headless",
+        "true"
+      ],
+      "env": {
+        "PYTHONUTF8": "1",
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "ANKA COIN Dashboard",
+      "type": "debugpy",
+      "request": "launch",
+      "module": "streamlit",
+      "args": [
+        "run",
+        "coin_dashboard.py",
+        "--server.port",
+        "8502",
+        "--server.headless",
+        "true"
+      ],
+      "env": {
+        "PYTHONUTF8": "1",
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "COIN Trader Dry Run",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/coin_otonom_trader.py",
+      "args": [
+        "--dry-run",
+        "--tara"
+      ],
+      "env": {
+        "PYTHONUTF8": "1",
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "console": "integratedTerminal"
+    },
+    {
+      "name": "BIST Trader Durum",
+      "type": "debugpy",
+      "request": "launch",
+      "program": "${workspaceFolder}/otonom_trader.py",
+      "args": [
+        "--durum"
+      ],
+      "env": {
+        "PYTHONUTF8": "1",
+        "PYTHONPATH": "${workspaceFolder}"
+      },
+      "console": "integratedTerminal"
+    }
+  ]
+}

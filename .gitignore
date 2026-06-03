@@ -4,7 +4,9 @@ __pycache__/
 data/*.json
 models/*.pkl
 *.log
+*.pid
 .env
+.env.local
 islem_gecmisi.json
 .claude/settings.local.json
 
@@ -15,7 +17,3 @@ islem_gecmisi.json
 .pytest_cache/
 .ruff_cache/
 .mypy_cache/
-
-# VS Code kullanici-spesifik
-.vscode/launch.json
-.vscode/tasks.json

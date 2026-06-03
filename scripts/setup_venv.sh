@@ -25,10 +25,19 @@ fi
 if [[ -d .venv ]]; then
     echo "[*] .venv zaten var. Yeniden olusturmak icin --force kullan."
 else
-    # Sirayla dene: uv -> pyenv -> python3.12 -> brew python@3.12
-    if command -v uv >/dev/null 2>&1; then
+    # Sirayla dene: Homebrew uv -> PATH uv -> Homebrew Python -> pyenv -> PATH python3.12
+    if [[ -x /opt/homebrew/bin/uv && -x /opt/homebrew/bin/python3.12 ]]; then
+        echo "[+] Homebrew uv ile venv olusturuluyor (Python 3.12)"
+        /opt/homebrew/bin/uv venv --python /opt/homebrew/bin/python3.12 .venv
+    elif [[ -x /opt/homebrew/bin/uv ]]; then
+        echo "[+] Homebrew uv ile venv olusturuluyor (Python 3.12)"
+        /opt/homebrew/bin/uv venv --python 3.12 .venv
+    elif command -v uv >/dev/null 2>&1; then
         echo "[+] uv ile venv olusturuluyor (Python 3.12)"
         uv venv --python 3.12 .venv
+    elif [[ -x /opt/homebrew/bin/python3.12 ]]; then
+        echo "[+] Homebrew python3.12 ile venv olusturuluyor"
+        /opt/homebrew/bin/python3.12 -m venv .venv
     elif command -v pyenv >/dev/null 2>&1 && pyenv versions --bare | grep -qE '^3\.12'; then
         PY=$(pyenv which python3.12)
         echo "[+] pyenv 3.12 ile venv olusturuluyor: $PY"
@@ -53,11 +62,18 @@ fi
 source .venv/bin/activate
 echo "[+] Python: $(python --version)"
 
+if ! python -m pip --version >/dev/null 2>&1; then
+    echo "[+] pip yok, ensurepip calistiriliyor"
+    python -m ensurepip --upgrade
+fi
+
 echo "[+] pip yukseltiliyor"
 python -m pip install --upgrade pip wheel
 
 echo "[+] requirements.txt yukleniyor"
-if command -v uv >/dev/null 2>&1; then
+if [[ -x /opt/homebrew/bin/uv ]]; then
+    /opt/homebrew/bin/uv pip install -r requirements.txt
+elif command -v uv >/dev/null 2>&1; then
     uv pip install -r requirements.txt
 else
     pip install -r requirements.txt

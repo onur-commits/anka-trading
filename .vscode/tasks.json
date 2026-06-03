@@ -1,0 +1,45 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "ANKA: Ortam Kur",
+      "type": "shell",
+      "command": "bash scripts/setup_venv.sh",
+      "problemMatcher": []
+    },
+    {
+      "label": "ANKA: BIST Dashboard",
+      "type": "shell",
+      "command": "PYTHONUTF8=1 PYTHONPATH=. .venv/bin/python -X utf8 -m streamlit run app.py --server.port 8501 --server.headless true",
+      "dependsOn": "ANKA: Ortam Kur",
+      "problemMatcher": []
+    },
+    {
+      "label": "ANKA: COIN Dashboard",
+      "type": "shell",
+      "command": "PYTHONUTF8=1 PYTHONPATH=. .venv/bin/python -X utf8 -m streamlit run coin_dashboard.py --server.port 8502 --server.headless true",
+      "dependsOn": "ANKA: Ortam Kur",
+      "problemMatcher": []
+    },
+    {
+      "label": "ANKA: BIST Durum",
+      "type": "shell",
+      "command": "PYTHONUTF8=1 PYTHONPATH=. .venv/bin/python -X utf8 otonom_trader.py --durum",
+      "dependsOn": "ANKA: Ortam Kur",
+      "problemMatcher": []
+    },
+    {
+      "label": "ANKA: COIN Dry Run Tarama",
+      "type": "shell",
+      "command": "PYTHONUTF8=1 PYTHONPATH=. .venv/bin/python -X utf8 coin_otonom_trader.py --dry-run --tara",
+      "dependsOn": "ANKA: Ortam Kur",
+      "problemMatcher": []
+    },
+    {
+      "label": "ANKA: VPS SSH Test",
+      "type": "shell",
+      "command": "set -a; [ -f .env ] && . ./.env; set +a; sshpass -p \"$VPS_PASSWORD\" ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no \"${VPS_USER:-Administrator}@${VPS_HOST:-78.135.87.29}\" \"hostname && echo SSH_OK\"",
+      "problemMatcher": []
+    }
+  ]
+}

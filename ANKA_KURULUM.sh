@@ -1,38 +1,56 @@
-#!/bin/bash
-# ANKA TAM KURULUM — Bu scripti çalıştır, her şey kurulur
-echo "🦅 ANKA Kurulum Başlıyor..."
+#!/usr/bin/env bash
+# ANKA TAM KURULUM - Mac yerel ortam + dashboardlar
 
-cd "/Users/onurbodur/adsız klasör"
+set -euo pipefail
 
-# 1. Yedekten geri yükle
-if [ -f ~/Desktop/ANKA_TAM_YEDEK_20260403.tar.gz ]; then
-    tar xzf ~/Desktop/ANKA_TAM_YEDEK_20260403.tar.gz
-    echo "✅ Dosyalar geri yüklendi"
+echo "ANKA Kurulum Basliyor..."
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+cd "$SCRIPT_DIR"
+mkdir -p logs
+
+if [ -x "scripts/setup_venv.sh" ]; then
+    bash scripts/setup_venv.sh
+else
+    PYTHON_BIN="${PYTHON_BIN:-/opt/homebrew/bin/python3.12}"
+    if [ ! -x "$PYTHON_BIN" ]; then
+        PYTHON_BIN="$(command -v python3.12 || command -v python3)"
+    fi
+
+    "$PYTHON_BIN" -m venv .venv
+    .venv/bin/python -m pip install --upgrade pip wheel
+    .venv/bin/python -m pip install -r requirements.txt
 fi
 
-# 2. Python ortamı
-python3 -m venv .venv 2>/dev/null
-source .venv/bin/activate
-pip install yfinance pandas numpy xgboost lightgbm scikit-learn schedule streamlit joblib requests 2>/dev/null
-echo "✅ Python paketleri kuruldu"
+export PYTHONUTF8=1
+export PYTHONPATH="$SCRIPT_DIR"
 
-# 3. Otonom trader başlat
-nohup .venv/bin/python borsa_surpriz/otonom_trader.py > /dev/null 2>&1 &
-echo "✅ Otonom trader başlatıldı"
+port_acik_mi() {
+    local port="$1"
+    command -v lsof >/dev/null 2>&1 && lsof -nP -iTCP:"$port" -sTCP:LISTEN >/dev/null 2>&1
+}
 
-# 4. Risk motoru başlat
-nohup .venv/bin/python borsa_surpriz/v3_risk_motor.py > /tmp/risk_motor.log 2>&1 &
-echo "✅ Risk motoru başlatıldı"
+dashboard_baslat() {
+    local app_file="$1"
+    local port="$2"
+    local log_file="$3"
+    local pid_file="$4"
 
-# 5. Uyku engeli
-caffeinate -d -i -s &
-echo "✅ Caffeinate aktif"
+    if port_acik_mi "$port"; then
+        echo "Port $port zaten acik: http://localhost:$port"
+        return
+    fi
 
-# 6. Dashboard
-nohup .venv/bin/streamlit run borsa_surpriz/anka_dashboard.py --server.port 8501 --server.headless true > /tmp/dashboard.log 2>&1 &
-echo "✅ Dashboard: http://localhost:8501"
+    nohup .venv/bin/python -X utf8 -m streamlit run "$app_file" \
+        --server.port "$port" \
+        --server.headless true \
+        > "$log_file" 2>&1 &
+    echo "$!" > "$pid_file"
+    echo "$app_file baslatildi: http://localhost:$port"
+}
+
+dashboard_baslat app.py 8501 logs/bist_dashboard.log logs/bist_dashboard.pid
+dashboard_baslat coin_dashboard.py 8502 logs/coin_dashboard.log logs/coin_dashboard.pid
 
 echo ""
-echo "🦅 ANKA HAZIR!"
-echo "IQ'da BOMBA_V3_TURBO12 robotunu başlat"
-echo "C:\Robot\aktif_bombalar.txt dosyasını kontrol et"
+echo "ANKA hazir."

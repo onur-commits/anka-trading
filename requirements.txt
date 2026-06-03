@@ -20,6 +20,7 @@ playwright>=1.40.0
 requests>=2.31.0
 python-dotenv>=1.0.0
 schedule>=1.2.0
+beautifulsoup4>=4.12.0
 
 # Opsiyonel — anka_muhendis psutil fallback + V3 Optuna tuning
 psutil>=5.9.0
