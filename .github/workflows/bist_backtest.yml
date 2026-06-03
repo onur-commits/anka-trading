@@ -1,0 +1,39 @@
+name: BIST Backtest
+
+# Manual: workflow_dispatch ile tetiklen, son 1 yil BIST verisini cek
+# (yfinance), bomba_skor mantigi ile simule et, rapor commit et.
+# VPS'e dokunmaz — Actions runner'da calisir.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  backtest:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Bagimliliklar
+        run: |
+          pip install -q yfinance pandas numpy scikit-learn xgboost lightgbm joblib
+
+      - name: Backtest calistir
+        run: |
+          export PYTHONUTF8=1
+          python -X utf8 backtest_bist.py 2>&1 | tee logs_backtest.txt | tail -50
+
+      - name: Sonucu commit
+        run: |
+          git config user.name "anka-backtest-bot"
+          git config user.email "actions@github.com"
+          git add data/backtest_bist_rapor.md
+          git diff --staged --quiet || { git commit -m "🦅 BIST backtest sonucu"; git push; }
