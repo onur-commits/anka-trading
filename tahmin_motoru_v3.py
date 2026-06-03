@@ -430,7 +430,7 @@ class StackingEnsembleV3(EnsembleModelV2):
         # Feature interactions ekle
         features_df = feature_interaction_ekle(features_df)
 
-        gecerli = [c for c in self.feature_cols if c in features_df.columns]
+        [c for c in self.feature_cols if c in features_df.columns]
         eksik = [c for c in self.feature_cols if c not in features_df.columns]
         if eksik:
             for c in eksik:

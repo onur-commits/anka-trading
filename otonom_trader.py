@@ -648,7 +648,7 @@ def gorev_08_30_tarama():
         if rejim:
             log(f"  Piyasa: {rejim['rejim'].upper()} ADX:{rejim['adx']}")
 
-        sentiment = haberleri_analiz_et()
+        haberleri_analiz_et()
 
         sonuclar = hisse_tara(veri, model, rejim)
         # HİBRİT VETO: ML + Hacim + Kapanış gücü hepsi onaylamalı
@@ -718,7 +718,7 @@ def gorev_08_50_iq_kontrol():
         return
 
     # IQ log kontrolü — stratejiler çalışıyor mu?
-    state = state_oku()
+    state_oku()
     calisan = 0
     for t in ["ENJSA", "GARAN", "HALKB", "TSKB", "TKFEN", "AKSEN", "ISCTR", "GUBRF", "THYAO", "SAHOL"]:
         log_dir = f"C:\\MatriksIQ\\Logs\\AlgoTrading\\BOMBA_{t}"

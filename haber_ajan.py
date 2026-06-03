@@ -423,7 +423,6 @@ class HaberAjan:
             self._log("kap", "SKIP", "bs4 veya requests kurulu degil")
             return {"skor": 50.0, "aciklamalar": [], "kaynak": "kap"}
 
-        url = "https://www.kap.org.tr/tr/bildirim-sorgu"
         try:
             # KAP JSON API endpoint (bildirimler)
             api_url = "https://www.kap.org.tr/tr/api/bildirim/son"

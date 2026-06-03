@@ -115,7 +115,7 @@ def feature_hesapla(df):
 
     # MA Alignment
     sma50 = close.rolling(50).mean()
-    sma200 = close.rolling(200).mean()
+    close.rolling(200).mean()
     f['ma_alignment'] = ((close > f['ema10']).astype(int) +
                          (close > f['ema20']).astype(int) +
                          (close > sma50).astype(int))

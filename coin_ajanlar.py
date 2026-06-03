@@ -31,7 +31,7 @@ class FundingAgent:
 
             if data:
                 son_rate = float(data[-1]["fundingRate"])
-                ort_rate = np.mean([float(d["fundingRate"]) for d in data])
+                np.mean([float(d["fundingRate"]) for d in data])
 
                 if son_rate < -0.001:
                     puan += 30  # Negatif funding → shortlar ödüyor → dip sinyali
@@ -60,7 +60,7 @@ class FundingAgent:
                 else:
                     detay.append(f"L/S:{long_ratio:.0%}/{short_ratio:.0%}")
 
-        except Exception as e:
+        except Exception:
             detay.append("Veri hatası")
 
         return max(0, min(100, puan)), " ".join(detay)
@@ -186,7 +186,7 @@ class LiquidationAgent:
             if data:
                 son = data[-1]
                 long_ratio = float(son["longAccount"])
-                short_ratio = float(son["shortAccount"])
+                float(son["shortAccount"])
 
                 # 10 saat önceki oran
                 onceki = data[0]

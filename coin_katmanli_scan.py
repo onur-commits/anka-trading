@@ -68,7 +68,7 @@ def uzman_analiz(symbol):
         closes = np.array([float(k[4]) for k in data])
         volumes = np.array([float(k[5]) for k in data])
         highs = np.array([float(k[2]) for k in data])
-        lows = np.array([float(k[3]) for k in data])
+        np.array([float(k[3]) for k in data])
 
         son = closes[-1]
         if son == 0: return None
@@ -90,7 +90,7 @@ def uzman_analiz(symbol):
         ema12 = pd.Series(closes).ewm(span=12).mean().iloc[-1]
         ema26 = pd.Series(closes).ewm(span=26).mean().iloc[-1]
         macd = ema12 - ema26
-        macd_signal = pd.Series(closes).ewm(span=12).mean().ewm(span=9).mean().iloc[-1] - pd.Series(closes).ewm(span=26).mean().ewm(span=9).mean().iloc[-1]
+        pd.Series(closes).ewm(span=12).mean().ewm(span=9).mean().iloc[-1] - pd.Series(closes).ewm(span=26).mean().ewm(span=9).mean().iloc[-1]
         macd_ok = macd > 0
 
         # Bollinger
@@ -228,7 +228,7 @@ def kesif_analiz(symbol):
         if son == 0: return None
 
         degisim_24s = (closes[-1] / closes[-24] - 1) * 100 if len(closes) >= 24 else 0
-        degisim_1s = (closes[-1] / closes[-2] - 1) * 100
+        (closes[-1] / closes[-2] - 1) * 100
 
         # Hacim anomali
         vol_son6 = np.mean(volumes[-6:])
