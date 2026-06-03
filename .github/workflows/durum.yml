@@ -1,0 +1,80 @@
+name: ANKA DURUM (tek panel)
+
+# TEK kontrol noktasi. 4 ayri workflow'un yerine gecer.
+# Yapar (SALT-OKUMA + git pull deploy):
+#   1. cd C:\ANKA && git stash && git pull   (en guncel kodu VPS'e indir)
+#   2. VPS'ten canli durum cek (bot/MatriksIQ/emir/log/proses)
+#   3. DURUM.md uret = canli kisim + data/durum_statik.md (kor noktalar dahil)
+#
+# HARD LIMIT: otonom_trader BASLATILMAZ, emir verilmez. Sadece deploy + okuma.
+#
+# Tetik: BIST saatlerinde her 10dk (TR 09:00-18:00) + manuel.
+
+on:
+  schedule:
+    - cron: '*/10 6-15 * * 1-5'   # UTC 06-15 = TR 09-18, hafta ici (09:05 dahil)
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  durum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y sshpass
+      - name: VPS deploy + durum
+        env:
+          VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          set -uo pipefail
+          HOST="78.135.87.29"; VUSER="Administrator"
+          [ -z "${VPS_PASSWORD:-}" ] && { echo "::error::VPS_PASSWORD yok"; exit 1; }
+          read -r -d '' PS <<'PSEOF' || true
+          $ErrorActionPreference='SilentlyContinue'
+          Set-Location C:\ANKA; $env:PYTHONUTF8='1'
+          Write-Output '### Kod guncelleme'
+          git stash push -u -m "auto-yedek" 2>&1 | Out-String
+          git pull 2>&1 | Select-Object -Last 3 | Out-String
+          Write-Output ('HEAD: ' + (git rev-parse --short HEAD))
+          Write-Output ''
+          Write-Output '### BIST bot'
+          $ot = Get-CimInstance Win32_Process -Filter "Name='python.exe'" | Where-Object { $_.CommandLine -like '*otonom_trader*' }
+          if ($ot) { $m = if ($ot.CommandLine -match '--dry-run|--paper'){'PAPER'}else{'CANLI'}; Write-Output ("CALISIYOR (PID " + $ot.ProcessId + ") MOD: " + $m) } else { Write-Output 'CALISMIYOR' }
+          Write-Output ''
+          Write-Output '### MatriksIQ + TCP'
+          $iq = Get-Process MatriksIQ -ErrorAction SilentlyContinue
+          if ($iq) { Write-Output ('ACIK PID ' + $iq.Id) } else { Write-Output 'KAPALI' }
+          if (netstat -an | Select-String 18890) { Write-Output 'TCP 18890: ACIK' } else { Write-Output 'TCP 18890: KAPALI' }
+          Write-Output ''
+          Write-Output '### Bugun emir verildi mi?'
+          if (Test-Path data\otonom_trades.json) {
+            $j = Get-Content data\otonom_trades.json -Raw | ConvertFrom-Json
+            $bugun = $j | Where-Object { $_.zaman -like ((Get-Date -Format 'yyyy-MM-dd') + '*') }
+            if ($bugun) { $bugun | Select-Object -Last 8 | ForEach-Object { $_.zaman + ' ' + $_.tip + ' ' + $_.symbol + ' x' + $_.adet + ' @' + $_.fiyat + ' [' + $_.status + ']' } }
+            else { Write-Output ('Bugun emir YOK (toplam kayit: ' + $j.Count + ')') }
+          } else { Write-Output 'otonom_trades.json YOK (hic emir verilmemis)' }
+          Write-Output ''
+          Write-Output '### Son 10 log'
+          if (Test-Path data\otonom_log.json) { (Get-Content data\otonom_log.json -Raw | ConvertFrom-Json) | Select-Object -Last 10 | ForEach-Object { '[' + $_.zaman + '] ' + $_.mesaj } } else { Write-Output '(log yok)' }
+          PSEOF
+          ENC=$(printf '%s' "$PS" | iconv -t UTF-16LE | base64 -w0)
+          {
+            echo "# 🦅 ANKA DURUM — Tek Kontrol Paneli"
+            echo ""
+            echo "_Güncelleme: $(TZ=Europe/Istanbul date '+%Y-%m-%d %H:%M:%S TR') · run ${GITHUB_RUN_ID}_"
+            echo ""
+            echo "## ⚡ ANLIK (VPS'ten canlı)"
+            echo '```'
+            sshpass -p "$VPS_PASSWORD" ssh -o ConnectTimeout=20 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null \
+              "$VUSER@$HOST" "powershell -NoProfile -EncodedCommand $ENC" 2>&1 || echo "SSH HATA — VPS/parola kontrol"
+            echo '```'
+            cat data/durum_statik.md
+          } > DURUM.md
+      - name: commit
+        run: |
+          git config user.name "anka-durum-bot"; git config user.email "actions@github.com"
+          git add DURUM.md
+          git diff --staged --quiet || { git commit -m "🦅 DURUM güncellendi ($(TZ=Europe/Istanbul date '+%H:%M TR'))"; git push; }
