@@ -1,6 +1,6 @@
 # 🔧 ANKA VPS Bakim Sonucu
 
-_2026-06-03 16:41:15 TR — run 26888656739_
+_2026-06-03 17:15:33 TR — run 26890677457_
 
 Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 #< CLIXML
@@ -8,27 +8,24 @@ Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 ```
 Saved working directory and index state On main: vps-auto-yedek
 
-Updating 923c249..f9c6e3a
+Updating f9c6e3a..ff14eae
 Fast-forward
- .github/workflows/baslat_kontrol.yml |  71 ++++++++++
- data/baslat_kontrol.md               |  21 +++
- data/vps_bakim_sonuc.md              | 242 +++++++++++++++++++++++++++++++++++
- start_otonom.bat                     |  24 ++++
- 4 files changed, 358 insertions(+)
- create mode 100644 .github/workflows/baslat_kontrol.yml
- create mode 100644 data/baslat_kontrol.md
- create mode 100644 data/vps_bakim_sonuc.md
- create mode 100644 start_otonom.bat
+ .github/workflows/baslat_kontrol.yml |   5 ++
+ data/baslat_kontrol.md               |  53 +++++++++++-
+ data/vps_bakim_sonuc.md              | 163 +++++------------------------------
+ otonom_trader.py                     |   2 +-
+ 4 files changed, 76 insertions(+), 147 deletions(-)
 
-HEAD: f9c6e3a
+HEAD: ff14eae
 ```
 
 ## 2) Calisan python prosesleri
 ```
 
-  Id StartTime            Dak
-  -- ---------            ---
-3888 28.05.2026 22:35:54 8285
+   Id StartTime            Dak
+   -- ---------            ---
+ 3888 28.05.2026 22:35:54 8320
+14060 3.06.2026 16:53:03    23
 
 
 
@@ -50,27 +47,27 @@ ANKA_Coin_Bot                            N/A                    Disabled
 ANKA_Coin_Bot_Paper                      N/A                    Disabled       
 ANKA_Coin_DCA                            8.06.2026 10:00:00     Ready          
 ANKA_Coin_Trader                         N/A                    Disabled       
-ANKA_ConfigCanary                        3.06.2026 16:56:00     Ready          
+ANKA_ConfigCanary                        3.06.2026 17:26:00     Ready          
 ANKA_Dashboard                           1.01.2099 00:00:00     Ready          
 ANKA_DurumBildirim_OneShot               N/A                    Ready          
 ANKA_FeedbackRapor                       3.06.2026 18:30:00     Ready          
 ANKA_IQ_Sabah_Check                      4.06.2026 07:55:00     Ready          
 ANKA_Orkestra                            N/A                    Disabled       
-ANKA_OtonomTrader                        N/A                    Ready          
+ANKA_OtonomTrader                        N/A                    Running        
 ANKA_Otonom_Trader                       N/A                    Disabled       
 ANKA_PaperModelB                         N/A                    Disabled       
-ANKA_REE_Doctor                          3.06.2026 17:06:00     Ready          
-ANKA_REE_Radar                           3.06.2026 17:06:00     Ready          
-ANKA_REE_Snapshot                        3.06.2026 17:06:00     Ready          
-ANKA_REE_Strateji_Aksam                  3.06.2026 17:00:00     Ready          
+ANKA_REE_Doctor                          3.06.2026 18:06:00     Ready          
+ANKA_REE_Radar                           3.06.2026 17:36:00     Ready          
+ANKA_REE_Snapshot                        3.06.2026 17:36:00     Ready          
+ANKA_REE_Strateji_Aksam                  4.06.2026 17:00:00     Ready          
 ANKA_REE_Strateji_Gece                   4.06.2026 02:00:00     Ready          
 ANKA_REE_Strateji_Ogle                   4.06.2026 12:00:00     Ready          
 ANKA_REE_Strateji_Sabah                  4.06.2026 08:00:00     Ready          
 ANKA_Saat_Duzelt                         N/A                    Ready          
 ANKA_Sabah_Hatirlatma                    N/A                    Ready          
-ANKA_State_Backup                        3.06.2026 16:42:00     Ready          
-ANKA_Telegram_Update                     3.06.2026 16:55:00     Ready          
-ANKA_TopGainer                           3.06.2026 17:09:00     Ready          
+ANKA_State_Backup                        3.06.2026 17:42:00     Ready          
+ANKA_Telegram_Update                     3.06.2026 17:20:00     Ready          
+ANKA_TopGainer                           3.06.2026 17:39:00     Ready          
 ANKA_Watchdog                            N/A                    Disabled       
 
 
