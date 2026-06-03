@@ -35,6 +35,13 @@
       "problemMatcher": []
     },
     {
+      "label": "ANKA: 🦅 CANLI DURUM (VPS)",
+      "detail": "VPS'teki canli bot durumunu cek — pozisyon, K/Z, son log. Salt-okuma.",
+      "type": "shell",
+      "command": "bash scripts/canli_durum.sh",
+      "problemMatcher": []
+    },
+    {
       "label": "ANKA: VPS Panel Baslat (guvenli)",
       "detail": "VPS panelini kontrol eder; dususse SADECE app.py dashboard'unu baslatir (trader'a dokunmaz)",
       "type": "shell",
