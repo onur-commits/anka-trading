@@ -1,0 +1,114 @@
+name: ANKA Canli Durum Izleyici
+
+# Otonom VPS bot durum cekici (KULLANICI ACIK ONAYIYLA, 2026-06-03):
+# GitHub Actions runner SSH ile VPS'e baglanir, otonom_trader --durum +
+# son emirler + son loglar + muhendis heartbeat'i ceker; sonucu
+# data/canli_durum.md dosyasina commit eder.
+# Kullanici sadece GitHub'da dosyaya bakar — tek tik bile gerekmez.
+#
+# GEREKSINIM:
+#   GitHub repo > Settings > Secrets and variables > Actions > New secret:
+#     VPS_PASSWORD = (VPS Administrator parolasi)
+#   Bu eklenmedikce workflow ERROR der ve fail eder. Parola repoya
+#   commitlenmez, sadece GitHub secret'inda kalir.
+#
+# SALT-OKUMA: SSH komutu sadece dosya okur ve --durum cagirir.
+# Emir vermez, dosya yazmaz (VPS'te), proses oldurmez.
+
+on:
+  schedule:
+    # BIST acik saatlerinde her 15dk (TR 10:00-18:00 = UTC 07:00-15:00)
+    # Hafta ici (Pzt-Cum = 1-5)
+    - cron: '*/15 7-15 * * 1-5'
+  workflow_dispatch:  # Manuel tetiklenebilir
+
+permissions:
+  contents: write
+
+jobs:
+  canli-durum:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: sshpass kur
+        run: sudo apt-get install -y sshpass
+
+      - name: VPS durumu cek
+        env:
+          VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          set -uo pipefail
+          HOST="78.135.87.29"
+          VUSER="Administrator"
+          if [ -z "${VPS_PASSWORD:-}" ]; then
+            echo "::error::VPS_PASSWORD secret tanimli degil. GitHub Settings > Secrets > Actions ekle."
+            exit 1
+          fi
+
+          # PowerShell payload — SALT-OKUMA
+          read -r -d '' PS <<'PSEOF' || true
+          $ErrorActionPreference='SilentlyContinue'
+          Write-Output '## Bot durumu (otonom_trader.py --durum)'
+          Write-Output '```'
+          cd C:\ANKA
+          $env:PYTHONUTF8='1'
+          & 'C:\Program Files\Python312\python.exe' -X utf8 otonom_trader.py --durum 2>&1 | Out-String -Width 200
+          Write-Output '```'
+          Write-Output ''
+          Write-Output '## Bugun emir verildi mi? (son 10)'
+          Write-Output '```'
+          if (Test-Path C:\ANKA\data\otonom_trades.json) {
+            $j = Get-Content C:\ANKA\data\otonom_trades.json -Raw | ConvertFrom-Json
+            if ($j.Count -gt 0) {
+              $j | Select-Object -Last 10 | Format-Table -AutoSize | Out-String -Width 200
+              Write-Output ("Toplam emir kaydi: " + $j.Count)
+            } else { Write-Output '(otonom_trades.json BOS — bot henuz emir vermemis)' }
+          } else { Write-Output '(otonom_trades.json YOK — bot henuz emir vermemis)' }
+          Write-Output '```'
+          Write-Output ''
+          Write-Output '## Son sistem aksiyonu (son 20 log)'
+          Write-Output '```'
+          if (Test-Path C:\ANKA\data\otonom_log.json) {
+            $l = Get-Content C:\ANKA\data\otonom_log.json -Raw | ConvertFrom-Json
+            $l | Select-Object -Last 20 | ForEach-Object { "[" + $_.zaman + "] [" + $_.seviye + "] " + $_.mesaj }
+          } else { Write-Output '(otonom_log.json yok)' }
+          Write-Output '```'
+          Write-Output ''
+          Write-Output '## Muhendis heartbeat'
+          Write-Output '```'
+          if (Test-Path C:\ANKA\data\muhendis_heartbeat.json) {
+            Get-Content C:\ANKA\data\muhendis_heartbeat.json
+          } else { Write-Output '(heartbeat yok)' }
+          Write-Output '```'
+          PSEOF
+
+          ENC=$(printf '%s' "$PS" | iconv -t UTF-16LE | base64 -w0)
+
+          mkdir -p data
+          {
+            echo "# 🦅 ANKA Canli Durum"
+            echo ""
+            echo "_Son guncelleme: $(TZ=Europe/Istanbul date '+%Y-%m-%d %H:%M:%S TR') (Workflow run: ${GITHUB_RUN_ID})_"
+            echo ""
+            sshpass -p "$VPS_PASSWORD" ssh \
+              -o ConnectTimeout=20 \
+              -o StrictHostKeyChecking=accept-new \
+              -o UserKnownHostsFile=/dev/null \
+              "$VUSER@$HOST" \
+              "powershell -NoProfile -EncodedCommand $ENC" \
+              2>&1 || echo "⚠️ SSH basarisiz oldu — VPS kapali, parola yanlis veya port engelli olabilir."
+          } > data/canli_durum.md
+
+      - name: Degisiklik varsa commit et
+        run: |
+          git config user.name "anka-canli-durum-bot"
+          git config user.email "actions@github.com"
+          git add data/canli_durum.md
+          if git diff --staged --quiet; then
+            echo "Degisiklik yok, commit atlandi."
+          else
+            git commit -m "🦅 Canli durum guncellendi ($(TZ=Europe/Istanbul date '+%H:%M TR'))"
+            git push
+          fi
