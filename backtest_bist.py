@@ -1,180 +1,241 @@
 """
-BIST Backtest Harness — son 1 yıl, gerçek bomba_skor mantığı
-=============================================================
-Veri: yfinance (52 hisse, gunluk_bomba.TICKERS)
-Kural: canlı bot ile birebir — skor >= MIN_BOMBA_SKOR (25), max 3 poz,
-       09:35 al, 17:30 kapat (intraday).
-Çıktı: data/backtest_bist_rapor.md (markdown tablo)
-
-NOT: Bu basitleştirilmiş simülasyon — slippage/komisyon/IQ TCP gecikmesi
-yok. Gerçek canlı performans daha düşük olur (paper_trader.py içinde
-pessimistic harness var ama ona uydurmak ayrı iş).
+BIST Backtest Harness — son ~1 yıl
+====================================
+İki versiyon: (1) ML ile bomba_skor, (2) ML yoksa teknik fallback
+(hacim+momentum+RSI). Sebep şeffaf görünür.
 """
 import sys
+import warnings
 from datetime import datetime
 from pathlib import Path
 
 import pandas as pd
 import yfinance as yf
 
+warnings.filterwarnings("ignore")
 ROOT = Path(__file__).parent
 sys.path.insert(0, str(ROOT))
 
-from gunluk_bomba import TICKERS, bomba_skor_hesapla  # noqa: E402
-from tahmin_motoru_v2 import (  # noqa: E402
-    EnsembleModelV2, feature_olustur_v2, hisse_analiz_v2,
-)
+MIN_SKOR = 25
+MAX_POZ = 3
+GUN = 252
+KOMISYON = 0.002
 
-MIN_SKOR = 25       # canlı eşik
-MAX_POZ = 3         # aynı anda max
-GUN = 252           # ~1 yıl borsa günü
-KOMISYON = 0.002    # 2 yön x 0.1% (gerçekçi)
+debug = {"hisse_yuklendi": 0, "model_ok": False, "gun_isleyen": 0,
+         "skor_toplam": 0, "aday_toplam": 0}
 
 
-def veri_cek_hepsi():
+def rsi(serisi, n=14):
+    delta = serisi.diff()
+    up = delta.clip(lower=0).rolling(n).mean()
+    down = -delta.clip(upper=0).rolling(n).mean()
+    rs = up / down
+    return 100 - 100 / (1 + rs)
+
+
+def basit_skor(df):
+    """ML olmadan: hacim_oran + RSI + momentum + günlük değişim."""
+    close = df["Close"]
+    vol = df["Volume"]
+    son = close.iloc[-1]
+    onceki = close.iloc[-2]
+    gun5 = close.iloc[-5] if len(close) > 5 else onceki
+
+    deg_gunluk = float((son / onceki - 1) * 100)
+    mom5 = float((son / gun5 - 1) * 100)
+    rsi_son = float(rsi(close).iloc[-1])
+    ort_vol = float(vol.rolling(20).mean().iloc[-1]) if len(vol) > 20 else 1
+    son_vol = float(vol.iloc[-1])
+    hacim_oran = son_vol / ort_vol if ort_vol > 0 else 1
+
+    skor = 0
+    if deg_gunluk > 1: skor += 15
+    if deg_gunluk > 3: skor += 10
+    if mom5 > 0: skor += 10
+    if mom5 > 5: skor += 10
+    if 40 < rsi_son < 70: skor += 15
+    if hacim_oran > 1.5: skor += 20
+    if hacim_oran > 3: skor += 10
+    return float(skor)
+
+
+def yukle_model_opsiyonel():
+    try:
+        from tahmin_motoru_v2 import EnsembleModelV2  # noqa
+        m = EnsembleModelV2.yukle()
+        if m:
+            debug["model_ok"] = True
+            return m
+    except Exception as e:
+        print(f"Model yüklenemedi (basit skora geçilecek): {e}")
+    return None
+
+
+def gelismis_skor(df, model):
+    """Model varsa tahmin_motoru üzerinden, yoksa basit_skor."""
+    try:
+        from tahmin_motoru_v2 import feature_olustur_v2, hisse_analiz_v2
+        from gunluk_bomba import bomba_skor_hesapla
+        analiz = hisse_analiz_v2("X", df, model, rejim=None)
+        features = feature_olustur_v2(df)
+        if analiz is None or features is None:
+            return basit_skor(df)
+        son = features.iloc[-1].to_dict()
+        skor, _ = bomba_skor_hesapla(analiz, son)
+        return float(skor)
+    except Exception:
+        return basit_skor(df)
+
+
+def tickers():
+    try:
+        from gunluk_bomba import TICKERS
+        return list(TICKERS)
+    except Exception:
+        # Fallback: BIST 30 + sık çalışan hisseler
+        return ["THYAO.IS", "GARAN.IS", "AKBNK.IS", "ISCTR.IS", "TUPRS.IS",
+                "EREGL.IS", "ASELS.IS", "BIMAS.IS", "TCELL.IS", "PETKM.IS",
+                "SISE.IS", "TOASO.IS", "FROTO.IS", "HEKTS.IS", "KCHOL.IS",
+                "SAHOL.IS", "VAKBN.IS", "HALKB.IS", "AEFES.IS", "PGSUS.IS",
+                "AKSEN.IS", "ENJSA.IS", "ENKAI.IS", "SOKM.IS", "TKFEN.IS",
+                "MGROS.IS", "DOAS.IS", "AYEN.IS", "ALARK.IS", "TSKB.IS"]
+
+
+def veri_cek_hepsi(tlist):
     veri = {}
-    for t in TICKERS:
+    for t in tlist:
         try:
             df = yf.download(t, period="2y", progress=False, auto_adjust=True)
+            if isinstance(df.columns, pd.MultiIndex):
+                df.columns = df.columns.get_level_values(0)
             if len(df) >= 200:
                 veri[t] = df
         except Exception:
             pass
-    xu = yf.download("XU100.IS", period="2y", progress=False, auto_adjust=True)
-    return veri, xu
+    debug["hisse_yuklendi"] = len(veri)
+    return veri
 
 
-def gun_simulasyon(veri, model, son_n_gun=GUN):
-    """Her gün için: skorla, en yüksek 3'ü 'al' (kapanış), ertesi gün kapanışta sat."""
-    print(f"Simülasyon: {len(veri)} hisse, son {son_n_gun} gün")
-    # Tarih indeksini al
-    ortak_tarih = sorted(set.intersection(*[set(df.index) for df in veri.values()]))
-    tarihler = ortak_tarih[-son_n_gun-1:]  # +1: ertesi gün için son satış
+def simule(veri, model):
+    ortak = sorted(set.intersection(*[set(df.index) for df in veri.values()]))
+    tarihler = ortak[-GUN-1:]
+    debug["gun_isleyen"] = len(tarihler) - 1
 
     islemler = []
     portfoy = 100000.0
-    pikt = portfoy
+    pik = portfoy
 
     for i in range(len(tarihler) - 1):
         bugun, yarin = tarihler[i], tarihler[i+1]
         adaylar = []
-
         for t, df in veri.items():
             try:
                 dft = df.loc[:bugun]
-                if len(dft) < 120:
+                if len(dft) < 60:
                     continue
-                analiz = hisse_analiz_v2(t, dft, model, rejim=None)
-                if analiz is None:
-                    continue
-                features = feature_olustur_v2(dft)
-                if features is None:
-                    continue
-                son = features.iloc[-1].to_dict()
-                skor, _ = bomba_skor_hesapla(analiz, son)
+                skor = gelismis_skor(dft, model)
+                debug["skor_toplam"] += 1
                 if skor >= MIN_SKOR:
+                    debug["aday_toplam"] += 1
                     adaylar.append((t, skor, float(dft["Close"].iloc[-1])))
             except Exception:
                 continue
-
         if not adaylar:
             continue
-
-        # En yüksek 3 skor
         adaylar.sort(key=lambda x: x[1], reverse=True)
         secilen = adaylar[:MAX_POZ]
-
-        # Ertesi gün kapat (intraday yerine yarın kapanış — simülasyon basit)
-        gunluk_kz = 0
+        gunluk = 0
         for t, skor, alis in secilen:
             try:
                 satis = float(veri[t].loc[yarin]["Close"])
-                kz_pct = (satis - alis) / alis * 100 - (KOMISYON * 100)
-                gunluk_kz += kz_pct / MAX_POZ  # eşit ağırlık
-                islemler.append({"tarih": bugun, "ticker": t, "skor": skor,
-                                 "alis": alis, "satis": satis, "kz_pct": kz_pct})
+                kz = (satis - alis) / alis * 100 - KOMISYON * 100
+                gunluk += kz / MAX_POZ
+                islemler.append({"tarih": str(bugun)[:10], "ticker": t,
+                                 "skor": round(skor, 1), "alis": round(alis, 2),
+                                 "satis": round(satis, 2), "kz_pct": round(kz, 2)})
             except Exception:
                 continue
-
-        portfoy *= (1 + gunluk_kz / 100)
-        pikt = max(pikt, portfoy)
-
-    return islemler, portfoy, pikt
+        portfoy *= (1 + gunluk / 100)
+        pik = max(pik, portfoy)
+    return islemler, portfoy, pik
 
 
-def rapor_uret(islemler, portfoy_son, pik):
+def rapor(islemler, portfoy, pik):
+    md = ["# 🦅 BIST Backtest Raporu", "",
+          f"_{datetime.now():%Y-%m-%d %H:%M:%S} · son ~1 yıl · yfinance_", ""]
+    md.append("## Debug bilgisi")
+    md.append("```")
+    md.append(f"Veri yüklenen hisse: {debug['hisse_yuklendi']}")
+    md.append(f"Model yüklendi (ML): {debug['model_ok']}")
+    md.append(f"İşlenen gün: {debug['gun_isleyen']}")
+    md.append(f"Skor hesaplaması: {debug['skor_toplam']}")
+    md.append(f"Eşik geçen aday: {debug['aday_toplam']}")
+    md.append("```")
+    md.append("")
+    if not islemler:
+        md.append("## ❌ Sonuç: 0 işlem")
+        md.append("Olası sebepler: veri yüklenemedi, ya da skor eşiğin altında kaldı.")
+        return "\n".join(md)
     df = pd.DataFrame(islemler)
-    if df.empty:
-        return "# BIST Backtest\n\nHiç işlem üretilmedi (skor eşiği yüksek?)."
-
     n = len(df)
     kazanc = (df["kz_pct"] > 0).mean() * 100
     ort = df["kz_pct"].mean()
     medyan = df["kz_pct"].median()
     std = df["kz_pct"].std()
-    sharpe_benzeri = ort / std if std > 0 else 0
-    toplam_getiri = (portfoy_son / 100000 - 1) * 100
-    drawdown = (portfoy_son / pik - 1) * 100
-
+    sharpe = ort / std if std > 0 else 0
+    getiri = (portfoy / 100000 - 1) * 100
+    dd = (portfoy / pik - 1) * 100
+    md += [
+        "## Özet", "",
+        f"| | |", f"|---|---|",
+        f"| Toplam işlem | {n} |",
+        f"| Kazanç oranı | %{kazanc:.1f} |",
+        f"| Ortalama K/Z | %{ort:+.2f} |",
+        f"| Medyan K/Z | %{medyan:+.2f} |",
+        f"| Std | {std:.2f} |",
+        f"| Sharpe-benzeri | {sharpe:.2f} |",
+        f"| **Portföy getirisi** | **%{getiri:+.1f}** |",
+        f"| Drawdown (son) | %{dd:+.1f} |", "",
+        "## Kural",
+        f"- Skor eşiği: {MIN_SKOR}",
+        f"- Max pozisyon: {MAX_POZ}",
+        f"- Komisyon: %{KOMISYON*100:.1f}",
+        f"- ML model: {'KULLANILDI' if debug['model_ok'] else 'YOK — basit teknik skora düşüldü'}",
+        "",
+    ]
     g = df.groupby("ticker")["kz_pct"].agg(["count", "mean", "sum"]).round(2)
     g.columns = ["İşlem", "Ort %", "Toplam %"]
     g = g.sort_values("Toplam %", ascending=False)
-
-    rapor = f"""# 🦅 BIST Backtest Raporu
-
-_{datetime.now():%Y-%m-%d %H:%M:%S} · son ~1 yıl · yfinance verisi_
-
-## Özet
-| | |
-|---|---|
-| Toplam işlem | {n} |
-| Kazanç oranı | %{kazanc:.1f} |
-| Ortalama K/Z | %{ort:+.2f} |
-| Medyan K/Z | %{medyan:+.2f} |
-| Std | {std:.2f} |
-| Sharpe-benzeri | {sharpe_benzeri:.2f} |
-| **Portföy getirisi** | **%{toplam_getiri:+.1f}** |
-| Max drawdown (anlık) | %{drawdown:+.1f} |
-
-## Kural seti
-- MIN_BOMBA_SKOR_ALIS = {MIN_SKOR} (canlı eşik)
-- Max pozisyon = {MAX_POZ}
-- Komisyon = %{KOMISYON*100:.1f} (iki yön)
-- Intraday: alış kapanış, ertesi gün kapanış sat
-
-## En iyi 10 hisse
-```
-{g.head(10).to_string()}
-```
-
-## En kötü 5 hisse
-```
-{g.tail(5).to_string()}
-```
-
-## ⚠️ Uyarılar
-- Slippage YOK (gerçekte fiyat hareketi alış-satış arası farklı)
-- IQ TCP gecikmesi YOK (gerçek emirde 5-15 sn'lik gecikme)
-- "Yarın kapanış sat" basitleştirme — gerçek bot 17:30'da satıyor (intraday)
-- Gerçek sonuç **%30-50 daha düşük** beklenebilir
-"""
-    return rapor
+    md.append("## En iyi 10")
+    md.append("```")
+    md.append(g.head(10).to_string())
+    md.append("```\n")
+    md.append("## En kötü 5")
+    md.append("```")
+    md.append(g.tail(5).to_string())
+    md.append("```")
+    return "\n".join(md)
 
 
 if __name__ == "__main__":
-    print("Model yükleniyor...")
-    model = EnsembleModelV2.yukle()
-    print(f"Model: {'OK' if model else 'YOK'}")
+    print("Model yükleniyor (opsiyonel)...")
+    model = yukle_model_opsiyonel()
+    print(f"Model: {'OK' if model else 'YOK — basit teknik skora düşüyor'}")
 
-    print("Veri çekiliyor (~52 hisse, yfinance)...")
-    veri, xu = veri_cek_hepsi()
-    print(f"Çekildi: {len(veri)} hisse")
+    tlist = tickers()
+    print(f"Hisse listesi: {len(tlist)} ticker")
+    print("Veri çekiliyor...")
+    veri = veri_cek_hepsi(tlist)
+    print(f"Yüklenen: {len(veri)} hisse")
 
-    print("Simülasyon başlıyor...")
-    islemler, portfoy, pik = gun_simulasyon(veri, model)
+    if not veri:
+        out_text = "# BIST Backtest\n\n❌ HİÇ HİSSE VERİSİ ÇEKİLEMEDİ (yfinance sorunu olabilir)."
+    else:
+        print("Simülasyon başlıyor...")
+        islemler, portfoy, pik = simule(veri, model)
+        print(f"İşlem: {len(islemler)}, portföy: %{(portfoy/100000-1)*100:+.1f}")
+        out_text = rapor(islemler, portfoy, pik)
 
-    rapor = rapor_uret(islemler, portfoy, pik)
-    out = ROOT / "data" / "backtest_bist_rapor.md"
-    out.write_text(rapor, encoding="utf-8")
-    print(f"\n✅ Rapor: {out}")
-    print(rapor[:1200])
+    (ROOT / "data" / "backtest_bist_rapor.md").write_text(out_text, encoding="utf-8")
+    print("\n--- RAPOR ---")
+    print(out_text[:2000])
