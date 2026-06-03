@@ -4,7 +4,19 @@ __pycache__/
 data/*.json
 models/*.pkl
 *.log
+
+# Credentials / secrets — TUM varyantlari yakala
 .env
+.env.*
+*.env
+secrets.json
+credentials.json
+*.pem
+*.key
+*.p12
+*_secret*
+*_secret*.json
+
 islem_gecmisi.json
 .claude/settings.local.json
 
