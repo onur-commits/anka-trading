@@ -1,6 +1,6 @@
 # ğŸ” ANKA Baslat Kontrol
 
-_2026-06-03 17:11:14 TR â€” run 26890418604_
+_2026-06-03 17:37:13 TR â€” run 26891983653_
 
 Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 #< CLIXML
@@ -58,6 +58,19 @@ PID 14060 | "C:\Program Files\Python312\python.exe"  -X utf8 -u otonom_trader.py
 [2026-06-03 16:53:07] [INFO]   17:35 ƒ+' GA¬n sonu rapor
 [2026-06-03 16:53:07] [INFO] 
 [2026-06-03 16:53:07] [BILDIRIM] Otonom Trader baYladñ!
+[2026-06-03 17:30:07] [INFO] ==================================================
+[2026-06-03 17:30:07] [INFO] dY?? [17:30] GAoN SONU SATIS ƒ?" Bot pozisyonlarñ kapatñlñyor
+[2026-06-03 17:30:07] [INFO] Bot aAñk pozisyon yok ƒ?" kullanñcñnñn manuel pozisyonlarñna dokunmuyorum
+[2026-06-03 17:35:08] [INFO] ==================================================
+[2026-06-03 17:35:08] [INFO] dY"? [17:35] GAoN SONU RAPORU
+[2026-06-03 17:35:11] [INFO] dY"S 03.06.2026 Raporu
+Piyasa: SIDEWAYS
+  AEFES: 20.18 (+0.0%) Skor:61
+  TOASO: 300.00 (-0.8%) Skor:56
+  AYEN: 37.04 (+7.4%) Skor:53
+  EREGL: 40.50 (+0.1%) Skor:50
+  HEKTS: 4.32 (+3.3%) Skor:50
+[2026-06-03 17:35:11] [BILDIRIM] GA¬n sonu rapor hazñr
 ```
 
 ## otonom_trader calisiyor mu + hangi mod?
