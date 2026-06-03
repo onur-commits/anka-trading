@@ -1,0 +1,102 @@
+name: ANKA VPS Bakim (git pull + teshis)
+
+# Kullanici VPS klavyesinde komut yazamiyor; bu workflow onun yerine
+# VPS'te (SALT BAKIM) sunu yapar:
+#   1. cd C:\ANKA && git stash && git pull   (kodu guncelle, yereli yedekle)
+#   2. Teshis: python prosesleri, ANKA scheduler'lari, MatriksIQ + TCP 18890,
+#      son loglar, gozcu/breaker durumu
+# Sonucu data/vps_bakim_sonuc.md'ye yazar.
+#
+# HARD LIMIT: Canli trader (otonom_trader.py) BASLATILMAZ, emir verilmez,
+# alim/satim tetiklenmez. Sadece kod sync + okuma teshisi.
+#
+# Sadece manuel (workflow_dispatch). Cron yok.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  vps-bakim:
+    runs-on: ubuntu-latest
+    timeout-minutes: 6
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: sshpass kur
+        run: sudo apt-get install -y sshpass
+
+      - name: VPS bakim + teshis
+        env:
+          VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          set -uo pipefail
+          HOST="78.135.87.29"; VUSER="Administrator"
+          if [ -z "${VPS_PASSWORD:-}" ]; then echo "::error::VPS_PASSWORD secret yok."; exit 1; fi
+
+          read -r -d '' PS <<'PSEOF' || true
+          $ErrorActionPreference='SilentlyContinue'
+          Set-Location C:\ANKA
+          $env:PYTHONUTF8='1'
+          Write-Output '## 1) Kod guncelleme (git stash + pull)'
+          Write-Output '```'
+          git stash push -u -m "vps-auto-yedek" 2>&1 | Out-String
+          git pull 2>&1 | Out-String
+          Write-Output ("HEAD: " + (git rev-parse --short HEAD))
+          Write-Output '```'
+          Write-Output ''
+          Write-Output '## 2) Calisan python prosesleri'
+          Write-Output '```'
+          $p = Get-Process python -ErrorAction SilentlyContinue
+          if ($p) { $p | Select-Object Id,StartTime,@{n='Dak';e={[int]((Get-Date)-$_.StartTime).TotalMinutes}} | Format-Table -AutoSize | Out-String -Width 200 }
+          else { Write-Output '(HIC python prosesi YOK — bot calismyor)' }
+          Write-Output '```'
+          Write-Output ''
+          Write-Output '## 3) ANKA zamanlanmis gorevler (scheduler)'
+          Write-Output '```'
+          schtasks /query /TN ANKA_Trading /FO LIST 2>&1 | Out-String
+          schtasks /query /FO TABLE 2>&1 | Select-String ANKA | Out-String
+          Write-Output '```'
+          Write-Output ''
+          Write-Output '## 4) MatriksIQ + TCP 18890 (emirler bunun icin gitmiyordu)'
+          Write-Output '```'
+          $iq = Get-Process MatriksIQ -ErrorAction SilentlyContinue
+          if ($iq) { Write-Output ('MatriksIQ ACIK (PID ' + $iq.Id + ')') } else { Write-Output 'MatriksIQ KAPALI' }
+          $tcp = netstat -an | Select-String 18890
+          if ($tcp) { Write-Output 'Port 18890:'; $tcp | Out-String } else { Write-Output 'Port 18890 DINLENMIYOR' }
+          Write-Output '```'
+          Write-Output ''
+          Write-Output '## 5) Son 15 sistem logu'
+          Write-Output '```'
+          if (Test-Path data\otonom_log.json) {
+            $l = Get-Content data\otonom_log.json -Raw | ConvertFrom-Json
+            $l | Select-Object -Last 15 | ForEach-Object { "[" + $_.zaman + "] [" + $_.seviye + "] " + $_.mesaj }
+          } else { Write-Output '(log yok)' }
+          Write-Output '```'
+          Write-Output ''
+          Write-Output '## 6) Gozcu / HARD BREAKER durumu'
+          Write-Output '```'
+          Get-ChildItem data\*.json | Where-Object { $_.Name -match 'gozcu|watchdog|breaker|kill' } | ForEach-Object { Write-Output ('--- ' + $_.Name + ' ---'); Get-Content $_.FullName -Raw }
+          Write-Output '```'
+          PSEOF
+
+          ENC=$(printf '%s' "$PS" | iconv -t UTF-16LE | base64 -w0)
+          mkdir -p data
+          {
+            echo "# 🔧 ANKA VPS Bakim Sonucu"
+            echo ""
+            echo "_$(TZ=Europe/Istanbul date '+%Y-%m-%d %H:%M:%S TR') — run ${GITHUB_RUN_ID}_"
+            echo ""
+            sshpass -p "$VPS_PASSWORD" ssh -o ConnectTimeout=20 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null \
+              "$VUSER@$HOST" "powershell -NoProfile -EncodedCommand $ENC" 2>&1 \
+              || echo "⚠️ SSH basarisiz — VPS/parola/port kontrol et."
+          } > data/vps_bakim_sonuc.md
+
+      - name: Sonucu commit et
+        run: |
+          git config user.name "anka-bakim-bot"
+          git config user.email "actions@github.com"
+          git add data/vps_bakim_sonuc.md
+          git diff --staged --quiet || { git commit -m "🔧 VPS bakim sonucu ($(TZ=Europe/Istanbul date '+%H:%M TR'))"; git push; }
