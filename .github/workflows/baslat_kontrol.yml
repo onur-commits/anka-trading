@@ -1,0 +1,71 @@
+name: ANKA Baslat Kontrol
+
+# Kullanici ANKA_OtonomTrader gorevini "Calistir" dedi ama start_otonom.bat'in
+# CANLI mi PAPER mi oldugu bilinmiyor. Bu workflow SADECE OKUR:
+#   - start_otonom.bat icerigi (canli mi --dry-run mi)
+#   - calisan python prosesleri + KOMUT SATIRI (--dry-run var mi)
+#   - otonom_trader.py acik mi
+# Hicbir sey baslatmaz/durdurmaz/degistirmez. SALT-OKUMA.
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  baslat-kontrol:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - run: sudo apt-get install -y sshpass
+      - name: Kontrol
+        env:
+          VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
+        run: |
+          set -uo pipefail
+          HOST="78.135.87.29"; VUSER="Administrator"
+          if [ -z "${VPS_PASSWORD:-}" ]; then echo "::error::VPS_PASSWORD yok"; exit 1; fi
+          read -r -d '' PS <<'PSEOF' || true
+          $ErrorActionPreference='SilentlyContinue'
+          Write-Output '## start_otonom.bat icerigi'
+          Write-Output '```'
+          if (Test-Path C:\ANKA\start_otonom.bat) { Get-Content C:\ANKA\start_otonom.bat } else { Write-Output '(YOK)' }
+          Write-Output '```'
+          Write-Output ''
+          Write-Output '## Calisan python prosesleri + KOMUT SATIRI (--dry-run var mi?)'
+          Write-Output '```'
+          $procs = Get-CimInstance Win32_Process -Filter "Name='python.exe'"
+          if ($procs) {
+            foreach ($p in $procs) { Write-Output ("PID " + $p.ProcessId + " | " + $p.CommandLine) }
+          } else { Write-Output '(python prosesi YOK)' }
+          Write-Output '```'
+          Write-Output ''
+          Write-Output '## otonom_trader calisiyor mu + hangi mod?'
+          Write-Output '```'
+          $ot = Get-CimInstance Win32_Process -Filter "Name='python.exe'" | Where-Object { $_.CommandLine -like '*otonom_trader*' }
+          if ($ot) {
+            foreach ($p in $ot) {
+              $mod = if ($p.CommandLine -match '--dry-run|--paper') { 'PAPER/DRY-RUN (guvenli)' } else { 'CANLI (gercek emir!)' }
+              Write-Output ("CALISIYOR -> MOD: " + $mod)
+              Write-Output ("   cmd: " + $p.CommandLine)
+            }
+          } else { Write-Output 'otonom_trader CALISMIYOR (gorev henuz baslamamis ya da hemen bitmis)' }
+          Write-Output '```'
+          PSEOF
+          ENC=$(printf '%s' "$PS" | iconv -t UTF-16LE | base64 -w0)
+          mkdir -p data
+          {
+            echo "# 🔍 ANKA Baslat Kontrol"
+            echo ""
+            echo "_$(TZ=Europe/Istanbul date '+%Y-%m-%d %H:%M:%S TR') — run ${GITHUB_RUN_ID}_"
+            echo ""
+            sshpass -p "$VPS_PASSWORD" ssh -o ConnectTimeout=20 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null \
+              "$VUSER@$HOST" "powershell -NoProfile -EncodedCommand $ENC" 2>&1 || echo "⚠️ SSH basarisiz."
+          } > data/baslat_kontrol.md
+      - name: commit
+        run: |
+          git config user.name "anka-bot"; git config user.email "actions@github.com"
+          git add data/baslat_kontrol.md
+          git diff --staged --quiet || { git commit -m "Baslat kontrol sonucu"; git push; }
