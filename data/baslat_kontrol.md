@@ -1,6 +1,6 @@
 # 🔍 ANKA Baslat Kontrol
 
-_2026-06-03 16:48:36 TR — run 26889079789_
+_2026-06-03 16:50:41 TR — run 26889201114_
 
 Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 #< CLIXML
@@ -35,6 +35,11 @@ echo [%date% %time%] ANKA BIST Otonom Trader sonlandi (exit %errorlevel%). >> lo
 ## Calisan python prosesleri + KOMUT SATIRI (--dry-run var mi?)
 ```
 PID 3888 | "C:\Program Files\Python312\python.exe" -X utf8 -u C:\ANKA\coin_otonom.py
+```
+
+## start_otonom.bat son cikti logu (calisti mi / hata mi?)
+```
+(otonom_trader.out.log YOK -> bat hic calismadi = Calistir basilmadi)
 ```
 
 ## otonom_trader calisiyor mu + hangi mod?
