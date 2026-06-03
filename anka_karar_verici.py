@@ -13,16 +13,11 @@ Uzman AI'lar:
 Karar Verici: Hepsini dinler, ağırlıklandırır, son kararı verir.
 """
 
-import json
-import os
 import sys
-import time
 import platform
 import subprocess
-from datetime import datetime
 from pathlib import Path
 
-import numpy as np
 import pandas as pd
 import yfinance as yf
 
@@ -427,7 +422,7 @@ class AnkaKararVerici:
         rejim, guven = self.rejim_tespit()
         agirliklar = self.REJIM_AGIRLIKLARI[rejim]
 
-        print(f"\n🦅 ANKA KARAR VERİCİ V2")
+        print("\n🦅 ANKA KARAR VERİCİ V2")
         print("=" * 70)
         print(f"📊 REJİM: {rejim} (güven: %{guven:.0f})")
         print(f"   Ağırlıklar: {' | '.join([f'{k[:3]}:{v:.0%}' for k,v in agirliklar.items()])}")

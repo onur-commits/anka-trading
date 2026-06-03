@@ -12,8 +12,6 @@ Oy: 10/10 oybirliği
 """
 
 import json
-import os
-import time
 from datetime import datetime, date
 from pathlib import Path
 
@@ -349,7 +347,7 @@ def panel_onayi(ticker, miktar, fiyat, beklenen_getiri_pct,
     # 4. Tavan/taban kontrolü
     tt_ok, _ = KaraKuguKoruma.tavan_taban_kontrol(degisim_pct)
     if not tt_ok:
-        print(f"🚫 Tavan/Taban kilidi — işlem yapılamaz")
+        print("🚫 Tavan/Taban kilidi — işlem yapılamaz")
         return False, "TAVAN_TABAN"
 
     # 5. Likidite kontrolü
@@ -357,7 +355,7 @@ def panel_onayi(ticker, miktar, fiyat, beklenen_getiri_pct,
     if not lk_ok:
         return False, "LİKİDİTE"
 
-    print(f"✅ PANEL ONAYI GEÇTİ — tüm kurallar sağlandı")
+    print("✅ PANEL ONAYI GEÇTİ — tüm kurallar sağlandı")
     return True, "ONAY"
 
 

@@ -35,7 +35,7 @@ import sys
 import json
 import time
 import warnings
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np

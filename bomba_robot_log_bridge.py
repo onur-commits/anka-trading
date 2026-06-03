@@ -18,7 +18,6 @@ import sys
 import os
 import json
 import time
-import glob as glob_mod
 from datetime import datetime
 from pathlib import Path
 

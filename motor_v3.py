@@ -27,12 +27,10 @@ import subprocess
 import warnings
 import schedule
 import shutil
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from typing import Optional, List, Dict
 
-import numpy as np
-import pandas as pd
 import yfinance as yf
 
 warnings.filterwarnings("ignore")
@@ -42,12 +40,10 @@ sys.path.insert(0, str(BASE_DIR))
 
 from tahmin_motoru_v2 import (
     EnsembleModelV2, feature_olustur_v2, market_rejim_tespit,
-    sektor_momentum_hesapla, hisse_analiz_v2, atr_hesapla,
+    hisse_analiz_v2, atr_hesapla,
 )
-from risk_yonetimi import RiskYoneticisi
-from haber_sentiment import haberleri_analiz_et
 from gunluk_bomba import (
-    TICKERS, bomba_skor_hesapla, iq_kodu_uret, stop_hesapla,
+    TICKERS, bomba_skor_hesapla,
 )
 
 # ============================================================

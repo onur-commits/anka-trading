@@ -190,7 +190,7 @@ def main():
     lines.append("# DCA Backtest Raporu — 2 Yıl (2024-04 → 2026-04)")
     lines.append("")
     lines.append(f"**Haftalık alım:** ${HAFTALIK_USDT}")
-    lines.append(f"**Komisyon:** %0.1  |  **Slippage:** %0.05")
+    lines.append("**Komisyon:** %0.1  |  **Slippage:** %0.05")
     lines.append(f"**Dönem:** {bars_btc[0][0].date()} → {bars_btc[-1][0].date()} ({len(bars_btc)} saatlik bar)")
     lines.append("")
     lines.append("## Referans: Buy & Hold (tek seferde al, sonda sat)")

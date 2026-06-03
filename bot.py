@@ -11,7 +11,6 @@ import json
 import subprocess
 import threading
 import logging
-import os
 from datetime import datetime, timedelta
 from pathlib import Path
 from dataclasses import dataclass, field, asdict
@@ -19,9 +18,7 @@ from dataclasses import dataclass, field, asdict
 # Proje modülleri
 from veri_isleyici import tum_verileri_cek, BIST_TICKERS, ticker_isim
 from tahmin_motoru import (
-    feature_olustur, teknik_skor_hesapla, teknik_sinyal_detay,
-    model_egit, model_yukle, ml_tahmin, birlesik_skor_hesapla,
-    hisse_analiz
+    model_egit, model_yukle, hisse_analiz
 )
 
 # ============================================================
@@ -429,7 +426,7 @@ class BistBot:
         self.config.kaydet()
         self._durdur.clear()
 
-        log.info(f"🤖 BIST Sürpriz Bot başlatıldı!")
+        log.info("🤖 BIST Sürpriz Bot başlatıldı!")
         log.info(f"   Tarama aralığı: {self.config.tarama_araligi_dk} dk")
         log.info(f"   Min sürpriz skor: {self.config.min_surpriz_skor}")
         log.info(f"   Hisse sayısı: {len(self.config.tickers)}")
@@ -539,7 +536,7 @@ if __name__ == "__main__":
         print("\nKullanım:")
         print("  python bot.py --tek     Tek seferlik tarama")
         print("  python bot.py --bot     Sürekli bot modu")
-        print(f"\nMevcut ayarlar:")
+        print("\nMevcut ayarlar:")
         print(f"  Aralık: {config.tarama_araligi_dk} dk")
         print(f"  Eşik: {config.min_surpriz_skor}")
         print(f"  iMessage: {'Aktif' if config.bildirim_imessage else 'Kapalı'}")

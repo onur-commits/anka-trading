@@ -40,7 +40,7 @@ import math
 import statistics
 from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime, timezone
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -578,7 +578,7 @@ def rapor_yaz(sonuclar: list[Sonuc]) -> None:
     lines.append("# ANKA Backtest v2 — Sonuç Raporu")
     lines.append("")
     lines.append(f"**Tarih:** {datetime.now().strftime('%Y-%m-%d %H:%M')}")
-    lines.append(f"**Dönem:** Son 365 gün (1h mumlar)")
+    lines.append("**Dönem:** Son 365 gün (1h mumlar)")
     lines.append(f"**Semboller:** {', '.join(SYMBOLS)}")
     lines.append(f"**Başlangıç sermaye:** ${BASLANGIC_SERMAYE:.2f}")
     lines.append(f"**Komisyon/yön:** %{KOMISYON_PCT} | **Slippage/yön:** %{SLIPPAGE_PCT}")

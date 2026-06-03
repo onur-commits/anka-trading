@@ -28,11 +28,8 @@ warnings.filterwarnings("ignore")
 from tahmin_motoru_v2 import (
     feature_olustur_v2, FEATURE_COLS_V2,
     hedef_olustur, _feature_sec_v2,
-    market_rejim_tespit, teknik_skor_v2,
-    hisse_analiz_v2, EnsembleModelV2,
-    rsi_hesapla, macd_hesapla, bollinger_hesapla,
-    obv_hesapla, atr_hesapla, adx_hesapla,
-    stokastik_hesapla, vwap_hesapla,
+    teknik_skor_v2,
+    EnsembleModelV2,
 )
 
 MODEL_DIR = Path(__file__).parent / "models"
@@ -108,7 +105,7 @@ def optimal_esik_bul(y_true: np.ndarray, y_prob: np.ndarray,
     F1 veya precision-recall dengesi için optimal olasılık eşiği.
     0.5 yerine veri-driven eşik kullan.
     """
-    from sklearn.metrics import f1_score, precision_score, recall_score
+    from sklearn.metrics import f1_score, precision_score
 
     en_iyi_esik = 0.5
     en_iyi_skor = 0
@@ -163,7 +160,6 @@ class StackingEnsembleV3(EnsembleModelV2):
         from sklearn.neural_network import MLPClassifier
         from sklearn.preprocessing import StandardScaler
         from sklearn.linear_model import LogisticRegression
-        from sklearn.calibration import CalibratedClassifierCV
         from sklearn.metrics import (accuracy_score, f1_score,
                                       precision_score, roc_auc_score,
                                       classification_report)
@@ -379,7 +375,7 @@ class StackingEnsembleV3(EnsembleModelV2):
         print(f"  Accuracy:  {final_acc:.4f}")
         print(f"  {'='*50}")
 
-        print(f"\n  Detaylı rapor:")
+        print("\n  Detaylı rapor:")
         print(classification_report(y_test, final_pred, target_names=["Zarar", "Kâr"]))
 
         # ── Feature Importance ────────────────────────────────
@@ -682,7 +678,7 @@ if __name__ == "__main__":
     print("ANKA ML V3 — Module Test")
     print("Bu modülü eğitmek için yfinance verisi gerekir.")
     print("Kullanım: model = StackingEnsembleV3(); model.egit_v3(tum_veri)")
-    print(f"\nV3 iyileştirmeleri:")
+    print("\nV3 iyileştirmeleri:")
     for i in [
         "Sample weighting (exponential decay)",
         "Feature interactions (5 cross-features)",

@@ -106,7 +106,6 @@ class RejimModelSistemi:
         """
         from xgboost import XGBClassifier
         from sklearn.metrics import roc_auc_score, f1_score, precision_score
-        from sklearn.preprocessing import StandardScaler
         from tahmin_motoru_v2 import feature_olustur_v2, hedef_olustur, FEATURE_COLS_V2
 
         try:
@@ -273,7 +272,7 @@ class RejimModelSistemi:
 
         # Ozet
         print(f"\n  {'='*50}")
-        print(f"  REJIM BAZLI MODEL OZETI")
+        print("  REJIM BAZLI MODEL OZETI")
         print(f"  {'='*50}")
         for r, s in sonuclar.items():
             print(f"    {r.upper():10s} AUC:{s['auc']:.4f} F1:{s['f1']:.4f} Prec:{s['precision']:.4f} (n={s['veri_boyut']})")

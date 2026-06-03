@@ -20,14 +20,12 @@ Kullanim:
   rapor       = ajan.tam_rapor()
 """
 
-import re
 import json
 import time
 import warnings
-import traceback
 from datetime import datetime, timedelta
 from pathlib import Path
-from typing import Dict, List, Optional, Tuple
+from typing import Dict, List, Optional
 
 import numpy as np
 

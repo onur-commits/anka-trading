@@ -22,7 +22,7 @@ import json
 import time
 import subprocess
 import platform
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 
@@ -94,7 +94,7 @@ def is_process_running(process_name: str) -> bool:
         else:
             # Windows
             result = subprocess.run(
-                ["tasklist", "/FI", f"IMAGENAME eq python*"],
+                ["tasklist", "/FI", "IMAGENAME eq python*"],
                 capture_output=True, text=True, timeout=5
             )
             return process_name in result.stdout

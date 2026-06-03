@@ -14,7 +14,6 @@ Veriler: data/feedback_log.json
 """
 
 import json
-import numpy as np
 import pandas as pd
 import yfinance as yf
 from pathlib import Path

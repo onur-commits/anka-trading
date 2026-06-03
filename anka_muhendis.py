@@ -20,7 +20,6 @@ import os
 import json
 import time
 import subprocess
-import traceback
 import shutil
 import schedule
 from datetime import datetime
@@ -173,7 +172,7 @@ def akilli_hata_analiz(hata_mesaji):
         return sorun_id, basarili
 
     # 2. Bilinmeyen hata — internetten araştır
-    log(f"Bilinmeyen hata — internet araştırması yapılıyor", "INFO", "ANALIZ")
+    log("Bilinmeyen hata — internet araştırması yapılıyor", "INFO", "ANALIZ")
     ipuclari = internet_arastir(hata_mesaji)
     if ipuclari:
         for ipucu in ipuclari:

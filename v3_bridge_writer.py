@@ -41,11 +41,9 @@ import os
 import sys
 import time
 import logging
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
 
 # Proje root — tahmin_motoru_v2'yi import etmek icin
 PROJECT_DIR = Path(__file__).parent

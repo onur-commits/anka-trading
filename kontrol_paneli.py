@@ -14,7 +14,6 @@ Uzaktan erişim:
 import streamlit as st
 import json
 import os
-import time
 import subprocess
 import platform
 from datetime import datetime

@@ -11,8 +11,6 @@
 
 import requests
 import numpy as np
-import time
-from datetime import datetime
 
 
 class DipAvciBot:
@@ -143,25 +141,25 @@ class DipAvciBot:
         # KATMAN 1: KORKU
         print(f"\n😱 KORKU ENDEKSİ: {korku['deger']}")
         if korku["extreme_fear"]:
-            print(f"   🟢 EXTREME FEAR — tarihsel alım bölgesi!")
+            print("   🟢 EXTREME FEAR — tarihsel alım bölgesi!")
         elif korku["donus_basladi"]:
             print(f"   🟡 Dönüş başladı (dün:{korku['dun']} → bugün:{korku['deger']})")
         else:
-            print(f"   ⚪ Normal bölge")
+            print("   ⚪ Normal bölge")
 
         # KATMAN 2: BALİNA
-        print(f"\n🐋 BALİNA ANALİZ:")
+        print("\n🐋 BALİNA ANALİZ:")
         print(f"   Fiyat 24s: {balina.get('fiyat_degisim', 0):+.1f}%")
         print(f"   Hacim 24s: {balina.get('hacim_degisim', 0):+.1f}%")
         if balina.get("divergence"):
-            print(f"   🟢 DİVERGENCE — Fiyat düşüyor ama hacim artıyor → BALİNA TOPLUYOR!")
+            print("   🟢 DİVERGENCE — Fiyat düşüyor ama hacim artıyor → BALİNA TOPLUYOR!")
         elif balina.get("accumulation"):
-            print(f"   🟡 ACCUMULATION — Hacim artıyor, birikim var")
+            print("   🟡 ACCUMULATION — Hacim artıyor, birikim var")
         else:
-            print(f"   ⚪ Normal hareket")
+            print("   ⚪ Normal hareket")
 
         # KATMAN 3: MAKRO
-        print(f"\n🌍 MAKRO:")
+        print("\n🌍 MAKRO:")
         print(f"   BTC 24s: {makro.get('btc_degisim', 0):+.1f}%")
         print(f"   Toplam hacim: ${makro.get('toplam_hacim_b', 0):.1f}B")
 
@@ -182,14 +180,14 @@ class DipAvciBot:
             print(f"   Dönüş teyidi → KADEME 3 ({self.kademe_3:.0f}$)")
             karar = "KADEME_1"
         elif skor >= 4:
-            print(f"   🟡 HAZIRLAN — Sinyaller güçleniyor, dipte birikim var")
-            print(f"   Korku endeksi dönüş yaparsa → GİR")
+            print("   🟡 HAZIRLAN — Sinyaller güçleniyor, dipte birikim var")
+            print("   Korku endeksi dönüş yaparsa → GİR")
             karar = "HAZIRLAN"
         elif skor >= 2:
-            print(f"   ⚪ İZLE — Henüz yeterli sinyal yok")
+            print("   ⚪ İZLE — Henüz yeterli sinyal yok")
             karar = "IZLE"
         else:
-            print(f"   🔴 BEKLE — Piyasa henüz dip yapmadı")
+            print("   🔴 BEKLE — Piyasa henüz dip yapmadı")
             karar = "BEKLE"
 
         print(f"   Skor: {skor}/9")

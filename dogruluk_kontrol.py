@@ -9,13 +9,11 @@ Yanlış sinyalleri loglar, ajan güvenilirliğini günceller.
 """
 
 import json
-import os
 import time
 import requests
 import numpy as np
-import pandas as pd
 import yfinance as yf
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 PROJECT_DIR = Path(__file__).parent
@@ -150,7 +148,7 @@ class DogrulukKontrol:
             print("📊 Henüz kontrol edilmiş sinyal yok")
             return
 
-        print(f"\n🔍 DOĞRULUK RAPORU")
+        print("\n🔍 DOĞRULUK RAPORU")
         print("=" * 60)
         print(f"Toplam sinyal: {len(self.sinyaller)}")
         print(f"Kontrol edilmiş: {len(kontrol_edilmis)}")
@@ -176,12 +174,12 @@ class DogrulukKontrol:
                     print(f"   {karar}: {len(k_sinyaller)} sinyal → %{len(k_dogrular)/len(k_sinyaller)*100:.0f} doğru")
 
         # En iyi ve en kötü sinyaller
-        print(f"\n📊 EN İYİ 3 SİNYAL:")
+        print("\n📊 EN İYİ 3 SİNYAL:")
         en_iyi = sorted(kontrol_edilmis, key=lambda x: x["sonuc"]["degisim_pct"], reverse=True)[:3]
         for s in en_iyi:
             print(f"   🟢 {s['symbol']} {s['karar']} @ {s['fiyat']:.2f} → %{s['sonuc']['degisim_pct']:+.1f}")
 
-        print(f"\n📊 EN KÖTÜ 3 SİNYAL:")
+        print("\n📊 EN KÖTÜ 3 SİNYAL:")
         en_kotu = sorted(kontrol_edilmis, key=lambda x: x["sonuc"]["degisim_pct"])[:3]
         for s in en_kotu:
             print(f"   🔴 {s['symbol']} {s['karar']} @ {s['fiyat']:.2f} → %{s['sonuc']['degisim_pct']:+.1f}")

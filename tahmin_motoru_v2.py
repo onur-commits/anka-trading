@@ -15,7 +15,7 @@ from pathlib import Path
 import joblib
 import json
 import warnings
-from datetime import datetime, timedelta
+from datetime import datetime
 
 warnings.filterwarnings("ignore")
 
@@ -610,7 +610,7 @@ class EnsembleModelV2:
         from xgboost import XGBClassifier
         from sklearn.neural_network import MLPClassifier
         from sklearn.preprocessing import StandardScaler
-        from sklearn.metrics import accuracy_score, f1_score, precision_score, roc_auc_score
+        from sklearn.metrics import f1_score, precision_score, roc_auc_score
 
         # LightGBM opsiyonel
         try:
@@ -1249,19 +1249,19 @@ def komisyonlu_backtest(
     print(f"Basari orani:        %{basari_orani:.1f}")
     print(f"Ort kazanc:          %{ort_kazanc:.2f}")
     print(f"Ort kayip:           %{ort_kayip:.2f}")
-    print(f"")
+    print("")
     print(f"Bariyer dagilimi:    TP={tp_count} | SL={sl_count} | TIME={time_count}")
-    print(f"")
+    print("")
     print(f"BRUT toplam getiri:  %{brut_toplam:.2f}")
     print(f"Komisyon etkisi:     %{komisyon_etkisi:.2f}")
     print(f"NET toplam getiri:   %{toplam_getiri:.2f}")
     print(f"Son sermaye:         {sermaye:,.0f} TL")
-    print(f"")
+    print("")
     print(f"Sharpe Ratio:        {sharpe:.3f}")
     print(f"Max Drawdown:        %{max_dd:.2f}")
-    print(f"")
+    print("")
     if bh_getiri is not None:
-        print(f"--- XU100 Buy & Hold ---")
+        print("--- XU100 Buy & Hold ---")
         print(f"XU100 getiri:        %{bh_getiri:.2f}")
         print(f"XU100 Sharpe:        {bh_sharpe:.3f}")
         print(f"XU100 Max DD:        %{bh_max_dd:.2f}")

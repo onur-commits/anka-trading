@@ -9,7 +9,6 @@ BIST ALPHA V2 — Dinamik Risk Yönetimi
 """
 
 import numpy as np
-import pandas as pd
 from datetime import datetime
 
 

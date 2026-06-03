@@ -4,24 +4,21 @@ BIST Sürpriz Hisse Tahmin Sistemi - Streamlit Arayüzü (V2)
 
 import streamlit as st
 import pandas as pd
-import numpy as np
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from datetime import datetime
 
 from tahmin_motoru_v2 import (
-    feature_olustur_v2, teknik_skor_v2,
-    EnsembleModelV2, hisse_analiz_v2, FEATURE_COLS_V2,
+    feature_olustur_v2, EnsembleModelV2, hisse_analiz_v2, FEATURE_COLS_V2,
     rsi_hesapla, macd_hesapla, bollinger_hesapla
 )
 from veri_isleyici import (
-    BIST_TICKERS, TICKER_ISIMLERI, ticker_isim,
+    ticker_isim,
     tum_verileri_cek, screenshot_ocr, dosya_parse,
     canli_veri_birlestir
 )
 from matriks_scraper import (
-    matriks_veri_cek_sync, kayitli_veri_oku, veri_to_dataframe,
-    CANLI_VERI_PATH
+    matriks_veri_cek_sync, kayitli_veri_oku, veri_to_dataframe
 )
 from bot import BistBot, BotConfig, sinyal_gecmisi_oku, sinyal_gecmisi_temizle
 

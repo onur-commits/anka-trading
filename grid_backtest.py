@@ -17,9 +17,7 @@ Parametreler grid sweep:
 from __future__ import annotations
 
 import csv
-from collections import defaultdict
 from dataclasses import dataclass, field
-from datetime import datetime
 from pathlib import Path
 
 PROJECT_DIR = Path(__file__).parent

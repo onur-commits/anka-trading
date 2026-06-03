@@ -12,14 +12,10 @@ Stratejiler:
   5. Mean Reversion — aşırı düşenden dönüş
 """
 
-import pandas as pd
 import numpy as np
 import yfinance as yf
 import json
-import os
 import sys
-import subprocess
-import platform
 from datetime import datetime
 from pathlib import Path
 
@@ -154,11 +150,11 @@ def vwap_bounce(ticker, df_intraday):
     # VWAP üstünde ve yükseliyor
     elif son > son_vwap and son > onceki:
         puan = 60
-        detay = f"VWAP üstü✅"
+        detay = "VWAP üstü✅"
     # VWAP altında
     elif son < son_vwap:
         puan = 20
-        detay = f"VWAP altı❌"
+        detay = "VWAP altı❌"
 
     return puan, detay
 

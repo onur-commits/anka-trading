@@ -158,7 +158,7 @@ def ana_dongu():
 
     cfg = config_oku()
     aralik = cfg.get("rejim_motor", {}).get("kontrol_aralik_dk", 30)
-    log(f"  Config yuklendi")
+    log("  Config yuklendi")
     log(f"  Kontrol aralik: {aralik} dk")
     log(f"  Max pozisyon: {cfg.get('genel', {}).get('max_pozisyon_sayisi', 5)}")
     log(f"  Strateji sayisi: {sum(1 for s in cfg.get('strateji_havuzu', {}).values() if s.get('aktif'))}")
