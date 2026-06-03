@@ -5,9 +5,12 @@ Tek bakışta geçmiş: işlemler, performans, sistem logları (audit), durum.
 Hepsi CSV olarak dışa aktarılabilir.
 
 Veri kaynakları (salt-okuma — trading koduna dokunmaz):
-- data/islem_gecmisi.json  : kapanan/açık işlemler (ticker, kâr/zarar%, ajan)
-- data/otonom_log.json     : sistem aksiyon/audit logları (zaman, seviye, mesaj)
-- data/otonom_state.json   : güncel rejim + aktif stratejiler
+- data/otonom_trades.json  : GERCEK canli/paper emirler (varsa)
+- data/islem_gecmisi.json  : SENTETIK egitim verisi (anka_ogrenme.py,
+                              5 yil simulasyon, ajan agirligi ogretmek
+                              icin — gercek trade kaydi DEGIL)
+- data/otonom_log.json     : sistem aksiyon/audit loglari
+- data/otonom_state.json   : guncel rejim + aktif stratejiler
 """
 
 import json
@@ -53,8 +56,21 @@ st.markdown("# 📊 ANKA Raporlar Merkezi")
 st.caption("Sistemin hafızası — işlemler, performans, audit logları. Hepsi salt-okuma + CSV export.")
 
 islem = yukle("islem_gecmisi.json", [])
+gercek_trades = yukle("otonom_trades.json", [])
 loglar = yukle("otonom_log.json", [])
 state = yukle("otonom_state.json", {})
+
+# Sentetik mi gercek mi ayrimi — kullanici dogru veriyi gorsun
+SENTETIK_NOT = (
+    "⚠️ Bu tablo `data/islem_gecmisi.json` — **sentetik 5 yıl simülasyon eğitim verisi** "
+    "(`anka_ogrenme.py` ajan ağırlıklarını öğretmek için). "
+    "Gerçek canlı/paper emirler `data/otonom_trades.json` dosyasında "
+    "(bot canlıda emir verdikten sonra dolar)."
+)
+GERCEK_NOT = (
+    "✅ Bu tablo `data/otonom_trades.json` — **gerçek canlı/paper emir kayıtları** "
+    "(`otonom_trader.py`'nin yazdığı)."
+)
 
 tab1, tab2, tab3, tab4 = st.tabs(
     ["📈 İşlem Raporu", "🏆 Performans", "🔍 Sistem / Audit Log", "🧭 Güncel Durum"]
@@ -64,10 +80,23 @@ tab1, tab2, tab3, tab4 = st.tabs(
 # TAB 1: İŞLEM RAPORU
 # ══════════════════════════════════════════════════════════
 with tab1:
-    if not islem:
-        st.info("Henüz işlem geçmişi yok (data/islem_gecmisi.json boş).")
+    # Hangi kaynak gosterilsin? Gercek varsa onu, yoksa sentetik (uyariyla)
+    if gercek_trades:
+        kaynak = st.radio(
+            "Veri kaynağı",
+            ["🟢 Gerçek emirler (otonom_trades.json)", "🟡 Sentetik eğitim verisi (islem_gecmisi.json)"],
+            horizontal=True,
+        )
+        kayitlar = gercek_trades if kaynak.startswith("🟢") else islem
+        st.info(GERCEK_NOT if kaynak.startswith("🟢") else SENTETIK_NOT)
     else:
-        df = pd.DataFrame(islem)
+        kayitlar = islem
+        st.warning(SENTETIK_NOT + "\n\n_Gerçek emir log'u (otonom_trades.json) henüz yok — bot canlıda emir vermemiş._")
+
+    if not kayitlar:
+        st.info("Henüz işlem geçmişi yok.")
+    else:
+        df = pd.DataFrame(kayitlar)
         # ajan_kararlari dict → okunur sütun
         if "ajan_kararlari" in df.columns:
             df["ajanlar"] = df["ajan_kararlari"].apply(
@@ -76,6 +105,18 @@ with tab1:
             df = df.drop(columns=["ajan_kararlari"])
 
         kapanan = df[df.get("durum", "") == "KAPANDI"] if "durum" in df.columns else df
+
+        # ── Outlier filtresi (BIST gunluk ~%10 tavan/taban; >|30%| supheli)
+        if "kar_zarar_pct" in kapanan.columns and len(kapanan):
+            outlier_say = ((kapanan["kar_zarar_pct"].abs() > 30)).sum()
+            if outlier_say > 0:
+                temizle = st.checkbox(
+                    f"📊 Şüpheli outlier'ları gizle ({outlier_say} kayıt, |K/Z|>%30 — BIST'te tek işlemde gerçekçi değil)",
+                    value=True,
+                )
+                if temizle:
+                    kapanan = kapanan[kapanan["kar_zarar_pct"].abs() <= 30]
+                    df = df[df.index.isin(kapanan.index) | (df.get("durum", "") != "KAPANDI")]
 
         c1, c2, c3, c4 = st.columns(4)
         c1.metric("Toplam İşlem", len(df))
@@ -109,10 +150,15 @@ with tab1:
 # TAB 2: PERFORMANS
 # ══════════════════════════════════════════════════════════
 with tab2:
-    if not islem:
+    kaynak_perf = gercek_trades if gercek_trades else islem
+    if gercek_trades:
+        st.info(GERCEK_NOT)
+    else:
+        st.warning(SENTETIK_NOT)
+    if not kaynak_perf:
         st.info("Performans için işlem verisi gerekli.")
     else:
-        df = pd.DataFrame(islem)
+        df = pd.DataFrame(kaynak_perf)
         if "kar_zarar_pct" not in df.columns or "ticker" not in df.columns:
             st.warning("İşlem verisinde kar_zarar_pct / ticker alanı yok.")
         else:
@@ -120,12 +166,22 @@ with tab2:
             kapanan = kapanan.dropna(subset=["kar_zarar_pct"])
 
             if len(kapanan):
+                outlier_say = (kapanan["kar_zarar_pct"].abs() > 30).sum()
+                if outlier_say > 0:
+                    temizle_p = st.checkbox(
+                        f"📊 Şüpheli outlier'ları gizle ({outlier_say} kayıt, |K/Z|>%30)",
+                        value=True, key="perf_outlier",
+                    )
+                    if temizle_p:
+                        kapanan = kapanan[kapanan["kar_zarar_pct"].abs() <= 30]
+
                 c1, c2, c3 = st.columns(3)
                 c1.metric("Toplam Birikmiş K/Z", f"%{kapanan['kar_zarar_pct'].sum():+.1f}")
-                eniyi = kapanan.loc[kapanan["kar_zarar_pct"].idxmax()]
-                enkotu = kapanan.loc[kapanan["kar_zarar_pct"].idxmin()]
-                c2.metric("En İyi", f"{eniyi['ticker']} %{eniyi['kar_zarar_pct']:+.2f}")
-                c3.metric("En Kötü", f"{enkotu['ticker']} %{enkotu['kar_zarar_pct']:+.2f}")
+                if len(kapanan):
+                    eniyi = kapanan.loc[kapanan["kar_zarar_pct"].idxmax()]
+                    enkotu = kapanan.loc[kapanan["kar_zarar_pct"].idxmin()]
+                    c2.metric("En İyi", f"{eniyi['ticker']} %{eniyi['kar_zarar_pct']:+.2f}")
+                    c3.metric("En Kötü", f"{enkotu['ticker']} %{enkotu['kar_zarar_pct']:+.2f}")
 
                 st.divider()
                 st.subheader("Hisse Bazlı Performans")

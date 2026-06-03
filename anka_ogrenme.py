@@ -8,6 +8,13 @@ Her işlem sonrası:
   - Yanlış çıkanın ağırlığını düşür
 
 İleride: Reinforcement Learning ile tam otonom ağırlık optimizasyonu.
+
+NOT (kaynak ayrimi — onemli!):
+  - data/islem_gecmisi.json : SENTETIK 5 yil simulasyon egitim verisi
+    (~1437 kayit, BIST'te imkansiz >|30%| outlier'lar icerir, ajan
+    agirligi ogretmek icin uretilmis — gercek trade kaydi DEGIL).
+  - data/otonom_trades.json : GERCEK canli/paper emirler
+    (otonom_trader._trade_log_yaz yazar — bot emir verdikten sonra dolar).
 """
 
 import json
