@@ -255,6 +255,46 @@ MAX_POZISYON_SAYISI = 3           # Aynı anda max pozisyon
 MAX_POZISYON_TL = 20000           # Pozisyon başına max TL
 MIN_BOMBA_SKOR_ALIS = 35          # Alış için min skor (canlı test için gevşetildi)
 
+# ── BEYIN DANISMANI (opsiyonel, VARSAYILAN KAPALI) ──────────
+# anka_beyin.py'nin 4 katmanli rejim analizini alim filtresi olarak baglar.
+# BEYIN_GATE_AKTIF = False iken ANKA TAMAMEN ESKISI GIBI calisir; bu bayrak
+# acilana kadar beyin hicbir karari etkilemez. Acikken bile herhangi bir
+# hata / eksik / bayat veri durumunda alima IZIN verir (fail-open) — yani
+# beyin ANKA'yi asla yanlislikla bloke edemez, sadece NET tehlikede atlatir.
+BEYIN_GATE_AKTIF = False          # ← canliya guvendiginde True yap
+BEYIN_MIN_AGRESIFLIK = 0.3        # agresiflik < bu ise riskli rejim (AYI 0.2 / KAOS 0.1)
+BEYIN_STATE_FILE = DATA_DIR / "beyin_state.json"
+BEYIN_BAYAT_SAAT = 26             # state bu saatten eskiyse guvenilmez -> izin ver
+
+
+def beyin_rejim_onay():
+    """Beyin rejimine gore otonom alima izin var mi?
+
+    Doner: (izin: bool, rejim_adi: str, agresiflik: float|None)
+    GUVENLIK: gate kapaliysa veya herhangi bir hata/bayat veri varsa
+    daima (True, ...) doner — ANKA'yi asla bloke etmez (fail-open).
+    """
+    if not BEYIN_GATE_AKTIF:
+        return True, "gate_kapali", None
+    try:
+        if not BEYIN_STATE_FILE.exists():
+            return True, "beyin_state_yok", None
+        import os as _os
+        yas_saat = (time.time() - _os.path.getmtime(BEYIN_STATE_FILE)) / 3600
+        if yas_saat > BEYIN_BAYAT_SAAT:
+            return True, f"bayat_{yas_saat:.0f}h", None
+        with open(BEYIN_STATE_FILE, encoding="utf-8") as f:
+            bs = json.load(f)
+        rejim = bs.get("rejim", {}) or {}
+        agr = rejim.get("agresiflik")
+        ad = rejim.get("ad", "?")
+        if agr is None:
+            return True, "agresiflik_yok", None
+        return (agr >= BEYIN_MIN_AGRESIFLIK), ad, agr
+    except Exception as e:
+        log(f"beyin_rejim_onay hata (fail-open): {e}", "WARN")
+        return True, "hata_fail_open", None
+
 
 def _trade_log_yaz(kayit):
     """otonom_trades.json'a append (atomik)."""
@@ -496,6 +536,16 @@ def gorev_09_05_otonom_alis():
     if not bombalar:
         log("Bu sabah bomba yok, alış atlandı")
         return
+
+    # ── Beyin danışmanı (opsiyonel, default KAPALI) ──
+    # Riskli rejimde (AYI/KAOS) otonom alışı tümden atla. Gate kapalıysa
+    # veya beyin verisi yok/bayatsa otomatik izin verir (ANKA bozulmaz).
+    izin, rej, agr = beyin_rejim_onay()
+    if not izin:
+        log(f"🧠 BEYIN: '{rej}' rejimi (agresiflik {agr}) riskli — otonom alış ATLANDI", "WARN")
+        return
+    if BEYIN_GATE_AKTIF:
+        log(f"🧠 BEYIN onay: '{rej}' (agresiflik {agr}) — alışa izin")
 
     # Mevcut pozisyonları al — hem bot state hem Midas hesabı
     mevcut = _pozisyonlari_oku()

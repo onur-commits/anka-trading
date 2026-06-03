@@ -12,6 +12,13 @@
 - Kullanici "coin'le isimiz yok" dedi: focus BIST. Coin modulleri
   (coin_otonom_trader, coin_strateji vs.) repodadir ama UI ve
   startup'tan cikarildi.
+- BEYIN DANISMANI: anka_beyin.py'nin rejim analizi otonom_trader'a
+  OPSIYONEL alim filtresi olarak baglandi. VARSAYILAN KAPALI
+  (otonom_trader.py: BEYIN_GATE_AKTIF=False) — bu sayede ANKA eskisi
+  gibi calisir. Acmak icin BEYIN_GATE_AKTIF=True yap; o zaman beyin
+  AYI(0.2)/KAOS(0.1) rejimlerinde otonom alisi atlar. Fail-open:
+  beyin verisi yok/bayat/bozuksa daima alima izin verir (ANKA bloke
+  olmaz). Esik: BEYIN_MIN_AGRESIFLIK (default 0.3).
 .
 ## Sistem Ozeti 
 ANKA, BIST (Borsa Istanbul) icin otonom trading sistemidir.

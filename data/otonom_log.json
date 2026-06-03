@@ -1608,5 +1608,10 @@
   "zaman": "2026-04-06 05:31:09",
   "seviye": "BILDIRIM",
   "mesaj": "ML güncellendi — AUC:0.5664"
+ },
+ {
+  "zaman": "2026-06-03 03:18:01",
+  "seviye": "WARN",
+  "mesaj": "beyin_rejim_onay hata (fail-open): Expecting property name enclosed in double quotes: line 1 column 2 (char 1)"
  }
 ]
