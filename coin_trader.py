@@ -19,7 +19,6 @@ Kullanim:
 import json
 import time
 import os
-import sys
 import hmac
 import hashlib
 import logging
@@ -524,7 +523,7 @@ class CoinBrain:
         bombalar.sort(key=lambda x: x["skor"], reverse=True)
 
         print(f"\n{'='*60}")
-        print(f"  SKOR SIRALAMASINA GORE TUM COINLER:")
+        print("  SKOR SIRALAMASINA GORE TUM COINLER:")
         print(f"{'='*60}")
         for i, b in enumerate(bombalar):
             isaret = "[1.]" if i == 0 else "[2.]" if i == 1 else "[3.]" if i == 2 else "[AL]" if b["karar"] == "AL" else "[ ]"

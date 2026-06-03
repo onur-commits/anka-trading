@@ -7,10 +7,8 @@ Veri İşleyici
 """
 
 import pandas as pd
-import numpy as np
 import re
 from io import BytesIO
-from pathlib import Path
 
 # BIST 100 hisselerinin Yahoo Finance tickerları
 BIST_TICKERS = [

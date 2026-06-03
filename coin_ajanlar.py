@@ -7,9 +7,6 @@ Binance + Whale Alert + Alternative.me + Reddit
 
 import requests
 import numpy as np
-import pandas as pd
-import time
-from datetime import datetime
 
 
 # ================================================================
@@ -64,7 +61,7 @@ class FundingAgent:
                     detay.append(f"L/S:{long_ratio:.0%}/{short_ratio:.0%}")
 
         except Exception as e:
-            detay.append(f"Veri hatası")
+            detay.append("Veri hatası")
 
         return max(0, min(100, puan)), " ".join(detay)
 
@@ -205,7 +202,7 @@ class LiquidationAgent:
                     puan -= 15  # Herkes long → riskli
                     detay.append(f"Long artış:{degisim:+.2%}→KALABALIK⚠️")
                 else:
-                    detay.append(f"L/S stabil")
+                    detay.append("L/S stabil")
 
             # Open Interest
             r2 = requests.get("https://fapi.binance.com/fapi/v1/openInterest",

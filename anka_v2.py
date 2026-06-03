@@ -10,16 +10,11 @@ En az N ajan onaylamalı (rejime göre değişir).
 Sabah 08:45'te otomatik çalışır.
 """
 
-import pandas as pd
 import numpy as np
 import yfinance as yf
-import json
-import os
 import sys
 import subprocess
 import platform
-import time
-from datetime import datetime
 from pathlib import Path
 
 PROJECT_DIR = Path(__file__).parent
@@ -275,7 +270,7 @@ class MacroAgent:
 
                     if sp_son < sp_sma200:
                         puan -= 15
-                        detay.append(f"S&P:SMA200 altı❌")
+                        detay.append("S&P:SMA200 altı❌")
                     if sp_chg < -1.0:
                         puan -= 10
                         detay.append(f"S&P:{sp_chg:+.1f}%❌")
@@ -477,7 +472,7 @@ class AnkaBrain:
             if macro < 40:
                 konusma.append(f"🌍 Macro: UYARI! Piyasa kötü ({macro})")
                 if rejim == "BEAR":
-                    konusma.append(f"🌍 Macro: Bear'de bu sinyal TUZAK olabilir → VETO")
+                    konusma.append("🌍 Macro: Bear'de bu sinyal TUZAK olabilir → VETO")
                     carpan_ayar = 0  # Hard veto
                 else:
                     carpan_ayar *= 0.5
@@ -508,7 +503,7 @@ class AnkaBrain:
 
         # 5. HERKESİN PUANI YÜKSEK — güçlü konsensüs
         if all(p >= 60 for p in puanlar.values()):
-            konusma.append(f"🦅 KONSENSÜS: 4/4 ajan AL diyor → AGRESİF GİR!")
+            konusma.append("🦅 KONSENSÜS: 4/4 ajan AL diyor → AGRESİF GİR!")
             carpan_ayar *= 1.3
 
         return konusma, max(0, min(2.0, carpan_ayar))
@@ -523,7 +518,7 @@ class AnkaBrain:
         min_onay = self.MIN_ONAY[self.rejim]
         pos_carpan = self.POS_CARPAN[self.rejim]
 
-        print(f"\n🦅 ANKA V2 — Multi-Agent Karar Sistemi")
+        print("\n🦅 ANKA V2 — Multi-Agent Karar Sistemi")
         print("=" * 70)
         print(f"📊 REJİM: {self.rejim} (güven: %{self.rejim_guven:.0f})")
         print(f"   Ağırlık: {' | '.join(f'{k}:{v:.0%}' for k,v in agirliklar.items())}")
@@ -637,7 +632,7 @@ class AnkaBrain:
             if bombalar:
                 onaylanan, reddedilen = SektorFiltresi.filtrele(bombalar)
                 if reddedilen:
-                    print(f"\n🎓 PANEL SEKTÖR VETOsu:")
+                    print("\n🎓 PANEL SEKTÖR VETOsu:")
                     for t, s in reddedilen:
                         print(f"   ❌ {t} ({s}) — aynı sektörden çok fazla")
                 bombalar = onaylanan

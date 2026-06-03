@@ -19,11 +19,9 @@ import sys
 import json
 import time
 import warnings
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
 import yfinance as yf
 
 warnings.filterwarnings("ignore")
@@ -31,12 +29,11 @@ warnings.filterwarnings("ignore")
 sys.path.insert(0, str(Path(__file__).parent))
 
 from tahmin_motoru_v2 import (
-    EnsembleModelV2, feature_olustur_v2, market_rejim_tespit,
-    sektor_momentum_hesapla, hisse_analiz_v2, teknik_skor_v2,
-    atr_hesapla, FEATURE_COLS_V2,
+    EnsembleModelV2, market_rejim_tespit,
+    sektor_momentum_hesapla, hisse_analiz_v2, atr_hesapla,
 )
 from risk_yonetimi import RiskYoneticisi
-from haber_sentiment import haberleri_analiz_et, hisse_sentiment_al
+from haber_sentiment import haberleri_analiz_et
 
 DATA_DIR = Path(__file__).parent / "data"
 DATA_DIR.mkdir(exist_ok=True)
@@ -149,7 +146,7 @@ def rapor_yazdir(sonuclar, rejim, sektor_mom, sentiment, risk):
     """Terminale güzel formatlanmış rapor."""
     print()
     print("═" * 70)
-    print(f"   🏆 BIST ALPHA V2 — TARAMA RAPORU")
+    print("   🏆 BIST ALPHA V2 — TARAMA RAPORU")
     print(f"   📅 {datetime.now().strftime('%Y-%m-%d %H:%M')}")
     print("═" * 70)
 
@@ -167,7 +164,7 @@ def rapor_yazdir(sonuclar, rejim, sektor_mom, sentiment, risk):
 
     # Sektör
     if sektor_mom:
-        print(f"\n   📊 Sektör Momentum (5g):")
+        print("\n   📊 Sektör Momentum (5g):")
         for s, m in sorted(sektor_mom.items(), key=lambda x: x[1]["mom_5"], reverse=True):
             emoji = "🟢" if m["mom_5"] > 1 else "🔴" if m["mom_5"] < -1 else "⚪"
             print(f"      {emoji} {s:12s} {m['mom_5']:+.1f}%")
@@ -279,7 +276,7 @@ def tek_tarama(sermaye=100_000):
 
     # 9. Kaydet
     sonuc_kaydet(sonuclar, rejim, sentiment)
-    print(f"\n💾 Sonuçlar kaydedildi: data/alpha_v2_sonuc.json")
+    print("\n💾 Sonuçlar kaydedildi: data/alpha_v2_sonuc.json")
 
     return sonuclar
 

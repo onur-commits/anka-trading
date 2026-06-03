@@ -5,9 +5,7 @@ Her saat çalışır. Gün içi veriyle hacim karşılaştırması yapar.
 Sabah, öğlen, akşam — her zaman bomba bulabilir.
 """
 
-import pandas as pd
 import yfinance as yf
-import os
 import sys
 import subprocess
 import platform
@@ -248,7 +246,7 @@ def anka_tara(symbol_list=None, ml_model=None):
 
     # En yüksek skorlular (bomba olmasa bile göster)
     detaylar.sort(key=lambda x: x["skor"], reverse=True)
-    logger.info(f"\n📊 Top 10 (bomba olmayanlar dahil):")
+    logger.info("\n📊 Top 10 (bomba olmayanlar dahil):")
     for d in detaylar[:10]:
         emoji = "💣" if d["bomba"] else "  "
         logger.info(f"  {emoji} {d['ticker']:6} | ML:{d['ml']:.2f} | Hacim:x{d['hacim']:.1f} | Skor:{d['skor']:.0f} | Gün:{d['gunluk']:+.1f}%")

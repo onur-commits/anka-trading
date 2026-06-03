@@ -12,7 +12,6 @@ Mac'ten çalışır, Parallels üzerinden Windows'u kontrol eder.
 import subprocess
 import time
 import sys
-import os
 from pathlib import Path
 
 STRATEGIES = {

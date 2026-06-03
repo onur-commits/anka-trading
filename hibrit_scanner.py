@@ -5,7 +5,6 @@ ML + Teknik + Veto sistemi ile bomba hisse bulucu.
 Sonuçları C:\Robot\aktif_bombalar.txt'ye yazar.
 """
 
-import pandas as pd
 import yfinance as yf
 import os
 import sys
@@ -140,7 +139,7 @@ if __name__ == "__main__":
     print("ML model yükleniyor...")
     model = ml_model_yukle()
     if model:
-        print(f"✅ ML model yüklendi")
+        print("✅ ML model yüklendi")
     else:
         print("⚠️ ML model bulunamadı — sadece teknik filtre")
     bombalar = hibrit_v3_scanner(BIST50, ml_model=model)

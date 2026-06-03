@@ -293,7 +293,7 @@ def feature_sec(X, y, max_feature=25, korelasyon_esik=0.90):
 def model_egit(X, y):
     """XGBoost + LightGBM ensemble eğit."""
     from sklearn.model_selection import train_test_split
-    from sklearn.metrics import classification_report, roc_auc_score
+    from sklearn.metrics import roc_auc_score
 
     # Train/test split
     X_train, X_test, y_train, y_test = train_test_split(
@@ -342,7 +342,7 @@ def model_egit(X, y):
         # Feature importance
         if 'xgb' in models:
             imp = pd.Series(models['xgb'].feature_importances_, index=X.columns)
-            print(f"\n📊 En önemli özellikler:")
+            print("\n📊 En önemli özellikler:")
             for feat, score in imp.nlargest(10).items():
                 print(f"  {feat}: {score:.4f}")
 

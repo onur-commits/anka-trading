@@ -38,7 +38,6 @@ Kullanım:
 import json
 import time
 import os
-import sys
 import hmac
 import hashlib
 import logging
@@ -46,7 +45,7 @@ import argparse
 import requests
 import numpy as np
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 from dotenv import load_dotenv
 

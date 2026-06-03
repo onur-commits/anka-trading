@@ -7,7 +7,6 @@ komisyon dahil net kâr hesabı gösterir, nihai karar verir.
 """
 
 import sys
-import json
 import warnings
 from datetime import datetime
 from pathlib import Path
@@ -214,10 +213,10 @@ def techno_analiz(teknik):
     # MACD
     if teknik["macd_yonu"] == "YUKARI":
         puan += 10
-        gorusler.append(f"✅ MACD sinyal üstünde — alım sinyali")
+        gorusler.append("✅ MACD sinyal üstünde — alım sinyali")
     else:
         puan -= 10
-        gorusler.append(f"❌ MACD sinyal altında — satım sinyali")
+        gorusler.append("❌ MACD sinyal altında — satım sinyali")
 
     # Bollinger
     bd = teknik["boll_durum"]

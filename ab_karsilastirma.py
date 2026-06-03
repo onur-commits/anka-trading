@@ -15,7 +15,6 @@ from __future__ import annotations
 import argparse
 import json
 import os
-import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -134,7 +133,7 @@ def snapshot_al():
             "bh_baslangic_usdt": bh_baslangic,
             "bot_baslangic_deger": bot_deger,
         }
-        print(f"[T0] Başlangıç kaydedildi (adil karşılaştırma — eşit sermaye).")
+        print("[T0] Başlangıç kaydedildi (adil karşılaştırma — eşit sermaye).")
         print(f"     B&H tarafı:  ${bh_baslangic:.2f} → {bh_btc_miktar:.6f} BTC @ ${btc_fiyat:.2f}")
         print(f"     Bot tarafı:  ${bot_deger:.2f}")
 
@@ -186,8 +185,8 @@ def rapor_uret():
     lines.append("")
     lines.append("## Anlık Skor")
     lines.append("")
-    lines.append(f"| Strateji | Başlangıç | Şu an | Getiri |")
-    lines.append(f"|---|---:|---:|---:|")
+    lines.append("| Strateji | Başlangıç | Şu an | Getiri |")
+    lines.append("|---|---:|---:|---:|")
     lines.append(f"| **Bot** (mevcut momentum) | ${t0['bot_baslangic_deger']:.2f} | ${son['bot_deger']:.2f} | **{son_bot_pct:+.2f}%** |")
     lines.append(f"| **BTC B&H** | ${t0['bh_baslangic_usdt']:.2f} | ${son['bh_deger']:.2f} | **{son_bh_pct:+.2f}%** |")
     lines.append(f"| **Fark** | | | {son_bot_pct - son_bh_pct:+.2f} puan |")

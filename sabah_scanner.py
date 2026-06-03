@@ -396,7 +396,7 @@ def tarama_yap(top_n=5, ml_esik=0.55):
               f"Fiyat:{s['fiyat']:8.2f}TL | 5g:{s['getiri_5g']:+.1f}%")
 
     print(f"\n📁 Sonuçlar: {OUTPUT_FILE}")
-    print(f"⚡ Bu hisseleri Matriks IQ'ya ekle: MaxPositionValue = 10000 TL\n")
+    print("⚡ Bu hisseleri Matriks IQ'ya ekle: MaxPositionValue = 10000 TL\n")
 
     return secilen, tum_df
 
@@ -424,7 +424,7 @@ if __name__ == "__main__":
                         combined = pd.concat(all_features, ignore_index=True)
                         sonuc = model.egit(combined)
                         if sonuc:
-                            print(f"\nModel eğitildi (V2 Ensemble)!")
+                            print("\nModel eğitildi (V2 Ensemble)!")
                             print(f"   Doğruluk  : %{sonuc.get('dogruluk', 0)*100:.1f}")
                             print(f"   F1 Skoru  : {sonuc.get('f1', 0):.3f}")
                             print(f"   Precision : {sonuc.get('precision', 0):.3f}")

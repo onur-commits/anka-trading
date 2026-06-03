@@ -18,14 +18,12 @@ Key yoksa yfinance fallback kullanılır.
 
 import os
 import time
-import requests
 import numpy as np
 import pandas as pd
 import yfinance as yf
 import warnings
 from pathlib import Path
 from datetime import datetime, timedelta
-from functools import lru_cache
 
 warnings.filterwarnings("ignore")
 
@@ -394,7 +392,7 @@ if __name__ == "__main__":
         features = makro_feature_hesapla(makro, xu_index)
         print(f"\n📈 Makro feature'lar: {features.shape[1]} sütun, {len(features)} satır")
         print(f"  Mevcut feature'lar: {[c for c in features.columns if features[c].notna().sum() > 100]}")
-        print(f"\n  Son değerler:")
+        print("\n  Son değerler:")
         son = features.iloc[-1]
         for col in features.columns:
             if pd.notna(son[col]):

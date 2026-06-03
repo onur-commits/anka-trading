@@ -22,7 +22,7 @@ from __future__ import annotations
 
 import logging
 from pathlib import Path
-from typing import Optional, Union
+from typing import Optional
 
 from tahmin_motoru_v2 import EnsembleModelV2, hisse_analiz_v2
 

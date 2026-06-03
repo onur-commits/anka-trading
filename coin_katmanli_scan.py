@@ -309,7 +309,7 @@ def katmanli_tara():
     """500 coin, 2 katman, paralel tarama."""
     katman1, katman2 = coin_katmanlari_yukle()
 
-    print(f"\n🪙 KATMANLI TARAMA")
+    print("\n🪙 KATMANLI TARAMA")
     print(f"   Katman 1 (büyük): {len(katman1)} coin → Uzman analiz")
     print(f"   Katman 2 (küçük): {len(katman2)} coin → Keşif analiz")
     print("=" * 70)
@@ -344,7 +344,7 @@ def katmanli_tara():
     print(f"\n⏱️ {len(sonuc1)+len(sonuc2)} coin {sure:.1f} saniyede tarandı")
 
     print(f"\n{'='*70}")
-    print(f"📊 KATMAN 1 — TOP 15 BÜYÜK COİN (Uzman Analiz)")
+    print("📊 KATMAN 1 — TOP 15 BÜYÜK COİN (Uzman Analiz)")
     print(f"{'='*70}")
     for i, s in enumerate(sonuc1[:15]):
         emoji = "🥇" if i == 0 else "🥈" if i == 1 else "🥉" if i == 2 else "🔥" if s["skor"] >= 70 else "⚪"
@@ -353,7 +353,7 @@ def katmanli_tara():
         print(f"  {i+1:3}. {emoji} {s['symbol']:15} ${s['fiyat']:>10} | Skor:{s['skor']:3} | {s['evre']:14} | 24s:{s['degisim_24s']:+5.1f}% | Hcm:x{s['hacim_x']:4.1f}{funding_txt}{ba_txt}")
 
     print(f"\n{'='*70}")
-    print(f"💎 KATMAN 2 — TOP 15 KÜÇÜK/YENİ COİN (Keşif)")
+    print("💎 KATMAN 2 — TOP 15 KÜÇÜK/YENİ COİN (Keşif)")
     print(f"{'='*70}")
     for i, s in enumerate(sonuc2[:15]):
         emoji = "💎" if s["skor"] >= 60 else "🔍" if s["skor"] >= 40 else "⚪"

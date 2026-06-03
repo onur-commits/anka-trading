@@ -317,7 +317,7 @@ def main() -> int:
             secim = _ask_yes_no(prompt)
 
         if not secim:
-            print(f"     atlandı.")
+            print("     atlandı.")
             atlanan_sayisi += 1
             continue
 
@@ -335,7 +335,7 @@ def main() -> int:
 
         if args.dry_run:
             kayit["durum"] = "dry-run"
-            print(f"     DRY-RUN: redeem isteği gönderilmedi.")
+            print("     DRY-RUN: redeem isteği gönderilmedi.")
             transfer_sayisi += 1
         else:
             try:

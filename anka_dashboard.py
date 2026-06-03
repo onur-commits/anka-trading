@@ -12,11 +12,9 @@
 
 import streamlit as st
 import json
-import os
-import time
+import sys
 import subprocess
 import platform
-import numpy as np
 import pandas as pd
 import yfinance as yf
 from datetime import datetime
@@ -328,7 +326,7 @@ with tab1:
                     sinyal_bar = -int(min(100, (1 - stop_mesafe / hard_stop_pct) * 100))
 
                     if kz_pct >= profit_trigger_pct:
-                        sinyal_mesafe += f" | 🎯 Trailing aktif!"
+                        sinyal_mesafe += " | 🎯 Trailing aktif!"
                 else:
                     # Pozisyonda değil — değişime göre basit sinyal
                     if detay["degisim"] > 2:
@@ -565,7 +563,7 @@ with tab4:
         rows = []
         for sym in coins_quick:
             try:
-                r = req.get(f"https://api.binance.com/api/v3/ticker/24hr", params={"symbol": sym}, timeout=5)
+                r = req.get("https://api.binance.com/api/v3/ticker/24hr", params={"symbol": sym}, timeout=5)
                 d = r.json()
                 rows.append({
                     "Coin": sym.replace("USDT",""),

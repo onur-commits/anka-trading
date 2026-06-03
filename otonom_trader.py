@@ -26,8 +26,6 @@ import schedule
 from datetime import datetime
 from pathlib import Path
 
-import numpy as np
-import pandas as pd
 import yfinance as yf
 
 warnings.filterwarnings("ignore")
@@ -37,12 +35,11 @@ sys.path.insert(0, str(BASE_DIR))
 
 from tahmin_motoru_v2 import (
     EnsembleModelV2, feature_olustur_v2, market_rejim_tespit,
-    sektor_momentum_hesapla, hisse_analiz_v2, atr_hesapla,
+    hisse_analiz_v2, atr_hesapla,
 )
-from risk_yonetimi import RiskYoneticisi
 from haber_sentiment import haberleri_analiz_et
 from gunluk_bomba import (
-    TICKERS, bomba_skor_hesapla, iq_kodu_uret, stop_hesapla,
+    TICKERS, bomba_skor_hesapla, iq_kodu_uret,
 )
 from piyasa_takvim import sadece_bist_acikken, bist_acik_mi
 
@@ -269,7 +266,7 @@ def _trade_log_yaz(kayit):
                     trades = json.load(f)
             except (json.JSONDecodeError, ValueError):
                 # Eski yazma kesilmis olabilir — bozuk JSON'u sifirla, log yazmaya devam et
-                log(f"Trade log JSON bozuk, sifirlaniyor", "WARN")
+                log("Trade log JSON bozuk, sifirlaniyor", "WARN")
                 trades = []
         trades.append(kayit)
         trades = trades[-500:]  # son 500 kayıt
@@ -994,7 +991,7 @@ def tek_dongu():
     log("🚀 TEK DÖNGÜ")
     gorev_05_30_egitim()
     gorev_08_30_tarama()
-    gorev_08_50_iq_hazirla()
+    gorev_08_50_iq_kontrol()
     gorev_09_35_acilis()
     gorev_10_00_ilk_yarim_saat()
     gorev_12_00_ogle()

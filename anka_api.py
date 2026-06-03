@@ -10,8 +10,6 @@ Protokol: JSON + char(11) sonlandırıcı
 
 import socket
 import json
-import time
-import os
 from datetime import datetime
 from pathlib import Path
 

@@ -10,11 +10,10 @@ BIST ALPHA V2 — Türkçe Haber Sentiment Analizi
 import re
 import json
 import warnings
-from datetime import datetime, timedelta
+from datetime import datetime
 from pathlib import Path
 
 import numpy as np
-import pandas as pd
 
 warnings.filterwarnings("ignore")
 

@@ -5,23 +5,18 @@ Streamlit multi-page: pages/1_🏆_Alpha_V2.py
 
 import streamlit as st
 import pandas as pd
-import numpy as np
 import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-from datetime import datetime
 from pathlib import Path
-import json
 import sys
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from tahmin_motoru_v2 import (
-    EnsembleModelV2, feature_olustur_v2, market_rejim_tespit,
-    sektor_momentum_hesapla, hisse_analiz_v2, teknik_skor_v2,
-    atr_hesapla, FEATURE_COLS_V2, SEKTOR_HISSELERI,
+    EnsembleModelV2, market_rejim_tespit,
+    sektor_momentum_hesapla, hisse_analiz_v2, atr_hesapla,
 )
 from risk_yonetimi import RiskYoneticisi
-from haber_sentiment import haberleri_analiz_et, hisse_sentiment_al
+from haber_sentiment import haberleri_analiz_et
 
 st.set_page_config(page_title="BIST ALPHA V2", page_icon="🏆", layout="wide")
 
