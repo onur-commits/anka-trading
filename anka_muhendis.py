@@ -246,7 +246,7 @@ def kontrol_dashboard():
                 cmdline = " ".join(proc.info.get("cmdline") or [])
                 if "streamlit" in cmdline and "app.py" in cmdline:
                     sonuc["bist"] = True
-                if "streamlit" in cmdline and "coin_dashboard" in cmdline:
+                if False:  # coin_dashboard kaldirildi (kullanici 'coin'le isimiz yok')
                     sonuc["coin"] = True
             except Exception:
                 continue
@@ -656,9 +656,8 @@ def onar_dashboard(hangisi):
     """Çökmüş dashboard'ı yeniden başlat."""
     if hangisi == "bist":
         cmd = 'start /B streamlit run C:\\ANKA\\app.py --server.port 8501 --server.headless true --server.address 0.0.0.0'
-    elif hangisi == "coin":
-        cmd = 'start /B streamlit run C:\\ANKA\\coin_dashboard.py --server.port 8502 --server.headless true --server.address 0.0.0.0'
     else:
+        # 'coin' dashboard kaldirildi — sadece BIST geri yuklenir
         return False
 
     try:
@@ -780,11 +779,34 @@ def saglik_raporu():
 # ZAMANLAYICI
 # ============================================================
 
+HEARTBEAT_FILE = DATA_DIR / "muhendis_heartbeat.json"
+
+
+def heartbeat_yaz(durum="OK", ekstra=None):
+    """Disaridan 'muhendis canli mi' anlasilsin diye her dongude json yaz."""
+    try:
+        import os as _os
+        veri = {
+            "zaman": datetime.now().isoformat(timespec="seconds"),
+            "pid": _os.getpid(),
+            "durum": durum,
+        }
+        if ekstra:
+            veri.update(ekstra)
+        tmp = HEARTBEAT_FILE.with_suffix(".json.tmp")
+        with open(tmp, "w", encoding="utf-8") as f:
+            json.dump(veri, f, ensure_ascii=False, indent=2)
+        _os.replace(tmp, HEARTBEAT_FILE)
+    except Exception:
+        pass
+
+
 def bakim_dongusu():
     """Her 30 dakikada bir temel kontrol, günde 2 kere tam rapor."""
     log("=" * 50, "INFO", "SISTEM")
     log("ANKA Mühendis başlatıldı — otonom bakım aktif", "INFO", "SISTEM")
     log("=" * 50, "INFO", "SISTEM")
+    heartbeat_yaz("BASLATILDI")
 
     # İlk kontrol
     saglik_raporu()
@@ -798,12 +820,15 @@ def bakim_dongusu():
     while True:
         try:
             schedule.run_pending()
+            heartbeat_yaz("DONGU")
             time.sleep(60)
         except KeyboardInterrupt:
             log("Mühendis durduruldu", "WARNING", "SISTEM")
+            heartbeat_yaz("DURDURULDU")
             break
         except Exception as e:
             log(f"Döngü hatası: {e}", "ERROR", "SISTEM")
+            heartbeat_yaz("HATA", {"hata": str(e)[:200]})
             time.sleep(300)
 
 
@@ -817,8 +842,6 @@ def hizli_kontrol():
             log(s, "WARNING", "DASHBOARD")
         if not dash["bist"]:
             onar_dashboard("bist")
-        if not dash["coin"]:
-            onar_dashboard("coin")
 
     # IQ Strateji kontrolü
     iq = kontrol_iq_stratejiler()

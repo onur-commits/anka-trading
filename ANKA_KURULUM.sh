@@ -50,7 +50,6 @@ dashboard_baslat() {
 }
 
 dashboard_baslat app.py 8501 logs/bist_dashboard.log logs/bist_dashboard.pid
-dashboard_baslat coin_dashboard.py 8502 logs/coin_dashboard.log logs/coin_dashboard.pid
 
 echo ""
 echo "ANKA hazir."
