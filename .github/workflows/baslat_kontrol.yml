@@ -42,6 +42,11 @@ jobs:
           } else { Write-Output '(python prosesi YOK)' }
           Write-Output '```'
           Write-Output ''
+          Write-Output '## start_otonom.bat son cikti logu (calisti mi / hata mi?)'
+          Write-Output '```'
+          if (Test-Path C:\ANKA\logs\otonom_trader.out.log) { Get-Content C:\ANKA\logs\otonom_trader.out.log -Tail 40 } else { Write-Output '(otonom_trader.out.log YOK -> bat hic calismadi = Calistir basilmadi)' }
+          Write-Output '```'
+          Write-Output ''
           Write-Output '## otonom_trader calisiyor mu + hangi mod?'
           Write-Output '```'
           $ot = Get-CimInstance Win32_Process -Filter "Name='python.exe'" | Where-Object { $_.CommandLine -like '*otonom_trader*' }
