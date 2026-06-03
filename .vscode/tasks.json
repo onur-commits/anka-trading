@@ -40,6 +40,13 @@
       "type": "shell",
       "command": "set -a; [ -f .env ] && . ./.env; set +a; sshpass -p \"$VPS_PASSWORD\" ssh -o ConnectTimeout=10 -o StrictHostKeyChecking=no \"${VPS_USER:-Administrator}@${VPS_HOST:-78.135.87.29}\" \"hostname && echo SSH_OK\"",
       "problemMatcher": []
+    },
+    {
+      "label": "ANKA: VPS Panel Baslat (guvenli)",
+      "detail": "VPS panellerini kontrol eder; BIST dususse SADECE dashboard'lari baslatir (trader'a dokunmaz)",
+      "type": "shell",
+      "command": "bash scripts/vps_kontrol.sh",
+      "problemMatcher": []
     }
   ]
 }
