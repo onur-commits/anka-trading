@@ -1,7 +1,20 @@
 # ANKA Trading System - Claude Code Rehberi 
-. 
+.
+## ⚡ Oturum Baslangic Notu (kullanici talebi)
+- Bypass mode tercih ediliyor. Onay kutulariyla bogulmamak icin
+  Claude Code'u baslatirken `claude --permission-mode bypassPermissions`
+  kullan (veya `.claude/settings.json` icinde
+  `"defaultMode": "bypassPermissions"` ayarla).
+- HARD LIMIT: canli alim/satim tetikleme yasagi devam ediyor.
+  `.claude/settings.json` icindeki PreToolUse hook'u
+  `otonom_trader.py` cagrilarinda `--dry-run/--paper/--tara/--durum`
+  bayraklarini zorlar — bu hook bypass'la bile aktiftir, korunur.
+- Kullanici "coin'le isimiz yok" dedi: focus BIST. Coin modulleri
+  (coin_otonom_trader, coin_strateji vs.) repodadir ama UI ve
+  startup'tan cikarildi.
+.
 ## Sistem Ozeti 
-ANKA, BIST (Borsa Istanbul) ve Kripto (Binance) icin otonom trading sistemidir. 
+ANKA, BIST (Borsa Istanbul) icin otonom trading sistemidir.
 VPS uzerinde 7/24 calisir. Mac'ten SSH ile yonetilebilir. 
 . 
 ## VPS Bilgileri 
