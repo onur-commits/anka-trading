@@ -253,7 +253,7 @@ MIDAS_BROKAGE_ID = "115"
 # Risk parametreleri (bot config)
 MAX_POZISYON_SAYISI = 3           # Aynı anda max pozisyon
 MAX_POZISYON_TL = 20000           # Pozisyon başına max TL
-MIN_BOMBA_SKOR_ALIS = 35          # Alış için min skor (canlı test için gevşetildi)
+MIN_BOMBA_SKOR_ALIS = 25          # Alış için min skor (kullanıcı talebiyle 35->25 düşürüldü, 2026-06-03)
 
 # ── BEYIN DANISMANI (opsiyonel, VARSAYILAN KAPALI) ──────────
 # anka_beyin.py'nin 4 katmanli rejim analizini alim filtresi olarak baglar.
