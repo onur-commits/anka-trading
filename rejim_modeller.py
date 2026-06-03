@@ -50,7 +50,7 @@ def _rejim_etiketle(xu100_df, pencere=50):
 
     # Volatilite
     vol = close.pct_change().rolling(20).std() * np.sqrt(252)
-    vol_med = vol.rolling(100).median()
+    vol.rolling(100).median()
 
     rejimler = pd.Series("sideways", index=close.index)
 

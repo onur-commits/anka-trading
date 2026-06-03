@@ -255,7 +255,7 @@ def gunluk_kontrol():
 
     # 1. Sonuclari guncelle
     print("\n1. Tahmin sonuclari guncelleniyor...")
-    n = sonuc_guncelle()
+    sonuc_guncelle()
 
     # 2. Rapor
     print("\n2. Performans raporu:")

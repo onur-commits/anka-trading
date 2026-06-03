@@ -90,10 +90,6 @@ def dca_calistir(bars_btc, bars_eth, varyant: str):
             son_hafta_no = hafta_no
 
     # RSI için kapanış listesi
-    btc_kapanis = []
-    eth_kapanis = []
-    btc_idx = 0
-    eth_idx = 0
 
     btc_coin = 0.0
     eth_coin = 0.0

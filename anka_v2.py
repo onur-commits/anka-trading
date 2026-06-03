@@ -44,8 +44,8 @@ class TechnoAgent:
         c = df['Close'].squeeze()
         h = df['High'].squeeze()
         l = df['Low'].squeeze()
-        o = df['Open'].squeeze()
-        v = df['Volume'].squeeze()
+        df['Open'].squeeze()
+        df['Volume'].squeeze()
 
         puan = 0
         detay = []

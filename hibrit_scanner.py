@@ -98,7 +98,7 @@ def hibrit_v3_scanner(symbol_list, ml_model=None):
             if is_bomba:
                 bombalar.append(s)
 
-        except Exception as e:
+        except Exception:
             continue
 
     # Dosyaya yaz

@@ -91,7 +91,7 @@ def hisse_puanla(sembol):
         son_ema21   = float(ema21.iloc[-1])
         son_ema50   = float(ema50.iloc[-1])
         son_rsi     = float(rsi14.iloc[-1])
-        son_atr     = float(atr14.iloc[-1])
+        float(atr14.iloc[-1])
         son_hacim   = float(volume.iloc[-1])
         ort_hacim   = float(vol_ma20.iloc[-1])
 
@@ -195,7 +195,7 @@ def hisse_puanla(sembol):
             "detay": detay,
         }
 
-    except Exception as e:
+    except Exception:
         return None
 
 
