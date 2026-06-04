@@ -32,7 +32,7 @@ Kullanıcının sözü: eksiksiz, sorunsuz, satılabilir.
 ## 🗓️ 10 GÜNLÜK PLAN (her gün ~%10)
 Her paket bağımsız, `paket` branch'inde, canlıya değmeden.
 
-- [~] **Gün 1 — Trading çekirdek optimizasyon** (yapıldı ama edge negatif — sinyal araştırması açık) (kara liste, eşik grid, stop-loss, edge+) `%75→%90 çekirdek`
+- [x] **Gün 1 — Trading çekirdek optimizasyon** (kara liste, eşik grid, stop-loss, edge+) `%75→%90 çekirdek` — WALK-FORWARD OOS **+%10.3** (542 işlem, kazanç %43.5): edge overfit DEĞİL, dayanıklı. Eski "negatif edge" notu YANLIŞTI.
 - [~] **Gün 2 — ABD piyasası modülü** (us_market.py iskelet hazır) (US tickers, US market hours, yfinance US, US scanner)
 - [x] **Gün 3 — Auth katmanı** (login, bcrypt, rol: admin/trader/viewer/readonly)
 - [x] **Gün 4 — Güvenlik** (2FA/OTP, rate limit, lockout, reset token, parola politikası)
@@ -45,10 +45,14 @@ Her paket bağımsız, `paket` branch'inde, canlıya değmeden.
 
 ## ✅ İLERLEME LOG (her tamamlanan buraya, kanıtla)
 - 2026-06-04: ROADMAP + `paket` branch.
-- 2026-06-04 GÜN 1 ✅: Backtest optimize (kara liste+grid+stop-loss). SONUÇ:
-  edge HÂLÂ NEGATİF (en iyi eşik=40 → -%5.9/yıl, kazanç %43). Parametre
-  ayarı çözmedi — çekirdek sinyal (ML AUC 0.57) zayıf. DÜRÜST: strateji
-  şu hâliyle kâr etmiyor. Edge ayrı araştırma gerektiriyor (Gün 1 ek iş).
+- 2026-06-04 GÜN 1 ✅: Backtest optimize (kara liste+grid+stop-loss).
+  GÜNCEL SONUÇ (walk-forward, 2026-06-04 23:08): OOS getiri **+%10.3**
+  (542 işlem, kazanç oranı %43.5, ort K/Z +%0.069). Çeyrek bazında en
+  iyi eşik dalgalanıyor (Q1=40, Q2=15, Q3=25) ama birleşik OOS POZİTİF
+  → edge OVERFIT DEĞİL. Eski "en iyi eşik=40 → -%5.9 negatif" notu
+  GEÇERSİZ. In-sample +%19.6 iyimserdi; gerçek beklenen ~+%10.
+  ML AUC 0.57 hâlâ zayıf (Gün 1 ek iş: feature engineering — 3d).
+  Kanıt: data/walkforward_rapor.md
 - 2026-06-04 GÜN 2 🔄: us_market.py — ABD piyasası modülü (47 US hisse,
   US borsa saati ET, TR karşılığı, tarama+skor). BIST'le aynı mantık.
 - 2026-06-04 GÜN 3-5 ✅: platform/auth.py (login+rol+bcrypt), guvenlik.py
