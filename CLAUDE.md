@@ -372,3 +372,15 @@ Deney 2026-05-19'da bitmesi gerekiyordu, 16 gun gec degerlendirildi.
 ### Ogrenme (gelecek A/B icin)
 - Sermaye DONDURULMALI: deney suresince deposit/withdraw YOK, yoksa karsilastirma cope.
 - Para akisi olacaksa net-flow-adjusted getiri (TWR/MWR) hesabi sart.
+
+## Altyapi Durumu — 2026-06-04 (Claude Code)
+- **Para Binance'den tamamen cekildi (2026-06-04):** Spot $0.18 (toz) + Earn $0
+  (Flexible bos). Onur'un karari, dogrulandi. KAYIP YOK — para baska yere cekildi.
+- **ANKA_Bot (coin) NSSM servisi DURDURULDU:** `coin_otonom.py` calistiriyordu.
+  Hesap bos oldugu icin durduruldu + START_TYPE manuel'e cekildi (reboot'ta
+  otomatik gelmez). GERI ACMAK: `sc config ANKA_Bot start= auto && sc start ANKA_Bot`.
+  (NSSM yolu: C:\nssm\nssm.exe)
+- **BIST dashboard 8501 manuel baslatildi:** `_dash_bist.bat` (streamlit run app.py
+  --server.headless true --server.address 0.0.0.0 --server.port 8501).
+  Aktif: http://78.135.87.29:8501 (HTTP 200 dogrulandi). Detached WMI ile baslatildi.
+- **BIST otonom_trader.py:** SAGLIKLI calisiyor (NSSM degil, ayri proses). Dokunulmadi.

@@ -61,6 +61,14 @@ Her paket bağımsız, `paket` branch'inde, canlıya değmeden.
   AÇIK: edge negatif (strateji kârı yok) + modüller ana app'e entegre
   edilmedi (auth app.py'ye bağlanmalı) — 'birleştir' öncesi yapılacak.
 
+## 🛠️ ALTYAPI DURUMU (2026-06-04, Claude Code)
+- **Para Binance'den tamamen çekildi:** Spot $0.18 (toz) + Earn $0. Onur'un kararı,
+  kayıp YOK. Coin tarafı pratikte sermayesiz.
+- **ANKA_Bot (coin) NSSM servisi DURDURULDU** + manuel başlangıç. Geri açmak için:
+  `sc config ANKA_Bot start= auto && sc start ANKA_Bot`
+- **BIST dashboard 8501 manuel başlatıldı:** http://78.135.87.29:8501 aktif (HTTP 200).
+- **BIST otonom_trader.py** sağlıklı çalışıyor (ayrı proses, NSSM değil).
+
 ## 🔌 KÖR NOKTALAR (Claude göremez — bkz DURUM.md)
 - VPS canlı görüntü yok (sadece durum.yml ~10dk foto)
 - Eski Cowork oturumları boş (data/eski_oturumlar/ doldurulmadı)
