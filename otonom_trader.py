@@ -534,6 +534,12 @@ def gorev_09_05_otonom_alis():
         log(f"Rapor okunamadı: {e}", "ERROR")
         return
 
+    # Bayat dosya koruması — dünün listesini bugün alma
+    bugun = datetime.now().strftime("%Y-%m-%d")
+    if rapor.get("tarih") != bugun:
+        log(f"Rapor bugüne ait değil (tarih={rapor.get('tarih')}, bugün={bugun}) — alış atlandı", "WARN")
+        return
+
     bombalar = rapor.get("bombalar", [])
     if not bombalar:
         log("Bu sabah bomba yok, alış atlandı")
@@ -686,6 +692,34 @@ def gorev_05_30_egitim():
         log(f"  HATA: {e}", "ERROR")
 
 
+def _gunluk_bomba_yaz(top5, rejim):
+    """gunluk_bomba.json yaz — gorev_09_05_otonom_alis'in okuduğu şema.
+    Tarama state_kaydet ile otonom_state.json'a yazıyordu ama alış buradan
+    okuyor + 'bomba_skor'/'sebepler' anahtarlarını bekliyor (eski 'skor'
+    uyumsuzdu → bot ~1 ay alım yapamadı). Bu fonksiyon ikisini eşleştirir."""
+    rapor = {
+        "tarih": datetime.now().strftime("%Y-%m-%d"),
+        "rejim": rejim,
+        "bombalar": [
+            {"ticker": s["ticker"].replace(".IS", ""),
+             "bomba_skor": s["bomba_skor"],
+             "ml": round(s["ml"], 3),
+             "teknik": s.get("teknik", 0),
+             "fiyat": s["fiyat"],
+             "atr_pct": round(s.get("atr_pct", 0), 2),
+             "sebepler": s.get("sebepler", [])}
+            for s in top5
+        ],
+        "son_guncelleme": datetime.now().strftime("%H:%M"),
+    }
+    try:
+        with open(DATA_DIR / "gunluk_bomba.json", "w", encoding="utf-8") as f:
+            json.dump(rapor, f, ensure_ascii=False, indent=2)
+        log(f"  📝 gunluk_bomba.json yazıldı ({len(top5)} bomba)")
+    except Exception as e:
+        log(f"  ❌ gunluk_bomba.json yazılamadı: {e}", "ERROR")
+
+
 def gorev_08_30_tarama():
     """08:30 — Günün bombalarını bul + IQ kodları üret."""
     log("=" * 50)
@@ -745,10 +779,12 @@ def gorev_08_30_tarama():
             }
             state_kaydet(state)
             bomba_listesi_guncelle(uretilen)
+            _gunluk_bomba_yaz(top5, rejim)
             bildirim(f"Bombalar: {', '.join(uretilen)}")
         else:
             log("  ❌ Bugün bomba yok")
             bomba_listesi_guncelle([])
+            _gunluk_bomba_yaz([], rejim)
             bildirim("Bugün bomba hisse bulunamadı")
 
     except Exception as e:
