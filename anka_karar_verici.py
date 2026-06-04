@@ -78,7 +78,7 @@ class TeknikAI:
         # Bollinger
         sma20 = close.rolling(20).mean()
         std20 = close.rolling(20).std()
-        boll_poz = float((close.iloc[-1] - (sma20.iloc[-1] - 2*std20.iloc[-1])) /
+        float((close.iloc[-1] - (sma20.iloc[-1] - 2*std20.iloc[-1])) /
                          (4*std20.iloc[-1] + 1e-10))
 
         # Puanlama
@@ -232,7 +232,7 @@ class MomentumAI:
         # Momentum
         mom_1d = float((close.iloc[-1] / close.iloc[-2] - 1) * 100) if len(close) >= 2 else 0
         mom_5d = float((close.iloc[-1] / close.iloc[-6] - 1) * 100) if len(close) >= 6 else 0
-        mom_10d = float((close.iloc[-1] / close.iloc[-11] - 1) * 100) if len(close) >= 11 else 0
+        float((close.iloc[-1] / close.iloc[-11] - 1) * 100) if len(close) >= 11 else 0
 
         # İvme (momentum'un momentum'u)
         ivme = mom_1d - mom_5d / 5
@@ -306,7 +306,7 @@ class AnkaKararVerici:
             high = xu['High'].squeeze()
             low = xu['Low'].squeeze()
             tr = pd.concat([high-low, (high-close.shift()).abs(), (low-close.shift()).abs()], axis=1).max(axis=1)
-            atr14 = tr.rolling(14).mean()
+            tr.rolling(14).mean()
 
             son = float(close.iloc[-1])
             s20 = float(sma20.iloc[-1])
@@ -316,7 +316,7 @@ class AnkaKararVerici:
             chg_20d = float((close.iloc[-1] / close.iloc[-20] - 1) * 100)
 
             # Volatilite
-            vol = float(close.pct_change().rolling(20).std().iloc[-1] * 100)
+            float(close.pct_change().rolling(20).std().iloc[-1] * 100)
 
             # Rejim tespiti
             if son > s20 > s50 and chg_20d > 2:

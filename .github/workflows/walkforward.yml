@@ -1,0 +1,22 @@
+name: Walk-Forward Dogrulama
+on:
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  wf:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: paket
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -q yfinance pandas numpy scikit-learn xgboost lightgbm joblib
+      - run: export PYTHONUTF8=1 && python -X utf8 walkforward.py 2>&1 | tail -40
+      - run: |
+          git config user.name "anka-bot"; git config user.email "actions@github.com"
+          git add data/walkforward_rapor.md
+          git diff --staged --quiet || { git commit -m "Walk-forward sonucu"; git push origin paket; }

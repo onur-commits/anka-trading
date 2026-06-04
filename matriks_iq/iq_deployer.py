@@ -74,7 +74,7 @@ def copy_files_to_windows():
     print("📁 Dosyalar Windows'a kopyalanıyor...")
     run_win(f'mkdir "{WIN_DEPLOY_DIR}" 2>nul')
 
-    base = Path(__file__).parent
+    Path(__file__).parent
     for name, info in STRATEGIES.items():
         src = f'\\\\Mac\\Home\\adsız klasör\\borsa_surpriz\\matriks_iq\\{info["file"]}'
         dst = f'{WIN_DEPLOY_DIR}\\{info["file"]}'

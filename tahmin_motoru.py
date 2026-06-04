@@ -380,7 +380,7 @@ def walk_forward_validation(X, y, n_splits=5):
         model.fit(X_train, y_train)
 
         y_pred = model.predict(X_test)
-        y_prob = model.predict_proba(X_test)[:, 1]
+        model.predict_proba(X_test)[:, 1]
 
         sonuclar.append({
             "fold": i + 1,

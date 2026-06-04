@@ -638,7 +638,7 @@ def gorev_risk():
         # Portföy güncellemesi
         state = State.oku()
         aktif = state.get("aktif_stratejiler", [])
-        portfolio = PortfolioTracker.guncelle(aktif)
+        PortfolioTracker.guncelle(aktif)
 
         # IQ kontrol
         if WindowsBridge.iq_calisiyor_mu():

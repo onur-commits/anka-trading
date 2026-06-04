@@ -621,7 +621,6 @@ class EnsembleModelV2:
             print("  ⚠ LightGBM yüklü değil, XGBoost+MLP ile devam ediliyor.")
 
         # Makro feature hazırla (varsa)
-        makro_features_cache = {}
         if makro_veri:
             from makro_veri import makro_feature_hesapla, MAKRO_FEATURE_COLS
             print("  🏦 Makro veri katmanı aktif!")

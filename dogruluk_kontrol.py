@@ -113,13 +113,10 @@ class DogrulukKontrol:
             # DOĞRULUK DEĞERLENDİRME
             if sinyal["karar"] == "AL":
                 dogru = degisim > 0  # AL dediyse ve yükseldiyse doğru
-                kar_zarar = degisim
             elif sinyal["karar"] == "SAT":
                 dogru = degisim < 0  # SAT dediyse ve düştüyse doğru
-                kar_zarar = -degisim
             else:  # BEKLE
                 dogru = abs(degisim) < 2  # BEKLE dediyse ve fazla oynamadıysa doğru
-                kar_zarar = 0
 
             sinyal["kontrol_edildi"] = True
             sinyal["sonuc"] = {

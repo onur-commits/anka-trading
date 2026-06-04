@@ -1,7 +1,61 @@
 # ANKA Trading System - Claude Code Rehberi 
-. 
+.
+## ⏰ KALICI: SAAT REFERANSI = TÜRKİYE (kullanici talebi, degismez)
+- **TÜM ortamlar Türkiye saati (Europe/Istanbul, UTC+3) referans alir.**
+- Claude saat soyleyecekse DAIMA TR'ye cevirip soyler. UTC ham hali YAZMA.
+  Komut: `TZ=Europe/Istanbul date '+%H:%M'`
+- Workflow/script'lerde zaman: her zaman `TZ=Europe/Istanbul`.
+- VPS (Windows) Turkiye saatinde olmali; degilse `w32tm /resync`.
+- Borsa saatleri TR: acilis 10:00, gun sonu sat 17:30, kapanis 18:00.
+  Bot alim 09:05, ML egitim 05:30, tarama 08:30 — hepsi TR.
+- UTC↔TR: UTC + 3 saat = TR. (cron UTC yazilir: TR 09:00 = UTC 06:00)
+.
+## 🧠 KALICI AYAR — MODEL (kullanici talebi, degismez)
+- **VARSAYILAN MODEL: Opus 4.8 — 1M context** (`claude-opus-4-8[1m]`).
+- Her oturum bununla baslat. Daha kucuk modele DUSME.
+- Hafiza oturumlar arasi sifirlandigi icin bu not buraya yazildi:
+  yeni oturumda once bunu oku, model 4.8 1M degilse kullaniciya soyle.
+- Baslatma: `/model` ile Opus 4.8 sec, 1M context aktif olsun.
+.
+## ⚡ KALICI YETKI KURALI (kullanici talebi — tekrar sorma)
+Kullanici "yap / hadi / başla / devam / ok" dediginde = TAM YETKI.
+Asagidakileri TEKRAR SORMADAN yap (her seferinde onay isteme):
+- Dev/paket branch'e commit + push, kod yaz/duzelt/test, ruff/derleme
+- main'e DOKUMAN/araç/workflow commit (trading mantigi DISI)
+- Workflow tetikleme, durum cekme, backtest, tarama (emirsiz)
+- PR ac/merge (rutin)
+SADECE su 3 sey icin TEK kisa onay yeter (her adimda degil, bir kez):
+  1) Canli main'e TRADING MANTIGI degisikligi (otonom_trader emir kurallari)
+  2) Canli emir TETIKLEME (flag/restart-to-buy) — HARD LIMIT, kullanici eli
+  3) Parola/secret/izin sistemi degisikligi
+NOT: Auto-mode classifier (Claude Code guvenlik katmani) 1-2-3'u yine de
+bloke edebilir; o ZAMAN kullanici NET cumleyle onaylar (örn "main'e push
+et canli bota gitsin, sorumluluk benim"). Vague "yap" classifier'i gecmez.
+Bu kural: rutin iste sıfır friction, sadece geri-donulmez canli-para
+isinde tek net onay.
+.
+## ⚡ Oturum Baslangic Notu (kullanici talebi)
+- Bypass mode tercih ediliyor. Onay kutulariyla bogulmamak icin
+  Claude Code'u baslatirken `claude --permission-mode bypassPermissions`
+  kullan (veya `.claude/settings.json` icinde
+  `"defaultMode": "bypassPermissions"` ayarla).
+- HARD LIMIT: canli alim/satim tetikleme yasagi devam ediyor.
+  `.claude/settings.json` icindeki PreToolUse hook'u
+  `otonom_trader.py` cagrilarinda `--dry-run/--paper/--tara/--durum`
+  bayraklarini zorlar — bu hook bypass'la bile aktiftir, korunur.
+- Kullanici "coin'le isimiz yok" dedi: focus BIST. Coin modulleri
+  (coin_otonom_trader, coin_strateji vs.) repodadir ama UI ve
+  startup'tan cikarildi.
+- BEYIN DANISMANI: anka_beyin.py'nin rejim analizi otonom_trader'a
+  OPSIYONEL alim filtresi olarak baglandi. VARSAYILAN KAPALI
+  (otonom_trader.py: BEYIN_GATE_AKTIF=False) — bu sayede ANKA eskisi
+  gibi calisir. Acmak icin BEYIN_GATE_AKTIF=True yap; o zaman beyin
+  AYI(0.2)/KAOS(0.1) rejimlerinde otonom alisi atlar. Fail-open:
+  beyin verisi yok/bayat/bozuksa daima alima izin verir (ANKA bloke
+  olmaz). Esik: BEYIN_MIN_AGRESIFLIK (default 0.3).
+.
 ## Sistem Ozeti 
-ANKA, BIST (Borsa Istanbul) ve Kripto (Binance) icin otonom trading sistemidir. 
+ANKA, BIST (Borsa Istanbul) icin otonom trading sistemidir.
 VPS uzerinde 7/24 calisir. Mac'ten SSH ile yonetilebilir. 
 . 
 ## VPS Bilgileri 
@@ -308,3 +362,35 @@ Ayni adimlari tekrar calistirmak gerekirse:
 - Cowork Claude: alim/satim/transfer TETIKLEMEZ
 - Sadece script yazar, kullanici calistirir veya izleme altyapisi kurar
 - A/B deneyinde: bot dogal olarak kendi islemlerini yapar (zaten canli), Cowork sadece snapshot alir
+
+## A/B Deneyi KAPANISI — 2026-06-04 (Claude Code)
+Deney 2026-05-19'da bitmesi gerekiyordu, 16 gun gec degerlendirildi.
+
+### Sonuc: GECERSIZ (metodolojik basarisizlik)
+- **Sebep:** Bot tarafinda sermaye sabit tutulamadi. Para giris/cikisi karsilastirmayi kirletti:
+  - 2026-04-21: +~$556 USDT deposit (bot_deger $228 → $782 zipladi)
+  - 2026-05-29 06:20: bot ALLO pozisyonunu (~$1100) satti → ayni gun ~$1100 USDT hesaptan CEKILDI (Onur'un karari, dogrulandi 2026-06-04)
+  - Bot_deger zaman serisi $118 ile $1424 arasi savruldu — getiri degil, para akisi.
+- **B&H referansi (temiz, dokunulmadi):** $224.63 → ~$200 = **-%11** (44 gun, stabil).
+- **Bot:** Agresif dusuk-cap rotasyonu (ZK, ALLO vb.), yuksek oynaklik. Para akisi kirliligi nedeniyle ham %getiri B&H ile kiyaslanamaz → temiz kazanan ILAN EDILEMEZ.
+- **Yorum:** 2 yillik backtest'in "aktif strateji < B&H" bulgusuyla CELISMIYOR. Coin Onur'un asil odagi degil (focus = BIST).
+
+### Hesabin su anki durumu (2026-06-04)
+- Binance Spot pratikte BOS: toplam **$0.18** (XLM $0.16 + SOL $0.02 tozu). Para cekildi.
+- `ANKA_AB_Karsilastirma` scheduler 2026-06-04'te DISABLE edildi (her gun $0 snapshot aliyordu, anlamsiz).
+
+### Ogrenme (gelecek A/B icin)
+- Sermaye DONDURULMALI: deney suresince deposit/withdraw YOK, yoksa karsilastirma cope.
+- Para akisi olacaksa net-flow-adjusted getiri (TWR/MWR) hesabi sart.
+
+## Altyapi Durumu — 2026-06-04 (Claude Code)
+- **Para Binance'den tamamen cekildi (2026-06-04):** Spot $0.18 (toz) + Earn $0
+  (Flexible bos). Onur'un karari, dogrulandi. KAYIP YOK — para baska yere cekildi.
+- **ANKA_Bot (coin) NSSM servisi DURDURULDU:** `coin_otonom.py` calistiriyordu.
+  Hesap bos oldugu icin durduruldu + START_TYPE manuel'e cekildi (reboot'ta
+  otomatik gelmez). GERI ACMAK: `sc config ANKA_Bot start= auto && sc start ANKA_Bot`.
+  (NSSM yolu: C:\nssm\nssm.exe)
+- **BIST dashboard 8501 manuel baslatildi:** `_dash_bist.bat` (streamlit run app.py
+  --server.headless true --server.address 0.0.0.0 --server.port 8501).
+  Aktif: http://78.135.87.29:8501 (HTTP 200 dogrulandi). Detached WMI ile baslatildi.
+- **BIST otonom_trader.py:** SAGLIKLI calisiyor (NSSM degil, ayri proses). Dokunulmadi.

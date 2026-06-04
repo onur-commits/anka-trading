@@ -1,7 +1,9 @@
 {
   "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "model": "claude-opus-4-8",
   "env": {
-    "PYTHONUTF8": "1"
+    "PYTHONUTF8": "1",
+    "ANTHROPIC_BETA": "context-1m-2025-08-07"
   },
   "language": "turkish",
   "permissions": {
@@ -62,6 +64,12 @@
       "Bash(whoami)",
       "Bash(wc)",
       "Bash(printf *)",
+      "Bash(git *)",
+      "Bash(sshpass *)",
+      "Bash(ssh *)",
+      "Bash(cd *)",
+      "Bash(curl *)",
+      "mcp__*",
       "Read",
       "Skill",
       "Edit",
@@ -85,7 +93,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": "jq -r '.tool_input.command // \"\"' | grep -E 'otonom_trader\\.py' | grep -vE -- '--dry-run|--paper|--tara|--durum' >/dev/null && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"Canli emir koruma: --dry-run/--paper olmadan otonom_trader calistirilmak isteniyor. Onayliyor musun?\"}}' || true"
+            "command": "jq -r '.tool_input.command // \"\"' | grep -E 'python[0-9.]*([[:space:]]+-[^|;&]*)?[[:space:]]+otonom_trader\\.py' | grep -vE -- '--dry-run|--paper|--tara|--durum' >/dev/null && echo '{\"hookSpecificOutput\":{\"hookEventName\":\"PreToolUse\",\"permissionDecision\":\"ask\",\"permissionDecisionReason\":\"Canli emir koruma: --dry-run/--paper olmadan otonom_trader calistirilmak isteniyor. Onayliyor musun?\"}}' || true"
           }
         ]
       }

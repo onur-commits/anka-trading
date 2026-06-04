@@ -841,7 +841,6 @@ class CoinOtonomTrader:
                         cor_p, cor_d = self.correlation.analiz(symbol)
                 else:
                     sen_p = fun_p = cor_p = 50
-                    sen_d = fun_d = cor_d = ""
 
                 # Ağırlıklı skor — uzman ajanlar aktifse yeni ağırlık, değilse eski
                 if self._uzman_ajanlar_aktif:
@@ -1039,7 +1038,7 @@ class CoinOtonomTrader:
                 # TAM SATIŞ
                 miktar = poz["miktar"]
                 logger.info(f"  🔴 {aksiyon}: {symbol} | PL:{pl_pct:+.1f}% | {detay}")
-                sonuc = self.client.market_sat(symbol, self._format_qty(symbol, miktar))
+                self.client.market_sat(symbol, self._format_qty(symbol, miktar))
 
                 oncelik = "acil" if aksiyon in ("STOP_LOSS", "ACIL_CIKIS") else "onemli"
                 bildirim(f"🔴 {aksiyon}: {symbol} | PL:{pl_pct:+.1f}% | {detay}", oncelik)
@@ -1055,7 +1054,7 @@ class CoinOtonomTrader:
                 # YARISINI SAT
                 yarim = poz["miktar"] / 2
                 logger.info(f"  🟡 TP_HALF: {symbol} | PL:+{pl_pct:.1f}% | Yarısı satılıyor")
-                sonuc = self.client.market_sat(symbol, self._format_qty(symbol, yarim))
+                self.client.market_sat(symbol, self._format_qty(symbol, yarim))
 
                 bildirim(f"🟡 TP1: {symbol} | PL:+{pl_pct:.1f}% | Yarısı satıldı, kalan trailing'e", "onemli")
 

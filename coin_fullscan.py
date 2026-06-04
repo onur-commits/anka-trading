@@ -67,7 +67,7 @@ def coin_analiz(symbol):
         closes = np.array([float(k[4]) for k in data])
         volumes = np.array([float(k[5]) for k in data])
         highs = np.array([float(k[2]) for k in data])
-        lows = np.array([float(k[3]) for k in data])
+        np.array([float(k[3]) for k in data])
 
         son = closes[-1]
         if son == 0:

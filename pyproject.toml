@@ -18,9 +18,30 @@ python-preference = "managed"
 target-version = "py312"
 line-length = 110
 
+[tool.ruff.lint]
+# Bu proje formatter zorlamiyor (compact one-liner'lar, 'sys.path.insert'
+# sonrasi import vb. bilincli). Sadece anlamli mantik kurallari (F =
+# tanimsiz isim, kullanilmayan import/degisken) + syntax (E9) taransin;
+# saf stil (E4/E7: import sirasi, tek-satir if, belirsiz 'l' adi) kapali.
+select = ["F", "E9"]
+
+[tool.ruff.lint.per-file-ignores]
+# Test dosyasi 'from coin_otonom import *' kullaniyor — bilincli.
+"coin_test_scan.py" = ["F403", "F405"]
+# try/except ImportError ile yedek modul varligi test ediliyor; import
+# kullanilmasa da 'available mi' kontrolu icin duruyor.
+"anka_scanner.py" = ["F401"]
+"haber_ajan.py" = ["F401"]
+"hibrit_scanner.py" = ["F401"]
+
 [tool.pyright]
 pythonVersion = "3.12"
 typeCheckingMode = "off"   # Mevcut kod tip annotasyonsuz; off -> false positive yok
+
+[tool.mypy]
+# pandas / yfinance gibi paketler tip-stub saglamiyor; 'import-untyped'
+# uyarilari calisma hatasi degil — sustur.
+ignore_missing_imports = true
 
 [tool.black]
 target-version = ["py312"]

@@ -1,0 +1,34 @@
+# ANKA reverse proxy + HTTPS (Gün 9) — örnek nginx config
+# Kurulum: certbot ile Let's Encrypt sertifikası al, bu dosyayı
+# /etc/nginx/sites-available/anka'ya koy, symlink + nginx -s reload.
+
+server {
+    listen 80;
+    server_name anka.example.com;
+    # HTTP -> HTTPS yönlendir
+    return 301 https://$host$request_uri;
+}
+
+server {
+    listen 443 ssl;
+    server_name anka.example.com;
+
+    ssl_certificate     /etc/letsencrypt/live/anka.example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/anka.example.com/privkey.pem;
+    ssl_protocols TLSv1.2 TLSv1.3;
+
+    # Güvenlik başlıkları
+    add_header X-Frame-Options SAMEORIGIN;
+    add_header X-Content-Type-Options nosniff;
+    add_header Strict-Transport-Security "max-age=31536000" always;
+
+    location / {
+        proxy_pass http://127.0.0.1:8501;
+        proxy_http_version 1.1;
+        proxy_set_header Upgrade $http_upgrade;       # websocket (Streamlit)
+        proxy_set_header Connection "upgrade";
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_read_timeout 86400;
+    }
+}

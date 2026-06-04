@@ -130,7 +130,7 @@ def tam_tarama(veri, model, risk, rejim_info, sentiment_data):
 
             sonuclar.append(analiz)
 
-        except Exception as e:
+        except Exception:
             continue
 
     # Sırala
@@ -272,7 +272,7 @@ def tek_tarama(sermaye=100_000):
     sonuclar = tam_tarama(veri, model, risk, rejim, sentiment)
 
     # 8. Rapor
-    sinyaller = rapor_yazdir(sonuclar, rejim, sektor_mom, sentiment, risk)
+    rapor_yazdir(sonuclar, rejim, sektor_mom, sentiment, risk)
 
     # 9. Kaydet
     sonuc_kaydet(sonuclar, rejim, sentiment)

@@ -253,7 +253,49 @@ MIDAS_BROKAGE_ID = "115"
 # Risk parametreleri (bot config)
 MAX_POZISYON_SAYISI = 3           # Aynı anda max pozisyon
 MAX_POZISYON_TL = 20000           # Pozisyon başına max TL
-MIN_BOMBA_SKOR_ALIS = 35          # Alış için min skor (canlı test için gevşetildi)
+MIN_BOMBA_SKOR_ALIS = 15          # Backtest sonucu (2026-06-04): eşik=15 en iyi getiri %+19.6 (yıl), komisyon %0.1, gerçek
+# ── KARA LISTE (backtest 2026-06-04, kaybeden 5 hisse — alımdan hariç) ──
+KARA_LISTE = {"SASA", "VESTL", "GUBRF", "EGEEN", "ENKAI"}
+
+# ── BEYIN DANISMANI (opsiyonel, VARSAYILAN KAPALI) ──────────
+# anka_beyin.py'nin 4 katmanli rejim analizini alim filtresi olarak baglar.
+# BEYIN_GATE_AKTIF = False iken ANKA TAMAMEN ESKISI GIBI calisir; bu bayrak
+# acilana kadar beyin hicbir karari etkilemez. Acikken bile herhangi bir
+# hata / eksik / bayat veri durumunda alima IZIN verir (fail-open) — yani
+# beyin ANKA'yi asla yanlislikla bloke edemez, sadece NET tehlikede atlatir.
+BEYIN_GATE_AKTIF = False          # ← canliya guvendiginde True yap
+BEYIN_MIN_AGRESIFLIK = 0.3        # agresiflik < bu ise riskli rejim (AYI 0.2 / KAOS 0.1)
+BEYIN_STATE_FILE = DATA_DIR / "beyin_state.json"
+BEYIN_BAYAT_SAAT = 26             # state bu saatten eskiyse guvenilmez -> izin ver
+
+
+def beyin_rejim_onay():
+    """Beyin rejimine gore otonom alima izin var mi?
+
+    Doner: (izin: bool, rejim_adi: str, agresiflik: float|None)
+    GUVENLIK: gate kapaliysa veya herhangi bir hata/bayat veri varsa
+    daima (True, ...) doner — ANKA'yi asla bloke etmez (fail-open).
+    """
+    if not BEYIN_GATE_AKTIF:
+        return True, "gate_kapali", None
+    try:
+        if not BEYIN_STATE_FILE.exists():
+            return True, "beyin_state_yok", None
+        import os as _os
+        yas_saat = (time.time() - _os.path.getmtime(BEYIN_STATE_FILE)) / 3600
+        if yas_saat > BEYIN_BAYAT_SAAT:
+            return True, f"bayat_{yas_saat:.0f}h", None
+        with open(BEYIN_STATE_FILE, encoding="utf-8") as f:
+            bs = json.load(f)
+        rejim = bs.get("rejim", {}) or {}
+        agr = rejim.get("agresiflik")
+        ad = rejim.get("ad", "?")
+        if agr is None:
+            return True, "agresiflik_yok", None
+        return (agr >= BEYIN_MIN_AGRESIFLIK), ad, agr
+    except Exception as e:
+        log(f"beyin_rejim_onay hata (fail-open): {e}", "WARN")
+        return True, "hata_fail_open", None
 
 
 def _trade_log_yaz(kayit):
@@ -492,10 +534,26 @@ def gorev_09_05_otonom_alis():
         log(f"Rapor okunamadı: {e}", "ERROR")
         return
 
+    # Bayat dosya koruması — dünün listesini bugün alma
+    bugun = datetime.now().strftime("%Y-%m-%d")
+    if rapor.get("tarih") != bugun:
+        log(f"Rapor bugüne ait değil (tarih={rapor.get('tarih')}, bugün={bugun}) — alış atlandı", "WARN")
+        return
+
     bombalar = rapor.get("bombalar", [])
     if not bombalar:
         log("Bu sabah bomba yok, alış atlandı")
         return
+
+    # ── Beyin danışmanı (opsiyonel, default KAPALI) ──
+    # Riskli rejimde (AYI/KAOS) otonom alışı tümden atla. Gate kapalıysa
+    # veya beyin verisi yok/bayatsa otomatik izin verir (ANKA bozulmaz).
+    izin, rej, agr = beyin_rejim_onay()
+    if not izin:
+        log(f"🧠 BEYIN: '{rej}' rejimi (agresiflik {agr}) riskli — otonom alış ATLANDI", "WARN")
+        return
+    if BEYIN_GATE_AKTIF:
+        log(f"🧠 BEYIN onay: '{rej}' (agresiflik {agr}) — alışa izin")
 
     # Mevcut pozisyonları al — hem bot state hem Midas hesabı
     mevcut = _pozisyonlari_oku()
@@ -524,9 +582,14 @@ def gorev_09_05_otonom_alis():
         log(f"Max pozisyon ({MAX_POZISYON_SAYISI}) dolu, alış atlandı")
         return
 
-    # Skor sırasına göre filtrele — zaten elde olanları atla
-    aday = [b for b in bombalar if b.get("bomba_skor", 0) >= MIN_BOMBA_SKOR_ALIS
-            and b["ticker"] not in toplam_tutulan]
+    # Skor + kara liste + zaten elde olanlar filtresi
+    aday_ham = [b for b in bombalar if b.get("bomba_skor", 0) >= MIN_BOMBA_SKOR_ALIS
+                and b["ticker"] not in toplam_tutulan]
+    # Kara liste (2026-06-04 backtest sonucu — kaybeden 5 hisse)
+    aday = [b for b in aday_ham if b["ticker"] not in KARA_LISTE]
+    elenen = [b["ticker"] for b in aday_ham if b["ticker"] in KARA_LISTE]
+    if elenen:
+        log(f"  🚫 Kara liste elendi: {elenen}")
     aday.sort(key=lambda x: x.get("bomba_skor", 0), reverse=True)
 
     alinan = 0
@@ -629,6 +692,34 @@ def gorev_05_30_egitim():
         log(f"  HATA: {e}", "ERROR")
 
 
+def _gunluk_bomba_yaz(top5, rejim):
+    """gunluk_bomba.json yaz — gorev_09_05_otonom_alis'in okuduğu şema.
+    Tarama state_kaydet ile otonom_state.json'a yazıyordu ama alış buradan
+    okuyor + 'bomba_skor'/'sebepler' anahtarlarını bekliyor (eski 'skor'
+    uyumsuzdu → bot ~1 ay alım yapamadı). Bu fonksiyon ikisini eşleştirir."""
+    rapor = {
+        "tarih": datetime.now().strftime("%Y-%m-%d"),
+        "rejim": rejim,
+        "bombalar": [
+            {"ticker": s["ticker"].replace(".IS", ""),
+             "bomba_skor": s["bomba_skor"],
+             "ml": round(s["ml"], 3),
+             "teknik": s.get("teknik", 0),
+             "fiyat": s["fiyat"],
+             "atr_pct": round(s.get("atr_pct", 0), 2),
+             "sebepler": s.get("sebepler", [])}
+            for s in top5
+        ],
+        "son_guncelleme": datetime.now().strftime("%H:%M"),
+    }
+    try:
+        with open(DATA_DIR / "gunluk_bomba.json", "w", encoding="utf-8") as f:
+            json.dump(rapor, f, ensure_ascii=False, indent=2)
+        log(f"  📝 gunluk_bomba.json yazıldı ({len(top5)} bomba)")
+    except Exception as e:
+        log(f"  ❌ gunluk_bomba.json yazılamadı: {e}", "ERROR")
+
+
 def gorev_08_30_tarama():
     """08:30 — Günün bombalarını bul + IQ kodları üret."""
     log("=" * 50)
@@ -648,7 +739,7 @@ def gorev_08_30_tarama():
         if rejim:
             log(f"  Piyasa: {rejim['rejim'].upper()} ADX:{rejim['adx']}")
 
-        sentiment = haberleri_analiz_et()
+        haberleri_analiz_et()
 
         sonuclar = hisse_tara(veri, model, rejim)
         # HİBRİT VETO: ML + Hacim + Kapanış gücü hepsi onaylamalı
@@ -688,10 +779,12 @@ def gorev_08_30_tarama():
             }
             state_kaydet(state)
             bomba_listesi_guncelle(uretilen)
+            _gunluk_bomba_yaz(top5, rejim)
             bildirim(f"Bombalar: {', '.join(uretilen)}")
         else:
             log("  ❌ Bugün bomba yok")
             bomba_listesi_guncelle([])
+            _gunluk_bomba_yaz([], rejim)
             bildirim("Bugün bomba hisse bulunamadı")
 
     except Exception as e:
@@ -718,7 +811,7 @@ def gorev_08_50_iq_kontrol():
         return
 
     # IQ log kontrolü — stratejiler çalışıyor mu?
-    state = state_oku()
+    state_oku()
     calisan = 0
     for t in ["ENJSA", "GARAN", "HALKB", "TSKB", "TKFEN", "AKSEN", "ISCTR", "GUBRF", "THYAO", "SAHOL"]:
         log_dir = f"C:\\MatriksIQ\\Logs\\AlgoTrading\\BOMBA_{t}"

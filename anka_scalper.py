@@ -169,9 +169,9 @@ def range_breakout(ticker, df_intraday):
         return 0, ""
 
     # İlk 2 bar (30dk × 2 = 1 saat) — açılış aralığı
-    h = df_intraday['High'].squeeze()
-    l = df_intraday['Low'].squeeze()
-    c = df_intraday['Close'].squeeze()
+    df_intraday['High'].squeeze()
+    df_intraday['Low'].squeeze()
+    df_intraday['Close'].squeeze()
 
     # Bugünün verisi
     bugun = df_intraday[df_intraday.index.date == df_intraday.index.date[-1]]
@@ -208,7 +208,7 @@ def mean_reversion(ticker, df_daily, df_intraday):
         return 0, ""
 
     c_daily = df_daily['Close'].squeeze()
-    c_intra = df_intraday['Close'].squeeze()
+    df_intraday['Close'].squeeze()
 
     # Son 3 günlük düşüş
     uc_gun = float((c_daily.iloc[-1] / c_daily.iloc[-4] - 1) * 100)
@@ -303,7 +303,7 @@ def scalp_tara(symbol_list=None):
     scalp_listesi = []
     for f in firsatlar[:15]:
         emoji = "⚡" if f["en_iyi_puan"] >= 70 else "🟡" if f["en_iyi_puan"] >= 50 else "⚪"
-        puanlar = " ".join(f"{k}:{v}" for k, v in f["tum_puanlar"].items())
+        " ".join(f"{k}:{v}" for k, v in f["tum_puanlar"].items())
         print(f"  {emoji} {f['ticker']:6} | Best:{f['en_iyi_strateji']}({f['en_iyi_puan']}) | {f['en_iyi_detay']}")
 
         if f["en_iyi_puan"] >= 70:
