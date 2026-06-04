@@ -1,5 +1,12 @@
 # ANKA Trading System - Claude Code Rehberi 
 .
+## 🧠 KALICI AYAR — MODEL (kullanici talebi, degismez)
+- **VARSAYILAN MODEL: Opus 4.8 — 1M context** (`claude-opus-4-8[1m]`).
+- Her oturum bununla baslat. Daha kucuk modele DUSME.
+- Hafiza oturumlar arasi sifirlandigi icin bu not buraya yazildi:
+  yeni oturumda once bunu oku, model 4.8 1M degilse kullaniciya soyle.
+- Baslatma: `/model` ile Opus 4.8 sec, 1M context aktif olsun.
+.
 ## ⚡ Oturum Baslangic Notu (kullanici talebi)
 - Bypass mode tercih ediliyor. Onay kutulariyla bogulmamak icin
   Claude Code'u baslatirken `claude --permission-mode bypassPermissions`
