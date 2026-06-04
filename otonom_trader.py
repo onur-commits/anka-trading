@@ -253,7 +253,9 @@ MIDAS_BROKAGE_ID = "115"
 # Risk parametreleri (bot config)
 MAX_POZISYON_SAYISI = 3           # Aynı anda max pozisyon
 MAX_POZISYON_TL = 20000           # Pozisyon başına max TL
-MIN_BOMBA_SKOR_ALIS = 25          # Alış için min skor (kullanıcı talebiyle 35->25 düşürüldü, 2026-06-03)
+MIN_BOMBA_SKOR_ALIS = 15          # Backtest sonucu (2026-06-04): eşik=15 en iyi getiri %+19.6 (yıl), komisyon %0.1, gerçek
+# ── KARA LISTE (backtest 2026-06-04, kaybeden 5 hisse — alımdan hariç) ──
+KARA_LISTE = {"SASA", "VESTL", "GUBRF", "EGEEN", "ENKAI"}
 
 # ── BEYIN DANISMANI (opsiyonel, VARSAYILAN KAPALI) ──────────
 # anka_beyin.py'nin 4 katmanli rejim analizini alim filtresi olarak baglar.
@@ -574,9 +576,14 @@ def gorev_09_05_otonom_alis():
         log(f"Max pozisyon ({MAX_POZISYON_SAYISI}) dolu, alış atlandı")
         return
 
-    # Skor sırasına göre filtrele — zaten elde olanları atla
-    aday = [b for b in bombalar if b.get("bomba_skor", 0) >= MIN_BOMBA_SKOR_ALIS
-            and b["ticker"] not in toplam_tutulan]
+    # Skor + kara liste + zaten elde olanlar filtresi
+    aday_ham = [b for b in bombalar if b.get("bomba_skor", 0) >= MIN_BOMBA_SKOR_ALIS
+                and b["ticker"] not in toplam_tutulan]
+    # Kara liste (2026-06-04 backtest sonucu — kaybeden 5 hisse)
+    aday = [b for b in aday_ham if b["ticker"] not in KARA_LISTE]
+    elenen = [b["ticker"] for b in aday_ham if b["ticker"] in KARA_LISTE]
+    if elenen:
+        log(f"  🚫 Kara liste elendi: {elenen}")
     aday.sort(key=lambda x: x.get("bomba_skor", 0), reverse=True)
 
     alinan = 0
