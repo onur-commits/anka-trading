@@ -1,6 +1,6 @@
 # 🦅 ANKA DURUM — Tek Kontrol Paneli
 
-_Güncelleme: 2026-06-04 19:03:18 TR · run 26963737350_
+_Güncelleme: 2026-06-04 23:41:51 TR · run 26978321468_
 
 ## ⚡ ANLIK (VPS'ten canlı)
 ```
@@ -9,11 +9,9 @@ Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 ### Kod guncelleme
 Saved working directory and index state On main: auto-yedek
 
-Fast-forward
- DURUM.md | 22 +++++++++++++++-------
- 1 file changed, 15 insertions(+), 7 deletions(-)
+Already up to date.
 
-HEAD: e5dbff5
+HEAD: 6605555
 
 ### BIST bot
 CALISIYOR (PID 19772) MOD: CANLI
@@ -39,6 +37,7 @@ Piyasa: BEAR
   ISGYO: 20.94 (+0.4%) Skor:50
 [2026-06-04 17:35:13] GA�n sonu rapor haz��r
 <Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><TN RefId="0"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="1"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="2"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>```
+
 
 ## ✅ ÇALIŞAN (kanıtlı)
 - BIST otonom_trader CANLI (PID değişebilir) — `start_otonom.bat` ile başlar
