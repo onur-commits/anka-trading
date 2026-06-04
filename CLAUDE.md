@@ -352,3 +352,23 @@ Ayni adimlari tekrar calistirmak gerekirse:
 - Cowork Claude: alim/satim/transfer TETIKLEMEZ
 - Sadece script yazar, kullanici calistirir veya izleme altyapisi kurar
 - A/B deneyinde: bot dogal olarak kendi islemlerini yapar (zaten canli), Cowork sadece snapshot alir
+
+## A/B Deneyi KAPANISI — 2026-06-04 (Claude Code)
+Deney 2026-05-19'da bitmesi gerekiyordu, 16 gun gec degerlendirildi.
+
+### Sonuc: GECERSIZ (metodolojik basarisizlik)
+- **Sebep:** Bot tarafinda sermaye sabit tutulamadi. Para giris/cikisi karsilastirmayi kirletti:
+  - 2026-04-21: +~$556 USDT deposit (bot_deger $228 → $782 zipladi)
+  - 2026-05-29 06:20: bot ALLO pozisyonunu (~$1100) satti → ayni gun ~$1100 USDT hesaptan CEKILDI (Onur'un karari, dogrulandi 2026-06-04)
+  - Bot_deger zaman serisi $118 ile $1424 arasi savruldu — getiri degil, para akisi.
+- **B&H referansi (temiz, dokunulmadi):** $224.63 → ~$200 = **-%11** (44 gun, stabil).
+- **Bot:** Agresif dusuk-cap rotasyonu (ZK, ALLO vb.), yuksek oynaklik. Para akisi kirliligi nedeniyle ham %getiri B&H ile kiyaslanamaz → temiz kazanan ILAN EDILEMEZ.
+- **Yorum:** 2 yillik backtest'in "aktif strateji < B&H" bulgusuyla CELISMIYOR. Coin Onur'un asil odagi degil (focus = BIST).
+
+### Hesabin su anki durumu (2026-06-04)
+- Binance Spot pratikte BOS: toplam **$0.18** (XLM $0.16 + SOL $0.02 tozu). Para cekildi.
+- `ANKA_AB_Karsilastirma` scheduler 2026-06-04'te DISABLE edildi (her gun $0 snapshot aliyordu, anlamsiz).
+
+### Ogrenme (gelecek A/B icin)
+- Sermaye DONDURULMALI: deney suresince deposit/withdraw YOK, yoksa karsilastirma cope.
+- Para akisi olacaksa net-flow-adjusted getiri (TWR/MWR) hesabi sart.
