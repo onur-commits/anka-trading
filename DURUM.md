@@ -1,6 +1,6 @@
 # ğŸ¦… ANKA DURUM â€” Tek Kontrol Paneli
 
-_GÃ¼ncelleme: 2026-06-04 14:57:48 TR Â· run 26950243284_
+_GÃ¼ncelleme: 2026-06-04 15:34:01 TR Â· run 26951971554_
 
 ## âš¡ ANLIK (VPS'ten canlÄ±)
 ```
@@ -9,11 +9,11 @@ Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 ### Kod guncelleme
 Saved working directory and index state On main: auto-yedek
 
- rename {platform => anka_platform}/guvenlik.py (100%)
- rename {platform => anka_platform}/raporlama.py (100%)
- create mode 100644 data/sabah_tarama_sonuc.md
+ DURUM.md                   | 10 +++++-----
+ data/sabah_tarama_sonuc.md | 46 +++++++++++++++++++++-------------------------
+ 2 files changed, 26 insertions(+), 30 deletions(-)
 
-HEAD: 576c559
+HEAD: 3f2615e
 
 ### BIST bot
 CALISIYOR (PID 7504) MOD: CANLI
@@ -26,8 +26,16 @@ TCP 18890: ACIK
 Bugun emir YOK (toplam kayit: 200)
 
 ### Son 10 log
-[2026-06-04 12:15:27] dY", [12:15] STRATEJø GAoNCELLEME
-[2026-06-04 12:16:02]   ƒo. DeYiYiklik yok
+[2026-06-04 15:00:36]   ƒ?O TTRAK VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-04 15:00:36]   ƒ?O HALKB VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-04 15:00:36]   ƒ?O ALBRK VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-04 15:00:36]   ƒ?O EREGL VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-04 15:00:36]   ƒ?O EKGYO VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-04 15:00:36]   ƒ?O SASA VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-04 15:00:36]   ƒ?O AEFES VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-04 15:00:36]   dY'œ ISGYO Skor:50 ML:72% Fiyat:20.76
+[2026-06-04 15:00:36]   dY"? aktif_bombalar.txt ƒ+' ISGYO
+[2026-06-04 15:00:36] Bombalar: ISGYO
 <Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><TN RefId="0"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="1"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="2"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>```
 
 ## âœ… Ã‡ALIÅAN (kanÄ±tlÄ±)
