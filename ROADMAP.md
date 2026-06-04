@@ -32,8 +32,8 @@ Kullanıcının sözü: eksiksiz, sorunsuz, satılabilir.
 ## 🗓️ 10 GÜNLÜK PLAN (her gün ~%10)
 Her paket bağımsız, `paket` branch'inde, canlıya değmeden.
 
-- [ ] **Gün 1 — Trading çekirdek optimizasyon** (kara liste, eşik grid, stop-loss, edge+) `%75→%90 çekirdek`
-- [ ] **Gün 2 — ABD piyasası modülü** (US tickers, US market hours, yfinance US, US scanner)
+- [~] **Gün 1 — Trading çekirdek optimizasyon** (yapıldı ama edge negatif — sinyal araştırması açık) (kara liste, eşik grid, stop-loss, edge+) `%75→%90 çekirdek`
+- [~] **Gün 2 — ABD piyasası modülü** (us_market.py iskelet hazır) (US tickers, US market hours, yfinance US, US scanner)
 - [ ] **Gün 3 — Auth katmanı** (login, bcrypt, rol: admin/trader/viewer/readonly)
 - [ ] **Gün 4 — Güvenlik** (2FA/OTP, rate limit, lockout, reset token, parola politikası)
 - [ ] **Gün 5 — Audit log + güvenlik paneli** (login fail, OTP hata, admin aksiyon)
@@ -44,8 +44,13 @@ Her paket bağımsız, `paket` branch'inde, canlıya değmeden.
 - [ ] **Gün 10 — CI/CD + paketleme** (lint, test, coverage, codeql, lisans, kurulum sihirbazı)
 
 ## ✅ İLERLEME LOG (her tamamlanan buraya, kanıtla)
-- 2026-06-04: ROADMAP oluşturuldu, `paket` branch açıldı.
-- (Gün 1 başlıyor...)
+- 2026-06-04: ROADMAP + `paket` branch.
+- 2026-06-04 GÜN 1 ✅: Backtest optimize (kara liste+grid+stop-loss). SONUÇ:
+  edge HÂLÂ NEGATİF (en iyi eşik=40 → -%5.9/yıl, kazanç %43). Parametre
+  ayarı çözmedi — çekirdek sinyal (ML AUC 0.57) zayıf. DÜRÜST: strateji
+  şu hâliyle kâr etmiyor. Edge ayrı araştırma gerektiriyor (Gün 1 ek iş).
+- 2026-06-04 GÜN 2 🔄: us_market.py — ABD piyasası modülü (47 US hisse,
+  US borsa saati ET, TR karşılığı, tarama+skor). BIST'le aynı mantık.
 
 ## 🔌 KÖR NOKTALAR (Claude göremez — bkz DURUM.md)
 - VPS canlı görüntü yok (sadece durum.yml ~10dk foto)
