@@ -148,6 +148,47 @@ def panel_hazirla(veri):
     return panel, skor_cache
 
 
+def kesitsel_ekle(panel, xu):
+    """
+    KESITSEL + ENDEKS-RELATIF + REJIM feature'lari ekle (hepsi causal, look-ahead YOK).
+    Mevcut feature'lar tek-hisse; bunlar 'bugun digerlerine GORE' boyutunu katar.
+
+    - ks_mom_rank/ks_vol_rank/ks_rsi_rank: o gun TUM evrende yuzdelik sira (kesitsel)
+    - ks_xu_rel5/ks_xu_rel10: hisse getirisi − XU100 getirisi (relative strength)
+    - ks_rejim: XU100 50g SMA ustunde mi (1/0) — boga/ayi rejim filtresi
+    - ks_xu_vol: XU100 20g volatilite (piyasa stres)
+    """
+    p = panel.copy()
+    # Kesitsel siralama (sadece panel — o gun digerlerine gore)
+    for src, dst in [("mom_10d", "ks_mom_rank"),
+                     ("hacim_oran", "ks_vol_rank"),
+                     ("rsi", "ks_rsi_rank")]:
+        if src in p.columns:
+            p[dst] = p.groupby("__tarih")[src].rank(pct=True)
+
+    # Endeks-relatif + rejim (XU100 gerekli)
+    if xu is not None and "Close" in getattr(xu, "columns", []):
+        xc = xu["Close"].astype(float)
+        xr5 = xc.pct_change(5) * 100
+        xr10 = xc.pct_change(10) * 100
+        xtrend = (xc > xc.rolling(50).mean()).astype(float)
+        xvol = (xc.pct_change() * 100).rolling(20).std()
+
+        def mp(series):
+            s = series.copy()
+            s.index = pd.to_datetime(s.index).normalize()
+            s = s[~s.index.duplicated(keep="last")]
+            return p["__tarih"].dt.normalize().map(s)
+
+        if "mom_5d" in p.columns:
+            p["ks_xu_rel5"] = p["mom_5d"] - mp(xr5).fillna(0)
+        if "mom_10d" in p.columns:
+            p["ks_xu_rel10"] = p["mom_10d"] - mp(xr10).fillna(0)
+        p["ks_rejim"] = mp(xtrend).fillna(0)
+        p["ks_xu_vol"] = mp(xvol)
+    return p
+
+
 def model_egit(X, y):
     """xgb + lgbm ensemble (tek fold)."""
     from xgboost import XGBClassifier
@@ -187,8 +228,9 @@ def triple_barrier_sonuc(df, giris_tarih, giris_fiyat):
     return None
 
 
-def walk_forward(veri, panel, skor_cache, benchmark=None):
-    feat_cols = [c for c in panel.columns if not c.startswith("__")]
+def walk_forward(veri, panel, skor_cache, benchmark=None, feat_cols=None):
+    if feat_cols is None:
+        feat_cols = [c for c in panel.columns if not c.startswith("__")]
     tarihler = np.sort(panel["__tarih"].unique())
     embargo = HEDEF_GUN
 
@@ -333,10 +375,72 @@ def rapor_yaz(fold_sonuc, tum_trade, oos_proba, oos_y, equity, span, bench_pct, 
     print(f"\n💾 {out}")
 
 
+def metrik_hesapla(sonuc, bench_pct):
+    """walk_forward sonucundan ozet metrik dict."""
+    from sklearn.metrics import roc_auc_score
+    fold_sonuc, tum_trade, oos_p, oos_y, equity, span = sonuc
+    try:
+        auc = roc_auc_score(oos_y, oos_p) if len(set(oos_y)) > 1 else float("nan")
+    except Exception:
+        auc = float("nan")
+    arr = np.array(tum_trade) if tum_trade else np.array([0.0])
+    toplam = (equity[-1] - 1) * 100
+    pik = np.maximum.accumulate(equity)
+    dd = float(((np.array(equity) / pik - 1).min()) * 100)
+    return {
+        "auc": auc, "trade": len(tum_trade),
+        "kazanc": float((arr > 0).mean() * 100), "ort_net": float(arr.mean()),
+        "getiri": toplam, "dd": dd,
+        "sharpe": float(arr.mean() / arr.std()) if arr.std() > 0 else 0.0,
+        "edge": (toplam - bench_pct) if bench_pct is not None else None,
+        "fold": len(fold_sonuc), "span": span, "fold_sonuc": fold_sonuc,
+    }
+
+
+def karsilastir_rapor(m_base, m_ks, bench_pct, kaynak, n_base, n_ks):
+    out = ROOT / "data" / "backtest_walkforward_rapor.md"
+    md = ["# 🦅 BIST Walk-Forward — Feature A/B (DURUST OOS)", "",
+          f"_{datetime.now():%Y-%m-%d %H:%M} · kaynak: {kaynak} · look-ahead YOK_", "",
+          "Ayni panel, ayni fold'lar; tek fark feature seti. **Kesitsel/endeks-relatif/"
+          "rejim feature'lari edge'i artiriyor mu?**", "",
+          "| Metrik | Baseline (tek-hisse) | +Kesitsel | Fark |",
+          "|---|---|---|---|",
+          f"| Feature sayisi | {n_base} | {n_ks} | +{n_ks - n_base} |",
+          f"| **OOS AUC** | {m_base['auc']:.4f} | {m_ks['auc']:.4f} | "
+          f"{m_ks['auc'] - m_base['auc']:+.4f} |",
+          f"| Ort net trade % | %{m_base['ort_net']:+.3f} | %{m_ks['ort_net']:+.3f} | "
+          f"%{m_ks['ort_net'] - m_base['ort_net']:+.3f} |",
+          f"| Kazanc % | %{m_base['kazanc']:.1f} | %{m_ks['kazanc']:.1f} | "
+          f"%{m_ks['kazanc'] - m_base['kazanc']:+.1f} |",
+          f"| Bilesik getiri % | %{m_base['getiri']:+.1f} | %{m_ks['getiri']:+.1f} | "
+          f"%{m_ks['getiri'] - m_base['getiri']:+.1f} |",
+          f"| Max DD % | %{m_base['dd']:.1f} | %{m_ks['dd']:.1f} | — |",
+          f"| Sharpe(trade) | {m_base['sharpe']:.3f} | {m_ks['sharpe']:.3f} | "
+          f"{m_ks['sharpe'] - m_base['sharpe']:+.3f} |",
+          f"| Trade sayisi | {m_base['trade']} | {m_ks['trade']} | — |"]
+    if bench_pct is not None:
+        md.append(f"| Benchmark B&H % | %{bench_pct:+.1f} | %{bench_pct:+.1f} | — |")
+    auc_fark = m_ks["auc"] - m_base["auc"]
+    md += ["", "## Sonuc",
+           f"- OOS dönem: {m_base['span'][0]} → {m_base['span'][1]} · {m_base['fold']} fold",
+           f"- Kesitsel feature'lar AUC'yi **{auc_fark:+.4f}** değiştirdi "
+           f"({'✅ İYİLEŞME' if auc_fark > 0.003 else '➖ kayda değer fark yok' if abs(auc_fark) <= 0.003 else '⚠️ KÖTÜLEŞME'}).",
+           "- Eklenenler: ks_mom_rank/ks_vol_rank/ks_rsi_rank (kesitsel sıra), "
+           "ks_xu_rel5/10 (endeks-relatif), ks_rejim (XU100 50g trend), ks_xu_vol.",
+           "- Tüm feature'lar causal; embargo + expanding window ile sızıntı yok."]
+    out.write_text("\n".join(md), encoding="utf-8")
+    print("\n".join(md))
+    print(f"\n💾 {out}")
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--csv", help="intraday CSV ile smoke-test (yfinance yerine)")
     ap.add_argument("--yil", type=int, default=5)
+    ap.add_argument("--karsilastir", action="store_true",
+                    help="Baseline vs +Kesitsel feature A/B karsilastirmasi")
+    ap.add_argument("--baseline", action="store_true",
+                    help="Sadece tek-hisse feature'lar (kesitsel ekleme)")
     args = ap.parse_args()
 
     print("📥 Veri yukleniyor...")
@@ -355,13 +459,29 @@ def main():
     if panel is None:
         print("❌ Panel bos")
         return
-    print(f"  Panel: {len(panel)} satir, {sum(1 for c in panel.columns if not c.startswith('__'))} feature, "
+    base_cols = [c for c in panel.columns if not c.startswith("__")]
+    panel = kesitsel_ekle(panel, bench)
+    all_cols = [c for c in panel.columns if not c.startswith("__")]
+    print(f"  Panel: {len(panel)} satir, base {len(base_cols)} + kesitsel "
+          f"{len(all_cols) - len(base_cols)} = {len(all_cols)} feature, "
           f"{panel['__sembol'].nunique()} sembol")
 
-    print("🔁 Walk-forward calisiyor...")
-    fold_sonuc, tum_trade, oos_p, oos_y, equity, span = walk_forward(veri, panel, skor_cache, bench)
+    if args.karsilastir:
+        print("🔁 A/B: baseline walk-forward...")
+        s_base = walk_forward(veri, panel, skor_cache, bench, feat_cols=base_cols)
+        print("🔁 A/B: +kesitsel walk-forward...")
+        s_ks = walk_forward(veri, panel, skor_cache, bench, feat_cols=all_cols)
+        bench_pct = benchmark_getiri(bench, s_base[5][0], s_base[5][1])
+        karsilastir_rapor(metrik_hesapla(s_base, bench_pct),
+                          metrik_hesapla(s_ks, bench_pct),
+                          bench_pct, kaynak, len(base_cols), len(all_cols))
+        return
+
+    feat = base_cols if args.baseline else all_cols
+    print(f"🔁 Walk-forward calisiyor ({len(feat)} feature)...")
+    fs, tt, op, oy, eq, span = walk_forward(veri, panel, skor_cache, bench, feat_cols=feat)
     bench_pct = benchmark_getiri(bench, span[0], span[1])
-    rapor_yaz(fold_sonuc, tum_trade, oos_p, oos_y, equity, span, bench_pct, kaynak)
+    rapor_yaz(fs, tt, op, oy, eq, span, bench_pct, kaynak)
 
 
 if __name__ == "__main__":
