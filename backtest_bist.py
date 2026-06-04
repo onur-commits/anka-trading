@@ -222,7 +222,7 @@ def main():
         md += ["## 🏆 En iyi config", "",
                f"- **Eşik = {e}** · Getiri **%{g:+.1f}** (1 yıl) · Kazanç %{k:.1f} · Sharpe {sh:.3f} · {n} işlem", "",
                "## Öneri",
-               f"- `MIN_BOMBA_SKOR_ALIS = {e}` (şu an 25)",
+               f"- Backtest en iyi eşik = {e} (canlıda etkin eşik 25: tarama hibrit veto + CLI min_skor=25)",
                "- Kara listeyi canlı bota uygula (5 hisse skip)",
                f"- Getiri {'POZİTİF ✅ edge düzeldi' if g > 0 else 'hâlâ negatif ⚠️'}"]
     out = ROOT / "data" / "backtest_bist_rapor.md"

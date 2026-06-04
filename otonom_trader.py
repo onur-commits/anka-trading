@@ -175,9 +175,11 @@ def state_kaydet(data):
 
 
 def dosya_windows_kopyala(ticker_list):
+    # Kaynak: kodlari_uret_ve_kopyala'nın az önce IQ_DIR'e yazdığı yerel .cs
+    # dosyaları (eski \\Mac\Home\... paylaşım yolu VPS'te geçersizdi).
     win_cmd(f'mkdir "{WIN_DEPLOY}" 2>nul')
     for t in ticker_list:
-        src = f'\\\\Mac\\Home\\adsız klasör\\borsa_surpriz\\matriks_iq\\BOMBA_{t}.cs'
+        src = str(IQ_DIR / f"BOMBA_{t}.cs")
         dst = f'{WIN_DEPLOY}\\BOMBA_{t}.cs'
         win_cmd(f'copy "{src}" "{dst}" /Y')
 
@@ -253,7 +255,9 @@ MIDAS_BROKAGE_ID = "115"
 # Risk parametreleri (bot config)
 MAX_POZISYON_SAYISI = 3           # Aynı anda max pozisyon
 MAX_POZISYON_TL = 20000           # Pozisyon başına max TL
-MIN_BOMBA_SKOR_ALIS = 15          # Backtest sonucu (2026-06-04): eşik=15 en iyi getiri %+19.6 (yıl), komisyon %0.1, gerçek
+MIN_BOMBA_SKOR_ALIS = 15          # Alış görevi alt-eşiği. NOT: tarama yolu zaten
+# hibrit veto + CLI min_skor=25 ile süzüldüğü için ETKİN eşik 25'tir (bu 15 pratikte
+# bağlamaz). Walk-forward OOS (2026-06-04): edge +%10.3, overfit değil.
 # ── KARA LISTE (backtest 2026-06-04, kaybeden 5 hisse — alımdan hariç) ──
 KARA_LISTE = {"SASA", "VESTL", "GUBRF", "EGEEN", "ENKAI"}
 
