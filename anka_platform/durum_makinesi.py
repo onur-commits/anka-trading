@@ -53,7 +53,7 @@ def varsayilan_health(max_latency_ms=500):
     """Latency modülünden son ölçüme bakan health-check üretir."""
     def kontrol():
         try:
-            from platform.raporlama import latency_ozet
+            from anka_platform.raporlama import latency_ozet
             o = latency_ozet()
             if o.get("adet", 0) == 0:
                 return True, "latency verisi yok (izin)"

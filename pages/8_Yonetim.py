@@ -17,7 +17,7 @@ sys.path.insert(0, str(BASE))
 st.set_page_config(page_title="ANKA Yönetim", page_icon="🔐", layout="wide")
 
 try:
-    from platform import auth, audit, guvenlik
+    from anka_platform import auth, audit, guvenlik
 except Exception as e:
     st.error(f"Platform modülleri yüklenemedi: {e}")
     st.stop()
