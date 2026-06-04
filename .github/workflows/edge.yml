@@ -41,7 +41,11 @@ jobs:
           git fetch origin $BRANCH 2>&1 | Out-Null
           git checkout origin/$BRANCH -- backtest_walkforward.py 2>&1 | Out-Null
           python -X utf8 backtest_walkforward.py 2>&1 | Out-Null
-          if (Test-Path data\backtest_walkforward_rapor.md) { Get-Content data\backtest_walkforward_rapor.md -Raw } else { Write-Output 'RAPOR URETILEMEDI' }
+          # Raporu base64 ile dondur: CLIXML/Turkce/emoji bozmasin (tek satir, ASCII-safe)
+          if (Test-Path data\backtest_walkforward_rapor.md) {
+            \$b = [Convert]::ToBase64String([IO.File]::ReadAllBytes("data\backtest_walkforward_rapor.md"))
+            Write-Output ("REPORT_B64:" + \$b)
+          } else { Write-Output 'REPORT_B64:' }
           git reset -q backtest_walkforward.py 2>&1 | Out-Null
           git checkout -- backtest_walkforward.py 2>&1 | Out-Null
           Remove-Item backtest_walkforward.py -ErrorAction SilentlyContinue
@@ -50,10 +54,16 @@ jobs:
           ENC=$(printf '%s' "$PS" | iconv -t UTF-16LE | base64 -w0)
           mkdir -p data
           sshpass -p "$VPS_PASSWORD" ssh -o ConnectTimeout=25 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null \
-            "$VUSER@$HOST" "powershell -NoProfile -EncodedCommand $ENC" 2>&1 \
-            | grep -vE 'CLIXML|<Objs|^\s*$' > data/backtest_walkforward_rapor.md || echo "SSH HATA" >> data/backtest_walkforward_rapor.md
+            "$VUSER@$HOST" "powershell -NoProfile -EncodedCommand $ENC" 2>&1 > /tmp/edge_raw.txt || true
+          B64=$(grep -aoE 'REPORT_B64:[A-Za-z0-9+/=]*' /tmp/edge_raw.txt | head -1 | sed 's/^REPORT_B64://')
+          if [ -n "$B64" ]; then
+            printf '%s' "$B64" | base64 -d > data/backtest_walkforward_rapor.md
+          else
+            echo "RAPOR ALINAMADI — SSH/python ham cikti:" > data/backtest_walkforward_rapor.md
+            tail -20 /tmp/edge_raw.txt >> data/backtest_walkforward_rapor.md
+          fi
           echo "--- rapor onizleme ---"
-          head -25 data/backtest_walkforward_rapor.md
+          head -30 data/backtest_walkforward_rapor.md
       - name: commit
         run: |
           git config user.name "anka-edge-bot"; git config user.email "actions@github.com"
