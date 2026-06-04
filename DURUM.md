@@ -1,6 +1,6 @@
 # ğŸ¦… ANKA DURUM â€” Tek Kontrol Paneli
 
-_GÃ¼ncelleme: 2026-06-04 15:34:01 TR Â· run 26951971554_
+_GÃ¼ncelleme: 2026-06-04 19:03:18 TR Â· run 26963737350_
 
 ## âš¡ ANLIK (VPS'ten canlÄ±)
 ```
@@ -9,14 +9,14 @@ Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 ### Kod guncelleme
 Saved working directory and index state On main: auto-yedek
 
- DURUM.md                   | 10 +++++-----
- data/sabah_tarama_sonuc.md | 46 +++++++++++++++++++++-------------------------
- 2 files changed, 26 insertions(+), 30 deletions(-)
+Fast-forward
+ DURUM.md | 22 +++++++++++++++-------
+ 1 file changed, 15 insertions(+), 7 deletions(-)
 
-HEAD: 3f2615e
+HEAD: e5dbff5
 
 ### BIST bot
-CALISIYOR (PID 7504) MOD: CANLI
+CALISIYOR (PID 19772) MOD: CANLI
 
 ### MatriksIQ + TCP
 ACIK PID 12672
@@ -26,16 +26,18 @@ TCP 18890: ACIK
 Bugun emir YOK (toplam kayit: 200)
 
 ### Son 10 log
-[2026-06-04 15:00:36]   ƒ?O TTRAK VETOlandñ (hacim/kapanñY zayñf)
-[2026-06-04 15:00:36]   ƒ?O HALKB VETOlandñ (hacim/kapanñY zayñf)
-[2026-06-04 15:00:36]   ƒ?O ALBRK VETOlandñ (hacim/kapanñY zayñf)
-[2026-06-04 15:00:36]   ƒ?O EREGL VETOlandñ (hacim/kapanñY zayñf)
-[2026-06-04 15:00:36]   ƒ?O EKGYO VETOlandñ (hacim/kapanñY zayñf)
-[2026-06-04 15:00:36]   ƒ?O SASA VETOlandñ (hacim/kapanñY zayñf)
-[2026-06-04 15:00:36]   ƒ?O AEFES VETOlandñ (hacim/kapanñY zayñf)
-[2026-06-04 15:00:36]   dY'œ ISGYO Skor:50 ML:72% Fiyat:20.76
-[2026-06-04 15:00:36]   dY"? aktif_bombalar.txt ƒ+' ISGYO
-[2026-06-04 15:00:36] Bombalar: ISGYO
+[2026-06-04 15:46:12] dY" [08:30] SABAH BOMBA TARAMASI
+[2026-06-04 15:46:35]   53 hisse
+[2026-06-04 15:46:35]   Piyasa: SIDEWAYS ADX:48.6
+[2026-06-04 17:30:12] ==================================================
+[2026-06-04 17:30:12] dY?? [17:30] GAoN SONU SATIS ƒ?" Bot pozisyonlarñ kapatñlñyor
+[2026-06-04 17:30:12] Bot aAñk pozisyon yok ƒ?" kullanñcñnñn manuel pozisyonlarñna dokunmuyorum
+[2026-06-04 17:35:12] ==================================================
+[2026-06-04 17:35:12] dY"? [17:35] GAoN SONU RAPORU
+[2026-06-04 17:35:13] dY"S 04.06.2026 Raporu
+Piyasa: BEAR
+  ISGYO: 20.94 (+0.4%) Skor:50
+[2026-06-04 17:35:13] GA¬n sonu rapor hazñr
 <Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><TN RefId="0"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="1"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="2"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>```
 
 ## âœ… Ã‡ALIÅAN (kanÄ±tlÄ±)
