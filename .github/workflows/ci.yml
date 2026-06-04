@@ -28,16 +28,16 @@ jobs:
 
       - name: Derleme kontrolü (tüm .py)
         run: |
-          python -m compileall -q platform/ *.py || exit 1
+          python -m compileall -q anka_platform/ *.py || exit 1
           echo "✅ Tüm modüller derleniyor"
 
       - name: Platform modül testleri (bağımlılıksız)
         run: |
           export PYTHONUTF8=1 PYTHONPATH=.
-          python platform/auth.py
-          python platform/guvenlik.py
-          python platform/audit.py
-          python platform/durum_makinesi.py
+          python anka_platform/auth.py
+          python anka_platform/guvenlik.py
+          python anka_platform/audit.py
+          python anka_platform/durum_makinesi.py
           echo "✅ Platform modülleri çalışıyor"
 
       - name: Sızıntı taraması (parola/secret)
