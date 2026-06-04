@@ -1,6 +1,6 @@
 # 🦅 ANKA DURUM — Tek Kontrol Paneli
 
-_Güncelleme: 2026-06-04 12:03:12 TR · run 26941991184_
+_Güncelleme: 2026-06-04 12:47:44 TR · run 26944187260_
 
 ## ⚡ ANLIK (VPS'ten canlı)
 ```
@@ -9,11 +9,11 @@ Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 ### Kod guncelleme
 Saved working directory and index state On main: auto-yedek
 
- create mode 100644 platform/guvenlik.py
- create mode 100644 platform/raporlama.py
- create mode 100644 us_market.py
+Fast-forward
+ DURUM.md | 28 ++++++++++++++++++++++++----
+ 1 file changed, 24 insertions(+), 4 deletions(-)
 
-HEAD: e26cf90
+HEAD: 462279f
 
 ### BIST bot
 CALISIYOR (PID 7504) MOD: CANLI
@@ -26,7 +26,8 @@ TCP 18890: ACIK
 Bugun emir YOK (toplam kayit: 200)
 
 ### Son 10 log
-(log yok)
+[2026-06-04 12:15:27] dY", [12:15] STRATEJ�� GAoNCELLEME
+[2026-06-04 12:16:02]   �o. De�Yi�Yiklik yok
 <Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><TN RefId="0"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="1"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="2"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>```
 
 ## ✅ ÇALIŞAN (kanıtlı)
