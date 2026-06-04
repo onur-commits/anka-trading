@@ -1,6 +1,6 @@
 # 🦅 ANKA DURUM — Tek Kontrol Paneli
 
-_Güncelleme: 2026-06-04 14:37:27 TR · run 26949322069_
+_Güncelleme: 2026-06-04 14:57:48 TR · run 26950243284_
 
 ## ⚡ ANLIK (VPS'ten canlı)
 ```
@@ -9,11 +9,11 @@ Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 ### Kod guncelleme
 Saved working directory and index state On main: auto-yedek
 
-Fast-forward
- DURUM.md | 13 +++++++------
- 1 file changed, 7 insertions(+), 6 deletions(-)
+ rename {platform => anka_platform}/guvenlik.py (100%)
+ rename {platform => anka_platform}/raporlama.py (100%)
+ create mode 100644 data/sabah_tarama_sonuc.md
 
-HEAD: f17d52c
+HEAD: 576c559
 
 ### BIST bot
 CALISIYOR (PID 7504) MOD: CANLI
