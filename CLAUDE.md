@@ -7,6 +7,23 @@
   yeni oturumda once bunu oku, model 4.8 1M degilse kullaniciya soyle.
 - Baslatma: `/model` ile Opus 4.8 sec, 1M context aktif olsun.
 .
+## ⚡ KALICI YETKI KURALI (kullanici talebi — tekrar sorma)
+Kullanici "yap / hadi / başla / devam / ok" dediginde = TAM YETKI.
+Asagidakileri TEKRAR SORMADAN yap (her seferinde onay isteme):
+- Dev/paket branch'e commit + push, kod yaz/duzelt/test, ruff/derleme
+- main'e DOKUMAN/araç/workflow commit (trading mantigi DISI)
+- Workflow tetikleme, durum cekme, backtest, tarama (emirsiz)
+- PR ac/merge (rutin)
+SADECE su 3 sey icin TEK kisa onay yeter (her adimda degil, bir kez):
+  1) Canli main'e TRADING MANTIGI degisikligi (otonom_trader emir kurallari)
+  2) Canli emir TETIKLEME (flag/restart-to-buy) — HARD LIMIT, kullanici eli
+  3) Parola/secret/izin sistemi degisikligi
+NOT: Auto-mode classifier (Claude Code guvenlik katmani) 1-2-3'u yine de
+bloke edebilir; o ZAMAN kullanici NET cumleyle onaylar (örn "main'e push
+et canli bota gitsin, sorumluluk benim"). Vague "yap" classifier'i gecmez.
+Bu kural: rutin iste sıfır friction, sadece geri-donulmez canli-para
+isinde tek net onay.
+.
 ## ⚡ Oturum Baslangic Notu (kullanici talebi)
 - Bypass mode tercih ediliyor. Onay kutulariyla bogulmamak icin
   Claude Code'u baslatirken `claude --permission-mode bypassPermissions`
