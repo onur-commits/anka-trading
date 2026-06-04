@@ -1,0 +1,50 @@
+name: CI (lint + test + güvenlik)
+
+# Gün 10 — gerçek CI pipeline. paket + main branch'inde çalışır.
+# lint (ruff), derleme, platform modül testleri, secret tarama.
+
+on:
+  push:
+    branches: [main, paket]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+jobs:
+  kalite:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+
+      - name: Bağımlılıklar (lint)
+        run: pip install -q ruff
+
+      - name: Ruff lint (mantık hataları)
+        run: ruff check . || true   # rapor et, build'i kırma (kademeli)
+
+      - name: Derleme kontrolü (tüm .py)
+        run: |
+          python -m compileall -q platform/ *.py || exit 1
+          echo "✅ Tüm modüller derleniyor"
+
+      - name: Platform modül testleri (bağımlılıksız)
+        run: |
+          export PYTHONUTF8=1 PYTHONPATH=.
+          python platform/auth.py
+          python platform/guvenlik.py
+          python platform/audit.py
+          python platform/durum_makinesi.py
+          echo "✅ Platform modülleri çalışıyor"
+
+      - name: Sızıntı taraması (parola/secret)
+        run: |
+          # Düz metin parola / API key kalmış mı?
+          if grep -rnE "AYiMn5ZkX|BINANCE_API_SECRET\s*=\s*[A-Za-z0-9]{20}" \
+             --include="*.py" --include="*.md" --include="*.bat" . ; then
+            echo "::error::Olası sızıntı bulundu!"; exit 1
+          fi
+          echo "✅ Sızıntı yok"
