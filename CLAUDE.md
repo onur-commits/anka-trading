@@ -240,7 +240,8 @@ Cowork (onur@miknatis.net) tarafindan baslatildi. Claude Code bir sonraki oturum
 
 ### Paper baslatma prosedurleri (BIR SONRAKI CLAUDE CODE OKUSUN)
 Ayni adimlari tekrar calistirmak gerekirse:
-1. SSH: `sshpass -p '*AYiMn5ZkX' ssh Administrator@78.135.87.29` (Mac'ten)
+1. SSH: `sshpass -p "$VPS_PAROLA" ssh Administrator@78.135.87.29` (Mac'ten)
+   — parola: GitHub Secret `VPS_PASSWORD` veya `.env` (repoya YAZILMAZ; sizinti taramasi engeller)
 2. VPS'te: `cd C:\ANKA && git pull`
 3. Canli bot durdur: `Get-CimInstance Win32_Process | Where CommandLine -like '*coin_otonom_trader*' | ForEach {Stop-Process -Id $_.ProcessId -Force}`
 4. Scheduler disable: `schtasks /Change /TN ANKA_Coin_Trader /DISABLE`
