@@ -1,5 +1,15 @@
 # ANKA Trading System - Claude Code Rehberi 
 .
+## ⏰ KALICI: SAAT REFERANSI = TÜRKİYE (kullanici talebi, degismez)
+- **TÜM ortamlar Türkiye saati (Europe/Istanbul, UTC+3) referans alir.**
+- Claude saat soyleyecekse DAIMA TR'ye cevirip soyler. UTC ham hali YAZMA.
+  Komut: `TZ=Europe/Istanbul date '+%H:%M'`
+- Workflow/script'lerde zaman: her zaman `TZ=Europe/Istanbul`.
+- VPS (Windows) Turkiye saatinde olmali; degilse `w32tm /resync`.
+- Borsa saatleri TR: acilis 10:00, gun sonu sat 17:30, kapanis 18:00.
+  Bot alim 09:05, ML egitim 05:30, tarama 08:30 — hepsi TR.
+- UTC↔TR: UTC + 3 saat = TR. (cron UTC yazilir: TR 09:00 = UTC 06:00)
+.
 ## 🧠 KALICI AYAR — MODEL (kullanici talebi, degismez)
 - **VARSAYILAN MODEL: Opus 4.8 — 1M context** (`claude-opus-4-8[1m]`).
 - Her oturum bununla baslat. Daha kucuk modele DUSME.
