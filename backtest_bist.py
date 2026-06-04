@@ -19,7 +19,7 @@ sys.path.insert(0, str(ROOT))
 
 MAX_POZ = 3
 GUN = 252
-KOMISYON = 0.002
+KOMISYON = 0.001  # ALIM+SATIM TOPLAM binde 1 (kullanici, 2026-06-04)
 STOP_LOSS = -3.0
 KARA_LISTE = {"SASA.IS", "VESTL.IS", "GUBRF.IS", "EGEEN.IS", "ENKAI.IS"}
 ESIK_GRID = [15, 20, 25, 30, 35, 40]
