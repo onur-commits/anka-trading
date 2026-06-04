@@ -40,7 +40,7 @@ jobs:
           Set-Location C:\ANKA; \$env:PYTHONUTF8='1'
           git fetch origin $BRANCH 2>&1 | Out-Null
           git checkout origin/$BRANCH -- backtest_walkforward.py 2>&1 | Out-Null
-          python -X utf8 backtest_walkforward.py 2>&1 | Out-Null
+          python -X utf8 backtest_walkforward.py --karsilastir 2>&1 | Out-Null
           # Raporu base64 ile dondur: CLIXML/Turkce/emoji bozmasin (tek satir, ASCII-safe)
           if (Test-Path data\backtest_walkforward_rapor.md) {
             \$b = [Convert]::ToBase64String([IO.File]::ReadAllBytes("data\backtest_walkforward_rapor.md"))
