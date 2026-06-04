@@ -1,13 +1,33 @@
 # 🦅 ANKA DURUM — Tek Kontrol Paneli
 
-_Güncelleme: 2026-06-04 10:48:45 TR · run 26938364707_
+_Güncelleme: 2026-06-04 12:03:12 TR · run 26941991184_
 
 ## ⚡ ANLIK (VPS'ten canlı)
 ```
 Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
-Permission denied, please try again.
-SSH HATA — VPS/parola kontrol
-```
+#< CLIXML
+### Kod guncelleme
+Saved working directory and index state On main: auto-yedek
+
+ create mode 100644 platform/guvenlik.py
+ create mode 100644 platform/raporlama.py
+ create mode 100644 us_market.py
+
+HEAD: e26cf90
+
+### BIST bot
+CALISIYOR (PID 7504) MOD: CANLI
+
+### MatriksIQ + TCP
+ACIK PID 12672
+TCP 18890: ACIK
+
+### Bugun emir verildi mi?
+Bugun emir YOK (toplam kayit: 200)
+
+### Son 10 log
+(log yok)
+<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><TN RefId="0"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="1"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="2"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>```
 
 ## ✅ ÇALIŞAN (kanıtlı)
 - BIST otonom_trader CANLI (PID değişebilir) — `start_otonom.bat` ile başlar
