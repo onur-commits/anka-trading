@@ -1,0 +1,61 @@
+name: ANKA EDGE (walk-forward backtest)
+
+# VPS'te DURUST walk-forward backtest calistirir, raporu repoya geri getirir.
+# main DOKUNULMAZ: dosya feature branch'ten tek-dosya checkout edilir, is
+# bitince VPS'te temizlenir. HARD LIMIT: emir YOK, sadece veri cekme + ML egitim
+# + rapor (read-only trading acisindan).
+#
+# Tetik: SADECE manuel (agirdir, her fold xgb+lgbm yeniden egitilir).
+
+on:
+  workflow_dispatch:
+    inputs:
+      branch:
+        description: "backtest_walkforward.py'nin oldugu branch"
+        default: "claude/check-binance-integration-CNT9j"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  edge:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.inputs.branch }}
+      - run: sudo apt-get install -y sshpass
+      - name: VPS walk-forward backtest
+        env:
+          VPS_PASSWORD: ${{ secrets.VPS_PASSWORD }}
+          BRANCH: ${{ github.event.inputs.branch }}
+        run: |
+          set -uo pipefail
+          HOST="78.135.87.29"; VUSER="Administrator"
+          [ -z "${VPS_PASSWORD:-}" ] && { echo "::error::VPS_PASSWORD yok"; exit 1; }
+          PS=$(cat <<PSEOF
+          \$ErrorActionPreference='SilentlyContinue'
+          Set-Location C:\ANKA; \$env:PYTHONUTF8='1'
+          git fetch origin $BRANCH 2>&1 | Out-Null
+          git checkout origin/$BRANCH -- backtest_walkforward.py 2>&1 | Out-Null
+          python -X utf8 backtest_walkforward.py 2>&1 | Out-Null
+          if (Test-Path data\backtest_walkforward_rapor.md) { Get-Content data\backtest_walkforward_rapor.md -Raw } else { Write-Output 'RAPOR URETILEMEDI' }
+          git reset -q backtest_walkforward.py 2>&1 | Out-Null
+          git checkout -- backtest_walkforward.py 2>&1 | Out-Null
+          Remove-Item backtest_walkforward.py -ErrorAction SilentlyContinue
+          PSEOF
+          )
+          ENC=$(printf '%s' "$PS" | iconv -t UTF-16LE | base64 -w0)
+          mkdir -p data
+          sshpass -p "$VPS_PASSWORD" ssh -o ConnectTimeout=25 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null \
+            "$VUSER@$HOST" "powershell -NoProfile -EncodedCommand $ENC" 2>&1 \
+            | grep -vE 'CLIXML|<Objs|^\s*$' > data/backtest_walkforward_rapor.md || echo "SSH HATA" >> data/backtest_walkforward_rapor.md
+          echo "--- rapor onizleme ---"
+          head -25 data/backtest_walkforward_rapor.md
+      - name: commit
+        run: |
+          git config user.name "anka-edge-bot"; git config user.email "actions@github.com"
+          git add data/backtest_walkforward_rapor.md
+          git diff --staged --quiet || { git commit -m "📊 walk-forward OOS edge raporu ($(TZ=Europe/Istanbul date '+%H:%M TR'))"; git push origin HEAD:${{ github.event.inputs.branch }}; }
