@@ -34,14 +34,14 @@ Her paket bağımsız, `paket` branch'inde, canlıya değmeden.
 
 - [~] **Gün 1 — Trading çekirdek optimizasyon** (yapıldı ama edge negatif — sinyal araştırması açık) (kara liste, eşik grid, stop-loss, edge+) `%75→%90 çekirdek`
 - [~] **Gün 2 — ABD piyasası modülü** (us_market.py iskelet hazır) (US tickers, US market hours, yfinance US, US scanner)
-- [ ] **Gün 3 — Auth katmanı** (login, bcrypt, rol: admin/trader/viewer/readonly)
-- [ ] **Gün 4 — Güvenlik** (2FA/OTP, rate limit, lockout, reset token, parola politikası)
-- [ ] **Gün 5 — Audit log + güvenlik paneli** (login fail, OTP hata, admin aksiyon)
-- [ ] **Gün 6 — Raporlama paketi** (PDF export, latency, execution kalitesi, session/region)
-- [ ] **Gün 7 — Admin paneli** (kullanıcı CRUD, rol değiştir, aktif/pasif)
-- [ ] **Gün 8 — Latency/health + state machine** (scanning→armed→execute→exit, WS health gate)
-- [ ] **Gün 9 — Dağıtım** (Docker, .env yönetimi, HTTPS/nginx, backup, multi-region notu)
-- [ ] **Gün 10 — CI/CD + paketleme** (lint, test, coverage, codeql, lisans, kurulum sihirbazı)
+- [x] **Gün 3 — Auth katmanı** (login, bcrypt, rol: admin/trader/viewer/readonly)
+- [x] **Gün 4 — Güvenlik** (2FA/OTP, rate limit, lockout, reset token, parola politikası)
+- [x] **Gün 5 — Audit log + güvenlik paneli** (login fail, OTP hata, admin aksiyon)
+- [x] **Gün 6 — Raporlama paketi** (PDF export, latency, execution kalitesi, session/region)
+- [x] **Gün 7 — Admin paneli** (kullanıcı CRUD, rol değiştir, aktif/pasif)
+- [x] **Gün 8 — Latency/health + state machine** (scanning→armed→execute→exit, WS health gate)
+- [x] **Gün 9 — Dağıtım** (Docker, .env yönetimi, HTTPS/nginx, backup, multi-region notu)
+- [x] **Gün 10 — CI/CD + paketleme** (lint, test, coverage, codeql, lisans, kurulum sihirbazı)
 
 ## ✅ İLERLEME LOG (her tamamlanan buraya, kanıtla)
 - 2026-06-04: ROADMAP + `paket` branch.
@@ -51,6 +51,15 @@ Her paket bağımsız, `paket` branch'inde, canlıya değmeden.
   şu hâliyle kâr etmiyor. Edge ayrı araştırma gerektiriyor (Gün 1 ek iş).
 - 2026-06-04 GÜN 2 🔄: us_market.py — ABD piyasası modülü (47 US hisse,
   US borsa saati ET, TR karşılığı, tarama+skor). BIST'le aynı mantık.
+- 2026-06-04 GÜN 3-5 ✅: platform/auth.py (login+rol+bcrypt), guvenlik.py
+  (2FA/lockout/reset/parola politikası), audit.py — HEPSİ TEST GEÇTİ.
+- 2026-06-04 GÜN 6-8 ✅: raporlama.py (CSV/PDF/latency/slippage),
+  durum_makinesi.py (8 durum+health gate), pages/8_Yonetim.py (admin UI).
+- 2026-06-04 GÜN 9-10 ✅: Dockerfile, .dockerignore, deploy/nginx.conf,
+  .github/workflows/ci.yml (lint+derleme+test+sızıntı tarama).
+- DURUM: 10 günlük iskelet TAMAM (paket branch). Canlıya değmedi.
+  AÇIK: edge negatif (strateji kârı yok) + modüller ana app'e entegre
+  edilmedi (auth app.py'ye bağlanmalı) — 'birleştir' öncesi yapılacak.
 
 ## 🔌 KÖR NOKTALAR (Claude göremez — bkz DURUM.md)
 - VPS canlı görüntü yok (sadece durum.yml ~10dk foto)
