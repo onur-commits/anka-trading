@@ -1,6 +1,6 @@
 # ü¶Ö ANKA DURUM ‚Äî Tek Kontrol Paneli
 
-_G√ºncelleme: 2026-06-04 23:51:56 TR ¬∑ run 26978839722_
+_G√ºncelleme: 2026-06-04 23:54:00 TR ¬∑ run 26978952486_
 
 ## ‚ö° ANLIK (VPS'ten canlƒ±)
 ```
@@ -10,13 +10,13 @@ Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 Saved working directory and index state On main: auto-yedek
 
 Fast-forward
- DURUM.md | 9 ++++-----
- 1 file changed, 4 insertions(+), 5 deletions(-)
+ DURUM.md | 8 +++++---
+ 1 file changed, 5 insertions(+), 3 deletions(-)
 
-HEAD: 24fc156
+HEAD: afc1ebc
 
 ### BIST bot
-CALISIYOR (PID 19772) MOD: CANLI
+CALISIYOR (PID 1260) MOD: CANLI
 
 ### MatriksIQ + TCP
 ACIK PID 12672
@@ -26,18 +26,16 @@ TCP 18890: ACIK
 Bugun emir YOK (toplam kayit: 200)
 
 ### Son 10 log
-[2026-06-04 15:46:12] dY"ù [08:30] SABAH BOMBA TARAMASI
-[2026-06-04 15:46:35]   53 hisse
-[2026-06-04 15:46:35]   Piyasa: SIDEWAYS ADX:48.6
-[2026-06-04 17:30:12] ==================================================
-[2026-06-04 17:30:12] dY?? [17:30] GAoN SONU SATIS É?" Bot pozisyonlaréÒ kapatéÒléÒyor
-[2026-06-04 17:30:12] Bot aAéÒk pozisyon yok É?" kullanéÒcéÒnéÒn manuel pozisyonlaréÒna dokunmuyorum
-[2026-06-04 17:35:12] ==================================================
-[2026-06-04 17:35:12] dY"? [17:35] GAoN SONU RAPORU
-[2026-06-04 17:35:13] dY"S 04.06.2026 Raporu
-Piyasa: BEAR
-  ISGYO: 20.94 (+0.4%) Skor:50
-[2026-06-04 17:35:13] GA¨n sonu rapor hazéÒr
+[2026-06-04 23:52:42]   08:30 É+' Bomba tarama + IQ kod A¨retimi
+[2026-06-04 23:52:42]   08:50 É+' IQ bildirim (kodlar hazéÒr)
+[2026-06-04 23:52:42]   09:35 É+' AAéÒléÒèY gap kontrolA¨
+[2026-06-04 23:52:42]   10:00 É+' é¯lk yaréÒm saat raporu
+[2026-06-04 23:52:42]   12:00 É+' A-éYlen hacim kontrolA¨
+[2026-06-04 23:52:42]   12:15 É+' Strateji gA¨ncelleme
+[2026-06-04 23:52:43]   15:00 É+' é¯kindi risk kontrolA¨
+[2026-06-04 23:52:43]   17:35 É+' GA¨n sonu rapor
+[2026-06-04 23:52:43] 
+[2026-06-04 23:52:43] Otonom Trader baèYladéÒ!
 <Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><TN RefId="0"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="1"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="2"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>```
 
 
