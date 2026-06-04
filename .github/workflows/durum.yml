@@ -71,6 +71,8 @@ jobs:
             sshpass -p "$VPS_PASSWORD" ssh -o ConnectTimeout=20 -o StrictHostKeyChecking=accept-new -o UserKnownHostsFile=/dev/null \
               "$VUSER@$HOST" "powershell -NoProfile -EncodedCommand $ENC" 2>&1 || echo "SSH HATA — VPS/parola kontrol"
             echo '```'
+            echo ""
+            if [ -f data/sabah_izleme.md ]; then cat data/sabah_izleme.md; echo ""; fi
             cat data/durum_statik.md
           } > DURUM.md
       - name: commit
