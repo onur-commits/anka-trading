@@ -49,6 +49,13 @@ Her paket bağımsız, `paket` branch'inde, canlıya değmeden.
   edge HÂLÂ NEGATİF (en iyi eşik=40 → -%5.9/yıl, kazanç %43). Parametre
   ayarı çözmedi — çekirdek sinyal (ML AUC 0.57) zayıf. DÜRÜST: strateji
   şu hâliyle kâr etmiyor. Edge ayrı araştırma gerektiriyor (Gün 1 ek iş).
+- 2026-06-04 GÜN 1+ ✅ (walk-forward DÜRÜST OOS): `backtest_walkforward.py`
+  yazıldı (expanding window + embargo, look-ahead YOK) + `edge.yml` (VPS köprü).
+  backtest_bist.py'nin +%19.6 sonucu IN-SAMPLE şişmesiydi. GERÇEK OOS (VPS):
+  **AUC 0.567, trade başına net +%0.446** (komisyon sonrası POZİTİF), benchmark
+  XU100 B&H +%161 (nominal TRY). YORUM: sinyalin trade-bazlı edge'i GERÇEK ama
+  zayıf; strateji nakitte çok durduğu için enflasyon-beta'sını kaçırıp B&H'ı
+  toplam getiride geçemiyor. Yön: feature mühendisliği (kesitsel/rejim) AUC↑.
 - 2026-06-04 GÜN 2 🔄: us_market.py — ABD piyasası modülü (47 US hisse,
   US borsa saati ET, TR karşılığı, tarama+skor). BIST'le aynı mantık.
 - 2026-06-04 GÜN 3-5 ✅: platform/auth.py (login+rol+bcrypt), guvenlik.py

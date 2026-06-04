@@ -47,8 +47,29 @@ MIN_TRAIN_GUN = 252    # ilk fold icin minimum egitim gunu (~1 yil)
 MIN_TRAIN = 300        # ek guvenlik: minimum egitim ornegi
 
 
+CACHE_YOL = ROOT / "data" / "bist_gunluk_cache.pkl"
+CACHE_SAAT = 20  # cache bu kadar saatten taze ise yfinance'e gitme
+
+
 def veri_yukle_yfinance(yil=5):
-    """VPS: BIST50 + endeks N yillik gunluk veri."""
+    """
+    VPS: BIST50 + endeks N yillik gunluk veri.
+    yfinance RATE-LIMIT'e karsi cache: basarili indirme pickle'lanir, <20h ise
+    tekrar indirilmez (ardisik backtest kosulari Yahoo'yu yormaz).
+    """
+    import time
+    if CACHE_YOL.exists():
+        yas_saat = (time.time() - CACHE_YOL.stat().st_mtime) / 3600
+        if yas_saat < CACHE_SAAT:
+            try:
+                import pickle
+                with open(CACHE_YOL, "rb") as f:
+                    d = pickle.load(f)
+                print(f"  cache kullanildi ({yas_saat:.1f}h taze): {len(d['veri'])} hisse")
+                return d["veri"], d.get("xu")
+            except Exception:
+                pass
+
     import yfinance as yf
     veri, basari = {}, 0
     for s in BIST50:
@@ -68,6 +89,14 @@ def veri_yukle_yfinance(yil=5):
             xu.columns = xu.columns.get_level_values(0)
     except Exception:
         xu = None
+    # Basarili indirme cache'lenir (rate-limit'e karsi)
+    if basari >= 10:
+        try:
+            import pickle
+            with open(CACHE_YOL, "wb") as f:
+                pickle.dump({"veri": veri, "xu": xu}, f)
+        except Exception:
+            pass
     return veri, xu
 
 

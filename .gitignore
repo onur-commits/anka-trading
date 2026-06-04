@@ -31,3 +31,4 @@ islem_gecmisi.json
 # VS Code kullanici-spesifik
 .vscode/launch.json
 .vscode/tasks.json
+data/bist_gunluk_cache.pkl
