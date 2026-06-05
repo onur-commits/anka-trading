@@ -1,6 +1,6 @@
 # 🦅 ANKA DURUM — Tek Kontrol Paneli
 
-_Güncelleme: 2026-06-04 23:54:00 TR · run 26978952486_
+_Güncelleme: 2026-06-05 12:36:46 TR · run 27007369439_
 
 ## ⚡ ANLIK (VPS'ten canlı)
 ```
@@ -9,14 +9,14 @@ Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 ### Kod guncelleme
 Saved working directory and index state On main: auto-yedek
 
-Fast-forward
- DURUM.md | 8 +++++---
- 1 file changed, 5 insertions(+), 3 deletions(-)
+ 6 files changed, 582 insertions(+), 23 deletions(-)
+ create mode 100644 .github/workflows/edge.yml
+ create mode 100644 backtest_walkforward.py
 
-HEAD: afc1ebc
+HEAD: 6fc027f
 
 ### BIST bot
-CALISIYOR (PID 1260) MOD: CANLI
+CALISMIYOR
 
 ### MatriksIQ + TCP
 ACIK PID 12672
