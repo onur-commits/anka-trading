@@ -1,6 +1,6 @@
 # 🦅 ANKA DURUM — Tek Kontrol Paneli
 
-_Güncelleme: 2026-06-05 18:33:36 TR · run 27024229062_
+_Güncelleme: 2026-06-05 20:30:16 TR · run 27030001315_
 
 ## ⚡ ANLIK (VPS'ten canlı)
 ```
@@ -10,10 +10,10 @@ Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 Saved working directory and index state On main: auto-yedek
 
 Fast-forward
- DURUM.md | 68 ++++++++++++++++++++++++++++++++++++++++++++++++++--------------
- 1 file changed, 53 insertions(+), 15 deletions(-)
+ DURUM.md | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-HEAD: 04cf821
+HEAD: 011288d
 
 ### BIST bot
 CALISMIYOR
