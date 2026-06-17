@@ -1,6 +1,6 @@
 # ğŸ¦… ANKA DURUM â€” Tek Kontrol Paneli
 
-_GÃ¼ncelleme: 2026-06-17 13:44:32 TR Â· run 27683340589_
+_GÃ¼ncelleme: 2026-06-17 17:19:23 TR Â· run 27695769987_
 
 ## âš¡ ANLIK (VPS'ten canlÄ±)
 ```
@@ -9,11 +9,11 @@ Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 ### Kod guncelleme
 Saved working directory and index state On main: auto-yedek
 
-Fast-forward
- DURUM.md | 60 ++++++++++++++++++++++++++++++------------------------------
- 1 file changed, 30 insertions(+), 30 deletions(-)
+ DURUM.md             | 10 +++++-----
+ data/sabah_izleme.md | 28 +++++++++++++---------------
+ 2 files changed, 18 insertions(+), 20 deletions(-)
 
-HEAD: 2cd8f38
+HEAD: 1ced625
 
 ### BIST bot
 CALISMIYOR
@@ -26,37 +26,35 @@ TCP 18890: ACIK
 Bugun emir YOK (toplam kayit: 200)
 
 ### Son 10 log
-[2026-06-16 14:32:44]   ƒ?O EREGL VETOlandñ (hacim/kapanñY zayñf)
-[2026-06-16 14:32:44]   ƒ?O EGEEN VETOlandñ (hacim/kapanñY zayñf)
-[2026-06-16 14:32:44]   ƒ?O ODAS VETOlandñ (hacim/kapanñY zayñf)
-[2026-06-16 14:32:44]   ƒ?O MPARK VETOlandñ (hacim/kapanñY zayñf)
-[2026-06-16 14:32:45]   dY'œ NETAS Skor:58 ML:69% Fiyat:70.80
-[2026-06-16 14:32:45]   dY'œ HEKTS Skor:53 ML:54% Fiyat:4.01
-[2026-06-16 14:32:45]   dY'œ ISGYO Skor:50 ML:71% Fiyat:20.70
-[2026-06-16 14:32:45]   dY"? aktif_bombalar.txt ƒ+' NETAS,HEKTS,ISGYO
-[2026-06-16 14:32:45]   dY"? gunluk_bomba.json yazñldñ (3 bomba)
-[2026-06-16 14:32:45] Bombalar: NETAS, HEKTS, ISGYO
+[2026-06-17 14:18:01]   ƒ?O AKSEN VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-17 14:18:02]   ƒ?O ENJSA VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-17 14:18:02]   ƒ?O ASELS VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-17 14:18:02]   ƒ?O LOGO VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-17 14:18:02]   ƒ?O EKGYO VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-17 14:18:02]   ƒ?O PETKM VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-17 14:18:02]   dY'œ AYEN Skor:55 ML:78% Fiyat:45.24
+[2026-06-17 14:18:02]   dY"? aktif_bombalar.txt ƒ+' AYEN
+[2026-06-17 14:18:02]   dY"? gunluk_bomba.json yazñldñ (1 bomba)
+[2026-06-17 14:18:02] Bombalar: AYEN
 <Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><TN RefId="0"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="1"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="2"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>```
 
 ## ğŸŒ… Sabah Ä°zleme (09:10 TR, EMIRSIZ)
 
-_2026-06-16 14:31:43 TR Â· run 27614435437_
+_2026-06-17 14:16:51 TR Â· run 27685033516_
 
 ```
 Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
 #< CLIXML
 ### 1) 08:30 Tarama (gunluk_bomba.json)
 Tarama bugun calismamis -> gorev_08_30_tarama() (EMIRSIZ) calistiriliyor...
-[2026-06-16 14:32:45] [INFO]   ğŸ’£ ISGYO Skor:50 ML:71% Fiyat:20.70
-[2026-06-16 14:32:45] [INFO]   ğŸ“ aktif_bombalar.txt â†’ NETAS,HEKTS,ISGYO
-[2026-06-16 14:32:45] [INFO]   ğŸ“ gunluk_bomba.json yazÄ±ldÄ± (3 bomba)
-[2026-06-16 14:32:45] [BILDIRIM] Bombalar: NETAS, HEKTS, ISGYO
+[2026-06-17 14:18:02] [INFO]   ğŸ’£ AYEN Skor:55 ML:78% Fiyat:45.24
+[2026-06-17 14:18:02] [INFO]   ğŸ“ aktif_bombalar.txt â†’ AYEN
+[2026-06-17 14:18:02] [INFO]   ğŸ“ gunluk_bomba.json yazÄ±ldÄ± (1 bomba)
+[2026-06-17 14:18:02] [BILDIRIM] Bombalar: AYEN
 TARAMA_OK
 
-Tarih: 2026-06-16 | Aday sayisi: 3
-  NETAS  skor 58
-  HEKTS  skor 53
-  ISGYO  skor 50
+Tarih: 2026-06-17 | Aday sayisi: 1
+  AYEN  skor 55
 
 ### 2) Config dogrulama (esik + kara liste)
 ESIK (MIN_BOMBA_SKOR_ALIS): 15 -> OK (15)
@@ -69,12 +67,12 @@ Bugun EMIR YOK (esik 15 ustu kara-liste-disi aday cikmadi veya piyasa kapali)
 
 ### 4) Bot durumu + son log
 BIST bot: CALISMIYOR
-[2026-06-16 14:32:45]   dY'œ NETAS Skor:58 ML:69% Fiyat:70.80
-[2026-06-16 14:32:45]   dY'œ HEKTS Skor:53 ML:54% Fiyat:4.01
-[2026-06-16 14:32:45]   dY'œ ISGYO Skor:50 ML:71% Fiyat:20.70
-[2026-06-16 14:32:45]   dY"? aktif_bombalar.txt ƒ+' NETAS,HEKTS,ISGYO
-[2026-06-16 14:32:45]   dY"? gunluk_bomba.json yazñldñ (3 bomba)
-[2026-06-16 14:32:45] Bombalar: NETAS, HEKTS, ISGYO
+[2026-06-17 14:18:02]   ƒ?O EKGYO VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-17 14:18:02]   ƒ?O PETKM VETOlandñ (hacim/kapanñY zayñf)
+[2026-06-17 14:18:02]   dY'œ AYEN Skor:55 ML:78% Fiyat:45.24
+[2026-06-17 14:18:02]   dY"? aktif_bombalar.txt ƒ+' AYEN
+[2026-06-17 14:18:02]   dY"? gunluk_bomba.json yazñldñ (1 bomba)
+[2026-06-17 14:18:02] Bombalar: AYEN
 <Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><TN RefId="0"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="1"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="2"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>```
 
 
