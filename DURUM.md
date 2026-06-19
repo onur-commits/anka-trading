@@ -1,42 +1,12 @@
 # ðŸ¦… ANKA DURUM â€” Tek Kontrol Paneli
 
-_GÃ¼ncelleme: 2026-06-18 19:47:07 TR Â· run 27775109022_
+_GÃ¼ncelleme: 2026-06-19 13:17:36 TR Â· run 27819809178_
 
 ## âš¡ ANLIK (VPS'ten canlÄ±)
 ```
-Warning: Permanently added '78.135.87.29' (ED25519) to the list of known hosts.
-#< CLIXML
-### Kod guncelleme
-Saved working directory and index state On main: auto-yedek
-
-Fast-forward
- DURUM.md | 58 ++++++++++++++++++++++++++++++----------------------------
- 1 file changed, 30 insertions(+), 28 deletions(-)
-
-HEAD: 0d4236d
-
-### BIST bot
-CALISMIYOR
-
-### MatriksIQ + TCP
-ACIK PID 8176
-TCP 18890: ACIK
-
-### Bugun emir verildi mi?
-Bugun emir YOK (toplam kayit: 200)
-
-### Son 10 log
-[2026-06-18 13:46:44]   ƒ?O EREGL VETOlandŽñ (hacim/kapanŽñY zayŽñf)
-[2026-06-18 13:46:44]   ƒ?O TOASO VETOlandŽñ (hacim/kapanŽñY zayŽñf)
-[2026-06-18 13:46:44]   ƒ?O BRISA VETOlandŽñ (hacim/kapanŽñY zayŽñf)
-[2026-06-18 13:46:44]   ƒ?O EKGYO VETOlandŽñ (hacim/kapanŽñY zayŽñf)
-[2026-06-18 13:46:44]   dY'œ GESAN Skor:65 ML:71% Fiyat:71.65
-[2026-06-18 13:46:44]   dY'œ ODAS Skor:53 ML:63% Fiyat:8.85
-[2026-06-18 13:46:44]   dY'œ NETAS Skor:53 ML:62% Fiyat:70.65
-[2026-06-18 13:46:44]   dY"? aktif_bombalar.txt ƒ+' GESAN,ODAS,NETAS
-[2026-06-18 13:46:44]   dY"? gunluk_bomba.json yazŽñldŽñ (3 bomba)
-[2026-06-18 13:46:44] Bombalar: GESAN, ODAS, NETAS
-<Objs Version="1.1.0.1" xmlns="http://schemas.microsoft.com/powershell/2004/04"><Obj S="progress" RefId="0"><TN RefId="0"><T>System.Management.Automation.PSCustomObject</T><T>System.Object</T></TN><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="1"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj><Obj S="progress" RefId="2"><TNRef RefId="0" /><MS><I64 N="SourceId">1</I64><PR N="Record"><AV>Preparing modules for first use.</AV><AI>0</AI><Nil /><PI>-1</PI><PC>-1</PC><T>Completed</T><SR>-1</SR><SD> </SD></PR></MS></Obj></Objs>```
+ssh: connect to host 78.135.87.29 port 22: Connection timed out
+SSH HATA â€” VPS/parola kontrol
+```
 
 ## ðŸŒ… Sabah Ä°zleme (09:10 TR, EMIRSIZ)
 
