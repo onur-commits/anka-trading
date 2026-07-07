@@ -1,6 +1,6 @@
 # 🦅 ANKA DURUM — Tek Kontrol Paneli
 
-_Güncelleme: 2026-07-07 15:15:59 TR · run 28865378777_
+_Güncelleme: 2026-07-07 18:17:48 TR · run 28877448459_
 
 ## ⚡ ANLIK (VPS'ten canlı)
 ```
