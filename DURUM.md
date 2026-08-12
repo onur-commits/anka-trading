@@ -1,6 +1,6 @@
 # 🦅 ANKA DURUM — Tek Kontrol Paneli
 
-_Güncelleme: 2026-08-12 10:14:18 TR · run 31573134809_
+_Güncelleme: 2026-08-12 11:40:31 TR · run 31579389375_
 
 ## ⚡ ANLIK (VPS'ten canlı)
 ```
@@ -10,7 +10,7 @@ SSH HATA — VPS/parola kontrol
 
 ## 🌅 Sabah İzleme (09:10 TR, EMIRSIZ)
 
-_2026-08-11 10:24:03 TR · run 31468782798_
+_2026-08-12 10:46:58 TR · run 31575418005_
 
 ```
 ssh: connect to host 78.135.87.29 port 22: Connection refused
